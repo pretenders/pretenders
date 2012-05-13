@@ -5,6 +5,12 @@ The fakers project creates flexible fakes for external network services.
 These external services can be faked by setting pre-canned answers,
 defining expectations, or just querying them after test execution.
 
+Fakers will be written in Python3:
+
+ * Because it is about time
+ * Because since these will be standalone servers, compatibility is not such
+   an issue
+
 fakers.http - HTTP server
 -------------------------
 
@@ -18,6 +24,8 @@ The pre-programming step may be done by using specific proprietary HTTP
 headers, or by using an alternative HTTP port to the one used for mocking.
 
 Implementation is based on http.server.HTTPServer
+
+A client library will be provided to simplify interacting with the server.
 
 fakers.smtp - SMTP server
 -------------------------
