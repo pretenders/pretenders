@@ -76,7 +76,7 @@ class Client(object):
         self.full_config_host = "{0}:{1}".format(self.host,
                                                  self.configuration_port)
         self.preset = PresetClient(self.full_config_host, '/preset')
-        self.record = SubClient(self.full_config_host, '/record')
+        self.history = SubClient(self.full_config_host, '/history')
 
 
 if __name__ == '__main__':
@@ -86,3 +86,4 @@ if __name__ == '__main__':
                  response_status=200,
                  response_body='You tested fred well')
     c.preset.reset()
+    print(c.history.list().read())
