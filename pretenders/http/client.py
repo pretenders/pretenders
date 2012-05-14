@@ -32,8 +32,9 @@ class Preset(object):
 
 
 class SubClient(object):
-    def __init__(self, base_url):
+    def __init__(self, base_url, url):
         self.base_url = base_url
+        self.url = url
         self.full_url = '{0}{1}'.format(base_url, self.url)
 
         self.conn = http.client.HTTPConnection(base_url)
@@ -47,29 +48,23 @@ class SubClient(object):
                           method="GET")
         return self.conn.getresponse()
 
+    def reset(self):
+        self.conn.request(url=self.full_url, method="DELETE")
+        return self.conn.getresponse()
+
+    def get(self, unique_id):
+        self.conn.request(url='{0}/{1}'.format(self.full_url, unique_id),
+                          method="GET")
+        return self.conn.getresponse()
+
 
 class PresetClient(SubClient):
-    url = '/preset'
 
     def add(self, *args, **kwargs):
         p = Preset(*args, **kwargs)
         self.conn.request(url=self.full_url,
                           method="POST",
                           body=p.serialize())
-        return self.conn.getresponse()
-
-    def reset(self):
-        self.conn.request(url=self.full_url, method="DELETE")
-        return self.conn.getresponse()
-
-
-class RecordClient(SubClient):
-
-    url = '/record'
-
-    def get(self, record_id):
-        self.conn.request(url='{0}/{1}'.format(self.full_url, record_id),
-                          method="GET")
         return self.conn.getresponse()
 
 
@@ -80,8 +75,8 @@ class Client(object):
         self.configuration_port = configuration_port
         self.full_config_host = "{0}:{1}".format(self.host,
                                                  self.configuration_port)
-        self.preset = PresetClient(self.full_config_host)
-        self.record = RecordClient(self.full_config_host)
+        self.preset = PresetClient(self.full_config_host, '/preset')
+        self.record = SubClient(self.full_config_host, '/record')
 
 
 if __name__ == '__main__':
