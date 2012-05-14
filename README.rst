@@ -10,7 +10,7 @@ Pretenders will be written in Python3:
 
 * Because it is about time
 * Because since these will be standalone servers, compatibility is not such
-   an issue
+  an issue
 
 Initial goal for services to be mocked by pretenders: HTTP, SMTP
 
