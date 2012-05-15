@@ -114,7 +114,7 @@ def test_method_matching():
     assert_equals(200, test_client._mock.get(url="/test_get").status)
     assert_equals(405, test_client._mock.post(url="/test_get").status)
 
-    # Only POST works when POTS matched
+    # Only POST works when POST matched
     assert_equals(201, test_client._mock.post(url="/test_post").status)
     assert_equals(405, test_client._mock.get(url="/test_post").status)
 
