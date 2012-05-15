@@ -19,13 +19,13 @@ def test_configure_request_and_check_values():
     add_test_preset()
     response = test_client._mock.post(url='/fred/test/one')
     assert_equals(response.status, 200)
-    assert_equals(response.read(), 'You tested fred well')
+    assert_equals(response.read(), b'You tested fred well')
 
-    request = test_client.get_requests(0)
+    request = test_client.get_request(0)
 
-    assert_equals(request['method'], 'POST')
-    assert_equals(request['url'], '/fred/test/one')
-    assert_equals(request['body'], '')
+    assert_equals(request.getheader('X-Pretend-Request-Method'), 'POST')
+    assert_equals(request.getheader('X-Pretend-Request-URL'), '/fred/test/one')
+    assert_equals(request.read(), '')
 
 
 def test_perform_wrong_method_on_configured_url():
@@ -36,9 +36,10 @@ def test_perform_wrong_method_on_configured_url():
     assert_equals(response.status, 405)
 
     historical_call = test_client.get_requests(0)
-    assert_equals(historical_call['method'], 'GET')
-    assert_equals(historical_call['url'], '/fred/test/one')
-    assert_equals(historical_call['body'], '')
+    assert_equals(historical_call.getheader('X-Pretend-Request-Method'), 'GET')
+    assert_equals(historical_call.getheader('X-Pretend-Request-URL'),
+                  '/fred/test/one')
+    assert_equals(historical_call.read(), '')
 
 
 def test_reset_results_in_subsequent_404():

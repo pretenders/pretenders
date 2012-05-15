@@ -3,37 +3,6 @@ import urllib
 import http.client
 
 
-class Preset(object):
-
-    def __init__(self,
-                 match_url='',
-                 match_method='',
-                 response_status=200,
-                 response_body='',
-                 response_headers={},
-                 response_encoding='ascii'):
-        self.match_url = match_url
-        self.match_method = match_method
-        self.response_status = response_status
-        self.response_body = response_body
-        self.response_encoding = response_encoding
-        self.response_headers = response_headers
-
-    def serialize(self):
-        return json.dumps({
-           'match': {
-               'url': self.match_url,
-               'method': self.match_method
-           },
-           'response': {
-                'status': self.response_status,
-                'body': self.response_body,
-                'encoding': self.response_encoding,
-                'headers': self.response_headers
-           }
-        })
-
-
 class SubClient(object):
     def __init__(self, base_url, url):
         self.base_url = base_url
@@ -60,31 +29,40 @@ class SubClient(object):
         query_string = ''
         if filters:
             query_string = '?{0}'.format(urllib.urlencode(filters))
-
-        return self.do_get(url='{0}{1}'.format(self.full_url, query_string))
+        url = '{0}{1}'.format(self.url, query_string)
+        print(url)
+        return self.do_get(url=url)
 
     def reset(self):
-        return self.do_delete(url=self.full_url)
+        return self.do_delete(url=self.url)
 
     def get_by_id(self, unique_id):
-        return self.do_get(url='{0}/{1}'.format(self.full_url, unique_id))
+        return self.do_get(url='{0}/{1}'.format(self.url, unique_id))
 
 
 class PresetClient(SubClient):
 
-    def add(self, *args, **kwargs):
-        p = Preset(*args, **kwargs)
-        return self.do_post(url=self.full_url, body=p.serialize())
+    def add(self, match_url='', match_method='', response_status=200,
+                response_body='', response_headers={}):
+        headers = response_headers.copy()
+        headers.update({
+            'X-Pretend-Match-Url': match_url,
+            'X-Pretend-Match-Method': match_method,
+            'X-Pretend-Response-Status': response_status,
+        })
+        return self.do_post(url=self.url,
+                            body=response_body,
+                            headers=headers)
 
 
 class MockClient(SubClient):
 
     def get(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.full_url, url)
+        url = "{0}{1}".format(self.url, url)
         return self.do_get(url=url, *args, **kwargs)
 
     def post(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.full_url, url)
+        url = "{0}{1}".format(self.url, url)
         return self.do_get(url=url, *args, **kwargs)
 
 
@@ -108,24 +86,22 @@ class Client(object):
     def add_preset(self, *args, **kwargs):
         return self.preset.add(*args, **kwargs)
 
-    def get_requests(self, sequence_id=None):
-        if sequence_id is not None:
-            result = self.history.get_by_id(sequence_id)
-        else:
-            result = self.history.list()
-        try:
-            return json.loads(str(result.read()))
-        except ValueError:
-            return []
+    def get_request(self, sequence_id=None):
+        return self.history.get_by_id(sequence_id)
 
 
 if __name__ == '__main__':
-    c = Client('localhost', 8000)
+    c = Client('localhost', 8000, 8000)
     c.add_preset(match_url='/fred/test/one',
                  match_method='GET',
                  response_status=200,
                  response_body='You tested fred well')
+    print ("*************")
 
-    print(c.get_requests())
+    response = c._mock.get(url='/fred/test/one')
+    response = c.get_request(0)
+    print(response.getheaders())
+    print(response.read())
 
-    c.reset_all()
+
+    #c.reset_all()
