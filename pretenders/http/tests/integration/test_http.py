@@ -2,7 +2,7 @@ from nose.tools import assert_equals
 
 from pretenders.http.client import Client
 
-test_client = Client('localhost', 8000, 8000)
+test_client = Client('localhost', 8000)
 
 
 def add_test_preset(path='/fred/test/one',

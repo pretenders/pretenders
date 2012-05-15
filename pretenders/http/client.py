@@ -67,17 +67,16 @@ class MockClient(SubClient):
 
 class Client(object):
 
-    def __init__(self, host, configuration_port=9001, mock_port=9000):
+    def __init__(self, host, port=9001):
         self.host = host
-        self.configuration_port = configuration_port
-        self.mock_port = mock_port
-        full_config_host = "{0}:{1}".format(self.host, self.configuration_port)
-        full_mock_host = "{0}:{1}".format(self.host, self.mock_port)
+        self.port = port
 
-        self.preset = PresetClient(full_config_host, '/preset')
-        self.history = SubClient(full_config_host, '/history')
-        self._mock = MockClient(full_mock_host, '/mock')
-        self._servermode = SubClient(full_config_host, '/mode')
+        full_host = "{0}:{1}".format(self.host, self.port)
+
+        self.preset = PresetClient(full_host, '/preset')
+        self.history = SubClient(full_host, '/history')
+        self._mock = MockClient(full_host, '/mock')
+        self._servermode = SubClient(full_host, '/mode')
 
     def reset_all(self):
         self.preset.reset()
@@ -97,7 +96,7 @@ class Client(object):
         self._servermode.do_post(url='/mode', body=body_text)
 
 if __name__ == '__main__':
-    c = Client('localhost', 8000, 8000)
+    c = Client('localhost', 8000)
     c.add_preset(match_path='/fred/test/one',
                  match_method='GET',
                  response_status=200,
