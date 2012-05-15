@@ -61,12 +61,12 @@ def clear_presets():
 @get('/history/<ordinal:int>')
 def get_history(ordinal):
     try:
-        saved_request = history[ordinal]
-        for header, value in saved_request['headers'].items():
+        saved = history[ordinal]
+        for header, value in saved['headers'].items():
             response.set_header(header, value)
-        response.set_header('X-Pretend-Request-Method', saved_request['method'])
-        response.set_header('X-Pretend-Request-Path', saved_request['path'])
-        return saved_request['body']
+        response.set_header('X-Pretend-Request-Method', saved['method'])
+        response.set_header('X-Pretend-Request-Path', saved['path'])
+        return saved['body']
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
 
