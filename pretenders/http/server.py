@@ -1,41 +1,76 @@
-from http.server import HTTPServer, BaseHTTPRequestHandler
+import json
+
+from bottle import request, route, run, HTTPResponse
+from bottle import delete, get, post
 
 
-next_response = 'Response'.encode('utf-8')
+presets = []
+history = []
 
 
-class ReplayRequestHandler(BaseHTTPRequestHandler):
-
-    def __getattr__(self, attr):
-        if attr.startswith('do_'):
-            print("Getting attr {0}".format(attr))
-            return self.dispatch
-        else:
-            raise AttributeError("'{}' not found".format(attr))
-
-    def dispatch(self):
-        global next_response
-        data = None
-        print("{0} {1}".format(self.command, self.path))
-        print("Headers:\n{0}".format(self.headers))
-        length = int(self.headers.get('Content-Length', 0))
-        if length:
-            data = self.rfile.read(length)
-            print("Data:\n{0}".format(data))
-            if self.command == 'RECORD':
-                next_response = data
-        self.send_response(200)
-        self.send_header('Content-Length', len(next_response))
-        self.end_headers()
-        self.wfile.write(next_response)
-
-    #do_GET = dispatch
-    #do_POST = dispatch
-    #do_HEAD = dispatch
-    #do_OPTIONS = dispatch
+def to_dict(wsgi_headers):
+    """
+    Convert WSGIHeaders to a dict so that it can be JSON-encoded
+    """
+    return {k: v for k, v in wsgi_headers.items()}
 
 
-if __name__ == '__main__':
-        server_address = ('', 8000)
-        httpd = HTTPServer(server_address, ReplayRequestHandler)
-        httpd.serve_forever()
+@route('/mock', method='ANY')
+def replay():
+    """
+    Replay a previously recorded preset, and save the request in history
+    """
+    if not len(presets):
+        raise HTTPResponse(b"No preset response", status=404)
+    encoding = 'utf-8'  # find out proper value?
+    saved_request = {
+        'body': request.body.read().decode(encoding),
+        'headers': to_dict(request.headers),
+        'method': request.method,
+        'path': request.path,
+    }
+    history.append(saved_request)
+    body = presets.pop(0)
+    return body
+
+
+@post('/preset')
+def add_preset():
+    """
+    Save the incoming request body as a preset response
+    """
+    # TODO: JSON decode in body, status, headers...
+    presets.append(request.body)
+
+
+@delete('/preset')
+def clear_presets():
+    """
+    Delete all recorded presets
+    """
+    del presets[:]
+
+
+@get('/history/<ordinal:int>')
+def get_history(ordinal):
+    try:
+        saved_request = history[ordinal]
+        return json.dumps(saved_request)
+    except IndexError:
+        raise HTTPResponse(b"No recorded request", status=404)
+
+
+@delete('/history')
+def clear_history():
+    """
+    Delete all recorded requests
+    """
+    del history[:]
+
+
+def run_bottle(port=8000):
+    run(host='localhost', port=port)
+
+
+if __name__ == "__main__":
+    run_bottle()
