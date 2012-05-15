@@ -1,4 +1,3 @@
-import json
 import urllib
 import http.client
 
@@ -42,11 +41,11 @@ class SubClient(object):
 
 class PresetClient(SubClient):
 
-    def add(self, match_url='', match_method='', response_status=200,
+    def add(self, match_path='', match_method='', response_status=200,
                 response_body='', response_headers={}):
         headers = response_headers.copy()
         headers.update({
-            'X-Pretend-Match-Url': match_url,
+            'X-Pretend-Match-Path': match_path,
             'X-Pretend-Match-Method': match_method,
             'X-Pretend-Response-Status': response_status,
         })
@@ -63,7 +62,7 @@ class MockClient(SubClient):
 
     def post(self, url, *args, **kwargs):
         url = "{0}{1}".format(self.url, url)
-        return self.do_get(url=url, *args, **kwargs)
+        return self.do_post(url=url, *args, **kwargs)
 
 
 class Client(object):
@@ -92,16 +91,12 @@ class Client(object):
 
 if __name__ == '__main__':
     c = Client('localhost', 8000, 8000)
-    c.add_preset(match_url='/fred/test/one',
+    c.add_preset(match_path='/fred/test/one',
                  match_method='GET',
                  response_status=200,
                  response_body='You tested fred well')
-    print ("*************")
 
     response = c._mock.get(url='/fred/test/one')
     response = c.get_request(0)
     print(response.getheaders())
     print(response.read())
-
-
-    #c.reset_all()

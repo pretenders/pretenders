@@ -1,4 +1,3 @@
-import json
 from nose.tools import assert_equals
 
 from pretenders.http.client import Client
@@ -7,7 +6,7 @@ test_client = Client('localhost', 8000, 8000)
 
 
 def add_test_preset(status=200, body='You tested fred well'):
-    test_client.add_preset(match_url='/fred/test/one',
+    test_client.add_preset(match_path='/fred/test/one',
                            match_method='POST',
                            response_status=status,
                            response_body=body)
@@ -24,8 +23,9 @@ def test_configure_request_and_check_values():
     request = test_client.get_request(0)
 
     assert_equals(request.getheader('X-Pretend-Request-Method'), 'POST')
-    assert_equals(request.getheader('X-Pretend-Request-URL'), '/fred/test/one')
-    assert_equals(request.read(), '')
+    assert_equals(request.getheader('X-Pretend-Request-Path'),
+                  '/fred/test/one')
+    assert_equals(request.read(), b'')
 
 
 def test_perform_wrong_method_on_configured_url():
@@ -37,7 +37,7 @@ def test_perform_wrong_method_on_configured_url():
 
     historical_call = test_client.get_requests(0)
     assert_equals(historical_call.getheader('X-Pretend-Request-Method'), 'GET')
-    assert_equals(historical_call.getheader('X-Pretend-Request-URL'),
+    assert_equals(historical_call.getheader('X-Pretend-Request-Path'),
                   '/fred/test/one')
     assert_equals(historical_call.read(), '')
 
@@ -65,6 +65,6 @@ def test_configure_multiple_rules():
         response = test_client._mock.post(url='/anything')
         assert_equals(response.status, expected_status_in_sequence)
 
-    # Do one more to show that it'll always be 410 from here on in:
+    # Do one more to show that it'll always be 404 from here on in:
     response = test_client._mock.post(url='/anything')
-    assert_equals(response.status, 410)
+    assert_equals(response.status, 404)
