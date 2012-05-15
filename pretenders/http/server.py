@@ -6,11 +6,15 @@ presets = []
 history = []
 
 
-def to_dict(wsgi_headers):
+def to_dict(wsgi_headers, include=lambda _: True):
     """
     Convert WSGIHeaders to a dict so that it can be JSON-encoded
     """
-    return {k: v for k, v in wsgi_headers.items()}
+    return {k: v for k, v in wsgi_headers.items() if include(k)}
+
+
+def get_header(header, default=None):
+    return request.headers.get(header, default)
 
 
 @route('/mock<path:path>', method='ANY')
@@ -39,14 +43,14 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    headers = {
-        k: v for k, v in request.headers.items()
-        if not k.startswith('X-Pretend-')
-    }
+    headers = to_dict(request.headers,
+                      include=lambda x: not x.startswith('X-Pretend-'))
     presets.append({
-        'body': request.body,
-        'status': int(request.headers.get('X-Pretend-Response-Status', 200)),
         'headers': headers,
+        'body': request.body,
+        'status': int(get_header('X-Pretend-Response-Status', 200)),
+        'match-method': get_header('X-Pretend-Match-Method'),
+        'match-path': get_header('X-Pretend-Match-Path'),
     })
 
 
