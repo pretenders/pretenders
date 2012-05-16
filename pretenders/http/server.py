@@ -24,11 +24,14 @@ def replay(path):
     """
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
+    relative_url = path
+    if request.query_string:
+        relative_url = "{0}?{1}".format(relative_url, request.query_string)
     saved_request = {
         'body': request.body.read(),
         'headers': to_dict(request.headers),
         'method': request.method,
-        'path': path,
+        'path': relative_url,
     }
     history.append(saved_request)
     preset = presets.pop(0)
@@ -84,7 +87,7 @@ def clear_history():
 
 
 def run_bottle(port=8000):
-    run(host='localhost', port=port)
+    run(host='localhost', port=port, reloader=True)
 
 
 if __name__ == "__main__":

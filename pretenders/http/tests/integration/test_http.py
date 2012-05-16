@@ -35,11 +35,24 @@ def test_perform_wrong_method_on_configured_url():
     response = test_client._mock.get(url='/fred/test/one')
     assert_equals(response.status, 405)
 
-    historical_call = test_client.get_requests(0)
+    historical_call = test_client.get_request(0)
     assert_equals(historical_call.getheader('X-Pretend-Request-Method'), 'GET')
     assert_equals(historical_call.getheader('X-Pretend-Request-Path'),
                   '/fred/test/one')
-    assert_equals(historical_call.read(), '')
+    assert_equals(historical_call.read(), b'')
+
+
+def test_url_query_string():
+    test_client.reset_all()
+    add_test_preset()
+    response = test_client._mock.get(url='/test/two?a=1&b=2')
+    assert_equals(response.status, 200)
+
+    historical_call = test_client.get_request(0)
+    assert_equals(historical_call.getheader('X-Pretend-Request-Method'), 'GET')
+    assert_equals(historical_call.getheader('X-Pretend-Request-Path'),
+                  '/test/two?a=1&b=2')
+    assert_equals(historical_call.read(), b'')
 
 
 def test_reset_results_in_subsequent_404():
