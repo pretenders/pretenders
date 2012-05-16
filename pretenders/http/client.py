@@ -3,11 +3,11 @@ import http.client
 
 
 class SubClient(object):
+
     def __init__(self, base_url, url):
         self.base_url = base_url
         self.url = url
         self.full_url = '{0}{1}'.format(base_url, self.url)
-
         self.conn = http.client.HTTPConnection(base_url)
 
     def request(self, *args, **kwargs):
@@ -67,15 +67,15 @@ class MockClient(SubClient):
 
 class Client(object):
 
-    def __init__(self, host, port=9001):
+    def __init__(self, host, port=9000):
         self.host = host
         self.port = port
-
         full_host = "{0}:{1}".format(self.host, self.port)
 
         self.preset = PresetClient(full_host, '/preset')
         self.history = SubClient(full_host, '/history')
         self._mock = MockClient(full_host, '/mock')
+
         self._servermode = SubClient(full_host, '/mode')
 
     def reset_all(self):

@@ -8,11 +8,15 @@ presets = []
 history = []
 
 
-def to_dict(wsgi_headers):
+def to_dict(wsgi_headers, include=lambda _: True):
     """
     Convert WSGIHeaders to a dict so that it can be JSON-encoded
     """
-    return {k: v for k, v in wsgi_headers.items()}
+    return {k: v for k, v in wsgi_headers.items() if include(k)}
+
+
+def get_header(header, default=None):
+    return request.headers.get(header, default)
 
 
 def select_preset(path):
@@ -27,13 +31,15 @@ def select_preset(path):
     Return 405 if no preset matches required method.
     """
     if mode == INDEPENDENT_RESPONSES:
-        return presets.pop(0)[2]
+        return presets.pop(0)
     else:
         path_match = False
-        for preset_path, preset_method, preset_data in presets:
+        for preset in presets:
+            preset_path = preset['match-path']
+            preset_method = preset['match-method']
             if preset_path == path:
                 if request.method == preset_method or preset_method == '*':
-                    return preset_data
+                    return preset
                 else:
                     path_match = True
 
@@ -82,17 +88,15 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    headers = {
-        k: v for k, v in request.headers.items()
-        if not k.startswith('X-Pretend-')
-    }
-    path = request.headers['X-Pretend-Match-Path']
-    method = request.headers['X-Pretend-Match-Method']
-    presets.append((path, method, {
-        'body': request.body.read(),
-        'status': int(request.headers.get('X-Pretend-Response-Status', 200)),
+    headers = to_dict(request.headers,
+                      include=lambda x: not x.startswith('X-Pretend-'))
+    presets.append({
         'headers': headers,
-    }))
+        'body': request.body.read(),
+        'status': int(get_header('X-Pretend-Response-Status', 200)),
+        'match-method': get_header('X-Pretend-Match-Method'),
+        'match-path': get_header('X-Pretend-Match-Path'),
+    })
 
 
 @delete('/preset')
@@ -106,12 +110,12 @@ def clear_presets():
 @get('/history/<ordinal:int>')
 def get_history(ordinal):
     try:
-        saved_req = history[ordinal]
-        for header, value in saved_req['headers'].items():
+        saved = history[ordinal]
+        for header, value in saved['headers'].items():
             response.set_header(header, value)
-        response.set_header('X-Pretend-Request-Method', saved_req['method'])
-        response.set_header('X-Pretend-Request-Path', saved_req['path'])
-        return saved_req['body']
+        response.set_header('X-Pretend-Request-Method', saved['method'])
+        response.set_header('X-Pretend-Request-Path', saved['path'])
+        return saved['body']
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
 
