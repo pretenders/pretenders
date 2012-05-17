@@ -47,7 +47,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Pretenders'
-copyright = '2012, Carles Barrobés and Alex Couper'
+copyright = u'2012, Carles Barrobés and Alex Couper'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -194,7 +194,7 @@ latex_elements = {
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'Pretenders.tex', 'Pretenders Documentation',
-   'Carles Barrobés and Alex Couper', 'manual'),
+   u'Carles Barrobés and Alex Couper', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -224,7 +224,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'pretenders', 'Pretenders Documentation',
-     ['Carles Barrobés and Alex Couper'], 1)
+     [u'Carles Barrobés and Alex Couper'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -238,7 +238,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
   ('index', 'Pretenders', 'Pretenders Documentation',
-   'Carles Barrobés and Alex Couper', 'Pretenders', 'One line description of project.',
+   u'Carles Barrobés and Alex Couper', 'Pretenders', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -256,9 +256,9 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = 'Pretenders'
-epub_author = 'Carles Barrobés and Alex Couper'
-epub_publisher = 'Carles Barrobés and Alex Couper'
-epub_copyright = '2012, Carles Barrobés and Alex Couper'
+epub_author = u'Carles Barrobés and Alex Couper'
+epub_publisher = u'Carles Barrobés and Alex Couper'
+epub_copyright = u'2012, Carles Barrobés and Alex Couper'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.
