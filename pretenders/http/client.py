@@ -84,7 +84,29 @@ class Client(object):
         return self.preset.add(*args, **kwargs)
 
     def get_request(self, sequence_id=None):
-        return self.history.get_by_id(sequence_id)
+        return Request(self.history.get_by_id(sequence_id))
+
+
+class Request(object):
+    """A stored request as issued to our pretend server"""
+    def __init__(self, pretend_response):
+        if pretend_response.status != 200:
+            # TODO use custom exception
+            raise Exception('No saved request')
+        self.response = pretend_response
+        self.headers = dict(self.response.getheaders())
+        self.method = self.headers['X-Pretend-Request-Method']
+        del self.headers['X-Pretend-Request-Method']
+        self.path = self.headers['X-Pretend-Request-Path']
+        del self.headers['X-Pretend-Request-Path']
+        self._request_body = None
+        del self.headers['Server']
+
+    @property
+    def body(self):
+        if not self._request_body:
+            self._request_body = self.response.read()
+        return self._request_body
 
 
 if __name__ == '__main__':

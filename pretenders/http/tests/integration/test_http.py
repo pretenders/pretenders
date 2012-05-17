@@ -22,9 +22,8 @@ def test_configure_request_and_check_values():
 
     request = test_client.get_request(0)
 
-    assert_equals(request.getheader('X-Pretend-Request-Method'), 'POST')
-    assert_equals(request.getheader('X-Pretend-Request-Path'),
-                  '/fred/test/one')
+    assert_equals(request.method, 'POST')
+    assert_equals(request.path, '/fred/test/one')
     assert_equals(request.read(), b'')
 
 
@@ -36,10 +35,9 @@ def test_perform_wrong_method_on_configured_url():
     assert_equals(response.status, 405)
 
     historical_call = test_client.get_request(0)
-    assert_equals(historical_call.getheader('X-Pretend-Request-Method'), 'GET')
-    assert_equals(historical_call.getheader('X-Pretend-Request-Path'),
-                  '/fred/test/one')
-    assert_equals(historical_call.read(), b'')
+    assert_equals(historical_call.method, 'GET')
+    assert_equals(historical_call.path, '/fred/test/one')
+    assert_equals(historical_call.body, b'')
 
 
 def test_url_query_string():
@@ -49,10 +47,9 @@ def test_url_query_string():
     assert_equals(response.status, 200)
 
     historical_call = test_client.get_request(0)
-    assert_equals(historical_call.getheader('X-Pretend-Request-Method'), 'GET')
-    assert_equals(historical_call.getheader('X-Pretend-Request-Path'),
-                  '/test/two?a=1&b=2')
-    assert_equals(historical_call.read(), b'')
+    assert_equals(historical_call.method, 'GET')
+    assert_equals(historical_call.path, '/test/two?a=1&b=2')
+    assert_equals(historical_call.body, b'')
 
 
 def test_reset_results_in_subsequent_404():
