@@ -19,6 +19,7 @@ Contents:
    intro
    http
 
+Sources can be found at https://github.com/txels/pretenders
 
 Indices and tables
 ==================
