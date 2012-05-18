@@ -113,8 +113,6 @@ def test_method_matching():
     "Test that server matches methods correctly."
     test_client.reset_all()
     add_test_preset('/test_get', 'GET', 'You tested a get', 200)
-    add_test_preset('/test_get', 'GET', 'You tested a get', 200)
-    add_test_preset('/test_post', 'POST', 'You tested a post', 201)
     add_test_preset('/test_post', 'POST', 'You tested a post', 201)
     add_test_preset('/test_star', '.*', 'You tested a .*', 202)
     add_test_preset('/test_star', '.*', 'You tested a .*', 202)
@@ -122,20 +120,24 @@ def test_method_matching():
             'You tested a PUT or a POST',  203)
 
     # Only GET works when GET matched
-    assert_equals(200, test_client._mock.get(url="/test_get").status)
     assert_equals(405, test_client._mock.post(url="/test_get").status)
+    assert_equals(200, test_client._mock.get(url="/test_get").status)
+    assert_equals(404, test_client._mock.get(url="/test_get").status)
 
     # Only POST works when POST matched
-    assert_equals(201, test_client._mock.post(url="/test_post").status)
     assert_equals(405, test_client._mock.get(url="/test_post").status)
+    assert_equals(201, test_client._mock.post(url="/test_post").status)
+    assert_equals(404, test_client._mock.post(url="/test_post").status)
 
     # Any method works with .* as the method matched
     assert_equals(202, test_client._mock.get(url="/test_star").status)
     assert_equals(202, test_client._mock.post(url="/test_star").status)
+    assert_equals(404, test_client._mock.post(url="/test_star").status)
 
     # PUT or POST work with (PUT|POST) as the method matched
     assert_equals(405, test_client._mock.get(url="/test_put_or_post").status)
     assert_equals(203, test_client._mock.post(url="/test_put_or_post").status)
+    assert_equals(404, test_client._mock.post(url="/test_put_or_post").status)
 
 
 def test_multiple_responses_for_a_url():
