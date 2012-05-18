@@ -1,8 +1,9 @@
 import re
 from collections import OrderedDict
 
-from bottle import request, response, route, run, HTTPResponse
+from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
+from bottle import run as run_bottle
 
 presets = OrderedDict()
 history = []
@@ -30,14 +31,14 @@ def select_preset(path):
     """
     path_match = False
     for key, preset_list in presets.items():
-        if not len(preset_list):
-            continue
         preset = preset_list[0]
         preset_path = preset['match-path']
         preset_method = preset['match-method']
         if re.match(preset_path, path):
-            if request.method == preset_method or preset_method == '*':
+            if re.match(preset_method, request.method):
                 del preset_list[0]
+                if not preset_list:
+                    del presets[key]
                 return preset
             else:
                 path_match = True
@@ -82,8 +83,8 @@ def add_preset():
     headers = to_dict(request.headers,
                       include=lambda x: not x.startswith('X-Pretend-'))
 
-    method = get_header('X-Pretend-Match-Method')
-    path = get_header('X-Pretend-Match-Path')
+    method = get_header('X-Pretend-Match-Method', '')
+    path = get_header('X-Pretend-Match-Path', '')
 
     if (path, method) not in presets:
         presets[(path, method)] = []
@@ -108,6 +109,9 @@ def clear_presets():
 
 @get('/history/<ordinal:int>')
 def get_history(ordinal):
+    """
+    Access requests issued to the mock server
+    """
     try:
         saved = history[ordinal]
         for header, value in saved['headers'].items():
@@ -127,9 +131,10 @@ def clear_history():
     del history[:]
 
 
-def run_bottle(port=8000):
-    run(host='localhost', port=port, reloader=True)
+def run(port=8000):
+    "Start the mock HTTP server"
+    run_bottle(host='localhost', port=port, reloader=True)
 
 
 if __name__ == "__main__":
-    run_bottle()
+    run()
