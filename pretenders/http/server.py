@@ -1,8 +1,9 @@
 import re
 from collections import OrderedDict
 
-from bottle import request, response, route, run, HTTPResponse
+from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
+from bottle import run as run_bottle
 
 presets = OrderedDict()
 history = []
@@ -108,6 +109,9 @@ def clear_presets():
 
 @get('/history/<ordinal:int>')
 def get_history(ordinal):
+    """
+    Access requests issued to the mock server
+    """
     try:
         saved = history[ordinal]
         for header, value in saved['headers'].items():
@@ -127,9 +131,10 @@ def clear_history():
     del history[:]
 
 
-def run_bottle(port=8000):
-    run(host='localhost', port=port, reloader=True)
+def run(port=8000):
+    "Start the mock HTTP server"
+    run_bottle(host='localhost', port=port, reloader=True)
 
 
 if __name__ == "__main__":
-    run_bottle()
+    run()
