@@ -1,5 +1,9 @@
 import urllib
-import http.client
+try:
+    from http.client import HTTPConnection
+except ImportError:
+    # Python2.6/2.7
+    from httplib import HTTPConnection
 
 
 class SubClient(object):
@@ -8,7 +12,7 @@ class SubClient(object):
         self.base_url = base_url
         self.url = url
         self.full_url = '{0}{1}'.format(base_url, self.url)
-        self.conn = http.client.HTTPConnection(base_url)
+        self.conn = HTTPConnection(base_url)
 
     def request(self, *args, **kwargs):
         print('Requesting with:', args, kwargs)
@@ -87,6 +91,25 @@ class Client(object):
         return Request(self.history.get_by_id(sequence_id))
 
 
+class CaseInsensitiveDict(dict):
+    "A dictionary that is case insensitive for keys."
+
+    def __init__(self, *args, **kwargs):
+        super(CaseInsensitiveDict, self).__init__(*args, **kwargs)
+        for key, value in self.items():
+            super(CaseInsensitiveDict, self).__delitem__(key)
+            self[key.lower()] = value
+
+    def __delitem__(self, key):
+        return super(CaseInsensitiveDict, self).__delitem__(key.lower())
+
+    def __setitem__(self, key, value):
+        super(CaseInsensitiveDict, self).__setitem__(key.lower(), value)
+
+    def __getitem__(self, key):
+        return super(CaseInsensitiveDict, self).__getitem__(key.lower())
+
+
 class Request(object):
     """A stored request as issued to our pretend server"""
     def __init__(self, pretend_response):
@@ -94,7 +117,7 @@ class Request(object):
             # TODO use custom exception
             raise Exception('No saved request')
         self.response = pretend_response
-        self.headers = dict(self.response.getheaders())
+        self.headers = CaseInsensitiveDict(self.response.getheaders())
         self.method = self.headers['X-Pretend-Request-Method']
         del self.headers['X-Pretend-Request-Method']
         self.path = self.headers['X-Pretend-Request-Path']
@@ -118,5 +141,5 @@ if __name__ == '__main__':
 
     response = c._mock.get(url='/fred/test/one')
     response = c.get_request(0)
-    print(response.getheaders())
-    print(response.read())
+    print(response.headers)
+    print(response.body)
