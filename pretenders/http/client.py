@@ -58,17 +58,6 @@ class PresetClient(SubClient):
                             headers=headers)
 
 
-class MockClient(SubClient):
-
-    def get(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.url, url)
-        return self.do_get(url=url, *args, **kwargs)
-
-    def post(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.url, url)
-        return self.do_post(url=url, *args, **kwargs)
-
-
 class Client(object):
 
     def __init__(self, host, port=9000):
@@ -78,7 +67,6 @@ class Client(object):
 
         self.preset = PresetClient(full_host, '/preset')
         self.history = SubClient(full_host, '/history')
-        self._mock = MockClient(full_host, '/mock')
 
     def reset_all(self):
         self.preset.reset()

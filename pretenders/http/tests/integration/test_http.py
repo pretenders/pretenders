@@ -1,8 +1,21 @@
 from nose.tools import assert_equals
 
-from pretenders.http.client import Client
+from pretenders.http.client import Client, SubClient
+
+
+class MockClient(SubClient):
+
+    def get(self, url, *args, **kwargs):
+        url = "{0}{1}".format(self.url, url)
+        return self.do_get(url=url, *args, **kwargs)
+
+    def post(self, url, *args, **kwargs):
+        url = "{0}{1}".format(self.url, url)
+        return self.do_post(url=url, *args, **kwargs)
+
 
 test_client = Client('localhost', 8000)
+mock_client = MockClient('localhost:8000', '/mock')
 
 
 def add_test_preset(match_url='/fred/test/one',
@@ -20,7 +33,7 @@ def test_configure_request_and_check_values():
     "Requires a running pretender.http.server instance"
     test_client.reset_all()
     add_test_preset()
-    response = test_client._mock.post(url='/fred/test/one')
+    response = mock_client.post(url='/fred/test/one')
     assert_equals(response.status, 200)
     assert_equals(response.read(), b'You tested fred well')
 
@@ -35,7 +48,7 @@ def test_perform_wrong_method_on_configured_url():
     "Expect this to fail until we implement method matching in the server."
     test_client.reset_all()
     add_test_preset()
-    response = test_client._mock.get(url='/fred/test/one')
+    response = mock_client.get(url='/fred/test/one')
     assert_equals(response.status, 405)
 
     historical_call = test_client.get_request(0)
@@ -48,7 +61,7 @@ def test_perform_wrong_method_on_configured_url():
 def test_url_query_string():
     test_client.reset_all()
     add_test_preset()
-    response = test_client._mock.get(url='/test/two?a=1&b=2')
+    response = mock_client.get(url='/test/two?a=1&b=2')
     assert_equals(response.status, 404)
 
     historical_call = test_client.get_request(0)
@@ -60,7 +73,7 @@ def test_url_query_string():
 def test_reset_results_in_subsequent_404():
     "Expect a 404 after resetting the client"
     test_client.reset_all()
-    response = test_client._mock.post(url='/fred/test/one', )
+    response = mock_client.post(url='/fred/test/one', )
     assert_equals(response.status, 404)
 
 
@@ -81,11 +94,11 @@ def test_configure_multiple_rules_independent():
                                              ('/test_400', 400),
                                              ('/test_500', 500),
                                              ('/test_410', 410)]:
-        response = test_client._mock.post(url=url)
+        response = mock_client.post(url=url)
         assert_equals(response.status, expected_status_in_sequence)
 
     # Do one more to show that it'll always be 404 from here on in:
-    response = test_client._mock.post(url='/test_200')
+    response = mock_client.post(url='/test_200')
     assert_equals(response.status, 404)
 
 
@@ -105,7 +118,7 @@ def test_configure_multiple_rules_url_match():
                                              ('/test_500', 404),
                                              ('/test_410', 410)
                                               ]:
-        response = test_client._mock.post(url=url)
+        response = mock_client.post(url=url)
         assert_equals(response.status, expected_status_in_sequence)
 
 
@@ -120,24 +133,24 @@ def test_method_matching():
             'You tested a PUT or a POST',  203)
 
     # Only GET works when GET matched
-    assert_equals(405, test_client._mock.post(url="/test_get").status)
-    assert_equals(200, test_client._mock.get(url="/test_get").status)
-    assert_equals(404, test_client._mock.get(url="/test_get").status)
+    assert_equals(405, mock_client.post(url="/test_get").status)
+    assert_equals(200, mock_client.get(url="/test_get").status)
+    assert_equals(404, mock_client.get(url="/test_get").status)
 
     # Only POST works when POST matched
-    assert_equals(405, test_client._mock.get(url="/test_post").status)
-    assert_equals(201, test_client._mock.post(url="/test_post").status)
-    assert_equals(404, test_client._mock.post(url="/test_post").status)
+    assert_equals(405, mock_client.get(url="/test_post").status)
+    assert_equals(201, mock_client.post(url="/test_post").status)
+    assert_equals(404, mock_client.post(url="/test_post").status)
 
     # Any method works with .* as the method matched
-    assert_equals(202, test_client._mock.get(url="/test_star").status)
-    assert_equals(202, test_client._mock.post(url="/test_star").status)
-    assert_equals(404, test_client._mock.post(url="/test_star").status)
+    assert_equals(202, mock_client.get(url="/test_star").status)
+    assert_equals(202, mock_client.post(url="/test_star").status)
+    assert_equals(404, mock_client.post(url="/test_star").status)
 
     # PUT or POST work with (PUT|POST) as the method matched
-    assert_equals(405, test_client._mock.get(url="/test_put_or_post").status)
-    assert_equals(203, test_client._mock.post(url="/test_put_or_post").status)
-    assert_equals(404, test_client._mock.post(url="/test_put_or_post").status)
+    assert_equals(405, mock_client.get(url="/test_put_or_post").status)
+    assert_equals(203, mock_client.post(url="/test_put_or_post").status)
+    assert_equals(404, mock_client.post(url="/test_put_or_post").status)
 
 
 def test_multiple_responses_for_a_url():
@@ -155,7 +168,7 @@ def test_multiple_responses_for_a_url():
                                              ('/test_url_pattern', 404),
                                              ('/test_url_pattern_2', 404)
                                               ]:
-        response = test_client._mock.post(url=url)
+        response = mock_client.post(url=url)
         assert_equals(response.status, expected_status_in_sequence)
 
 
@@ -173,7 +186,7 @@ def test_regular_expression_matching():
                                              ('/something/1', 200),
                                              ('/something/Aaaa', 404),
                                               ]:
-        response = test_client._mock.post(url=url)
+        response = mock_client.post(url=url)
         assert_equals(response.status, expected_status_in_sequence)
 
 
@@ -181,9 +194,9 @@ def test_blank_url_matches_anything():
     "A blank url matcher header matches any url"
     test_client.reset_all()
     add_test_preset("", response_status=200)
-    response = test_client._mock.post(url='/some/strange/12121/string')
+    response = mock_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 200)
-    response = test_client._mock.post(url='/some/strange/12121/string')
+    response = mock_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 404)
 
 
@@ -192,5 +205,5 @@ def test_missing_method_and_url_matches_anything():
     test_client.reset_all()
     test_client.add_preset(response_status=323,
                            response_body=b'Hello')
-    response = test_client._mock.post(url='/some/strange/12121/string')
+    response = mock_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 323)
