@@ -2,7 +2,7 @@ import urllib
 try:
     from http.client import HTTPConnection
 except ImportError:
-    #Python2.6/2.7
+    # Python2.6/2.7
     from httplib import HTTPConnection
 
 
