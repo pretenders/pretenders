@@ -32,7 +32,8 @@ Resource URLs:
   target individual items, e.g.:
 
     * ``/history/0`` - the first recorded request
-..    * ``/history/?url=&method=&status`` - matched recorded data
+
+..  * ``/history/?url=&method=&status`` - matched recorded data
 
 The presets contain all the information necessary to later produce a
 pre-canned response. The mapping is as follows:

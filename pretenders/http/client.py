@@ -76,9 +76,6 @@ class HttpMock(object):
         self.preset.add(self.url, self.method, status, body, headers)
         return self
 
-    def add_preset(self, *args, **kwargs):
-        return self.preset.add(*args, **kwargs)
-
     def get_request(self, sequence_id=None):
         return Request(self.history.get(sequence_id))
 
