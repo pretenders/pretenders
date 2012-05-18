@@ -11,7 +11,7 @@ class SubClient(object):
         self.conn = http.client.HTTPConnection(base_url)
 
     def request(self, *args, **kwargs):
-        print(args, kwargs)
+        print('Requesting with:', args, kwargs)
         self.conn.request(*args, **kwargs)
         return self.conn.getresponse()
 
@@ -29,7 +29,7 @@ class SubClient(object):
         if filters:
             query_string = '?{0}'.format(urllib.urlencode(filters))
         url = '{0}{1}'.format(self.url, query_string)
-        print(url)
+
         return self.do_get(url=url)
 
     def reset(self):
@@ -76,6 +76,8 @@ class Client(object):
         self.history = SubClient(full_host, '/history')
         self._mock = MockClient(full_host, '/mock')
 
+        self._servermode = SubClient(full_host, '/mode')
+
     def reset_all(self):
         self.preset.reset()
         self.history.reset()
@@ -108,6 +110,12 @@ class Request(object):
             self._request_body = self.response.read()
         return self._request_body
 
+    def set_server_mode(self, path_match=False):
+        if path_match:
+            body_text = 'path_match'
+        else:
+            body_text = 'independent_responses'
+        self._servermode.do_post(url='/mode', body=body_text)
 
 if __name__ == '__main__':
     c = Client('localhost', 8000)

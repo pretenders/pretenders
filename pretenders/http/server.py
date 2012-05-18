@@ -1,7 +1,9 @@
 from bottle import request, response, route, run, HTTPResponse
 from bottle import delete, get, post
 
-
+PATH_MATCH = 0
+INDEPENDENT_RESPONSES = 1
+mode = PATH_MATCH
 presets = []
 history = []
 
@@ -15,6 +17,47 @@ def to_dict(wsgi_headers, include=lambda _: True):
 
 def get_header(header, default=None):
     return request.headers.get(header, default)
+
+
+def select_preset(path):
+    """Select a preset to respond with.
+
+    If the current mode is ``INDEPENDENT_RESPONSES`` pop the top preset and
+    return it.
+
+    Otherwise match the path and request method to pick the appropriate preset.
+
+    Return 404 if no preset found that matches.
+    Return 405 if no preset matches required method.
+    """
+    if mode == INDEPENDENT_RESPONSES:
+        return presets.pop(0)
+    else:
+        path_match = False
+        for preset in presets:
+            preset_path = preset['match-path']
+            preset_method = preset['match-method']
+            if preset_path == path:
+                if request.method == preset_method or preset_method == '*':
+                    return preset
+                else:
+                    path_match = True
+
+        if path_match:
+            raise HTTPResponse(b"Path matched but invalid method", status=405)
+        else:
+            raise HTTPResponse(b"No matching preset response", status=404)
+
+
+@post('/mode')
+def set_mode():
+    "Set the mode by which we select presets"
+    global mode
+    msg = request.body.read()
+    if msg == b'path_match':
+        mode = PATH_MATCH
+    elif msg == b'independent_responses':
+        mode = INDEPENDENT_RESPONSES
 
 
 @route('/mock<path:path>', method='ANY')
@@ -34,7 +77,9 @@ def replay(path):
         'path': relative_url,
     }
     history.append(saved_request)
-    preset = presets.pop(0)
+
+    preset = select_preset(path)
+
     for header, value in preset['headers'].items():
         response.set_header(header, value)
     response.status = preset['status']
@@ -50,7 +95,7 @@ def add_preset():
                       include=lambda x: not x.startswith('X-Pretend-'))
     presets.append({
         'headers': headers,
-        'body': request.body,
+        'body': request.body.read(),
         'status': int(get_header('X-Pretend-Response-Status', 200)),
         'match-method': get_header('X-Pretend-Match-Method'),
         'match-path': get_header('X-Pretend-Match-Path'),
