@@ -167,3 +167,13 @@ def test_regular_expression_matching():
                                               ]:
         response = test_client._mock.post(url=url)
         assert_equals(response.status, expected_status_in_sequence)
+
+
+def test_blank_path_matches_anything():
+    test_client.reset_all()
+    add_test_preset("", response_status=200)
+    response = test_client._mock.post(url='/some/strange/12121/string')
+    assert_equals(response.status, 200)
+    response = test_client._mock.post(url='/some/strange/12121/string')
+    assert_equals(response.status, 404)
+
