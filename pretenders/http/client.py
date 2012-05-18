@@ -65,8 +65,9 @@ class HttpMock(object):
     def reset(self):
         self.preset.reset()
         self.history.reset()
+        return self
 
-    def when(self, url='', method='GET'):
+    def when(self, url='', method=''):
         mock = copy(self)
         mock.url = url
         mock.method = method
