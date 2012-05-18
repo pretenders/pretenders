@@ -54,13 +54,3 @@ One of our goals will be that the wire protocol is simple enough that you do
 not need any specialised client. That said, we will be providing client
 libraries (at least one in Python) to simplify interacting with the server,
 and to provide a comfortable API to use in tests.
-
-..
-  pretenders.smtp - SMTP server
-  -----------------------------
-
-  Typical usage is to record a system's outgoing mail for further analysis.
-  No pre-programmed responses are necessary, just an API for checking
-  status and retrieving sent messages.
-
-  Implementation is based on ``smtpd.SMTPServer``
