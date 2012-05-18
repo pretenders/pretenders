@@ -20,7 +20,7 @@ def get_header(header, default=None):
     return request.headers.get(header, default)
 
 
-def select_preset(path):
+def select_preset(url):
     """Select a preset to respond with.
 
     Look through the presets for a match. If one is found pop off a preset
@@ -29,45 +29,45 @@ def select_preset(path):
     Return 404 if no preset found that matches.
     Return 405 if no preset matches required method.
     """
-    path_match = False
+    url_match = False
     for key, preset_list in presets.items():
         preset = preset_list[0]
-        preset_path = preset['match-path']
+        preset_url = preset['match-url']
         preset_method = preset['match-method']
-        if re.match(preset_path, path):
+        if re.match(preset_url, url):
             if re.match(preset_method, request.method):
                 del preset_list[0]
                 if not preset_list:
                     del presets[key]
                 return preset
             else:
-                path_match = True
+                url_match = True
 
-    if path_match:
-        raise HTTPResponse(b"Path matched but invalid method", status=405)
+    if url_match:
+        raise HTTPResponse(b"URL matched but invalid method", status=405)
     else:
         raise HTTPResponse(b"No matching preset response", status=404)
 
 
-@route('/mock<path:path>', method='ANY')
-def replay(path):
+@route('/mock<url:path>', method='ANY')
+def replay(url):
     """
     Replay a previously recorded preset, and save the request in history
     """
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
-    relative_url = path
+    relative_url = url
     if request.query_string:
         relative_url = "{0}?{1}".format(relative_url, request.query_string)
     saved_request = {
         'body': request.body.read(),
         'headers': to_dict(request.headers),
         'method': request.method,
-        'path': relative_url,
+        'url': relative_url,
     }
     history.append(saved_request)
 
-    preset = select_preset(path)
+    preset = select_preset(url)
 
     for header, value in preset['headers'].items():
         response.set_header(header, value)
@@ -84,18 +84,18 @@ def add_preset():
                       include=lambda x: not x.startswith('X-Pretend-'))
 
     method = get_header('X-Pretend-Match-Method', '')
-    path = get_header('X-Pretend-Match-Path', '')
+    url = get_header('X-Pretend-Match-Url', '')
 
-    if (path, method) not in presets:
-        presets[(path, method)] = []
+    if (url, method) not in presets:
+        presets[(url, method)] = []
 
-    path_presets = presets[(path, method)]
-    path_presets.append({
+    url_presets = presets[(url, method)]
+    url_presets.append({
         'headers': headers,
         'body': request.body.read(),
         'status': int(get_header('X-Pretend-Response-Status', 200)),
         'match-method': method,
-        'match-path': path,
+        'match-url': url,
     })
 
 
@@ -117,7 +117,7 @@ def get_history(ordinal):
         for header, value in saved['headers'].items():
             response.set_header(header, value)
         response.set_header('X-Pretend-Request-Method', saved['method'])
-        response.set_header('X-Pretend-Request-Path', saved['path'])
+        response.set_header('X-Pretend-Request-Url', saved['url'])
         return saved['body']
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)

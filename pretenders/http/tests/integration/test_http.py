@@ -5,12 +5,12 @@ from pretenders.http.client import Client
 test_client = Client('localhost', 8000)
 
 
-def add_test_preset(match_path='/fred/test/one',
+def add_test_preset(match_url='/fred/test/one',
                     match_method="POST",
                     response_body='You tested fred well',
                     response_status=200,
                     ):
-    test_client.add_preset(match_path=match_path,
+    test_client.add_preset(match_url=match_url,
                            match_method=match_method,
                            response_status=response_status,
                            response_body=response_body)
@@ -27,7 +27,7 @@ def test_configure_request_and_check_values():
     request = test_client.get_request(0)
 
     assert_equals(request.method, 'POST')
-    assert_equals(request.path, '/fred/test/one')
+    assert_equals(request.url, '/fred/test/one')
     assert_equals(request.body, b'')
 
 
@@ -41,7 +41,7 @@ def test_perform_wrong_method_on_configured_url():
     historical_call = test_client.get_request(0)
 
     assert_equals(historical_call.method, 'GET')
-    assert_equals(historical_call.path, '/fred/test/one')
+    assert_equals(historical_call.url, '/fred/test/one')
     assert_equals(historical_call.body, b'')
 
 
@@ -53,7 +53,7 @@ def test_url_query_string():
 
     historical_call = test_client.get_request(0)
     assert_equals(historical_call.method, 'GET')
-    assert_equals(historical_call.path, '/test/two?a=1&b=2')
+    assert_equals(historical_call.url, '/test/two?a=1&b=2')
     assert_equals(historical_call.body, b'')
 
 
@@ -89,8 +89,8 @@ def test_configure_multiple_rules_independent():
     assert_equals(response.status, 404)
 
 
-def test_configure_multiple_rules_path_match():
-    """We get responses based on the path used.
+def test_configure_multiple_rules_url_match():
+    """We get responses based on the url used.
     """
     test_client.reset_all()
     add_test_preset('/test_500', response_status=500)
@@ -161,10 +161,10 @@ def test_multiple_responses_for_a_url():
 
 def test_regular_expression_matching():
     "Test with regular expression matching"
-    path = r'^/something/([a-zA-Z0-9\-_]*)/?'
+    url = r'^/something/([a-zA-Z0-9\-_]*)/?'
     test_client.reset_all()
     for i in range(5):
-        add_test_preset(path, response_status=200)
+        add_test_preset(url, response_status=200)
 
     for url, expected_status_in_sequence in [('/something/fred', 200),
                                              ('/something/10dDf', 200),
@@ -177,8 +177,8 @@ def test_regular_expression_matching():
         assert_equals(response.status, expected_status_in_sequence)
 
 
-def test_blank_path_matches_anything():
-    "A blank path matcher header matches any path"
+def test_blank_url_matches_anything():
+    "A blank url matcher header matches any url"
     test_client.reset_all()
     add_test_preset("", response_status=200)
     response = test_client._mock.post(url='/some/strange/12121/string')
@@ -187,7 +187,7 @@ def test_blank_path_matches_anything():
     assert_equals(response.status, 404)
 
 
-def test_missing_method_and_path_matches_anything():
+def test_missing_method_and_url_matches_anything():
     "Missing matcher headers match anything"
     test_client.reset_all()
     test_client.add_preset(response_status=323,

@@ -45,11 +45,11 @@ class SubClient(object):
 
 class PresetClient(SubClient):
 
-    def add(self, match_path='', match_method='', response_status=200,
+    def add(self, match_url='', match_method='', response_status=200,
                 response_body='', response_headers={}):
         headers = response_headers.copy()
         headers.update({
-            'X-Pretend-Match-Path': match_path,
+            'X-Pretend-Match-Url': match_url,
             'X-Pretend-Match-Method': match_method,
             'X-Pretend-Response-Status': response_status,
         })
@@ -120,8 +120,8 @@ class Request(object):
         self.headers = CaseInsensitiveDict(self.response.getheaders())
         self.method = self.headers['X-Pretend-Request-Method']
         del self.headers['X-Pretend-Request-Method']
-        self.path = self.headers['X-Pretend-Request-Path']
-        del self.headers['X-Pretend-Request-Path']
+        self.url = self.headers['X-Pretend-Request-Url']
+        del self.headers['X-Pretend-Request-Url']
         self._request_body = None
         del self.headers['Server']
 
@@ -130,16 +130,3 @@ class Request(object):
         if not self._request_body:
             self._request_body = self.response.read()
         return self._request_body
-
-
-if __name__ == '__main__':
-    c = Client('localhost', 8000)
-    c.add_preset(match_path='/fred/test/one',
-                 match_method='GET',
-                 response_status=200,
-                 response_body='You tested fred well')
-
-    response = c._mock.get(url='/fred/test/one')
-    response = c.get_request(0)
-    print(response.headers)
-    print(response.body)
