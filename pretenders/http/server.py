@@ -30,14 +30,14 @@ def select_preset(path):
     """
     path_match = False
     for key, preset_list in presets.items():
-        if not len(preset_list):
-            continue
         preset = preset_list[0]
         preset_path = preset['match-path']
         preset_method = preset['match-method']
         if re.match(preset_path, path):
             if re.match(preset_method, request.method):
                 del preset_list[0]
+                if not preset_list:
+                    del presets[key]
                 return preset
             else:
                 path_match = True
