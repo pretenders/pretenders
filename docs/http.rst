@@ -1,3 +1,5 @@
+.. _pretend-http:
+
 HTTP Pretenders
 ===============
 
@@ -30,7 +32,7 @@ Resource URLs:
   target individual items, e.g.:
 
     * ``/history/0`` - the first recorded request
-* ``/history/?url=&method=&status`` - matched recorded data
+..    * ``/history/?url=&method=&status`` - matched recorded data
 
 The presets contain all the information necessary to later produce a
 pre-canned response. The mapping is as follows:
@@ -39,9 +41,12 @@ pre-canned response. The mapping is as follows:
 * response status = preset header ``X-Pretend-Response-Status``
 * response headers = all request headers, excluding those beginning with 
   ``X-Pretend-``
+* URL matcher (regex) = preset header ``X-Pretend-Match-Url``
+* HTTP methods to match (regex) = ``X-Pretend-Match-Method``
 
 Preset responses are returned by the mock service in the order they have been
-preset.
+preset, as long as they match, i.e. the first precanned response in the first
+matching preset (both URL and method) will be returned.
 
 History will contain all requests that have been issued to the mock service.
 History can be queried with HTTP GET, and responses will contain information
@@ -51,9 +56,6 @@ from the saved requests:
 * The method used will be in a header ``X-Pretend-Request-Header``
 * The (relative) URL will be in a header ``X-Pretend-Request-Path``
 
-..
-  * URL matcher (regex) = X-Pretend-Match-Url
-  * HTTP methods to match = X-Pretend-Match-Methods (comma separated)
 
 The mocked service
 ~~~~~~~~~~~~~~~~~~
