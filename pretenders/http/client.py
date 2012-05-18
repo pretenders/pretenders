@@ -15,7 +15,7 @@ class SubClient(object):
         self.conn = HTTPConnection(base_url)
 
     def request(self, *args, **kwargs):
-        print(args, kwargs)
+        print('Requesting with:', args, kwargs)
         self.conn.request(*args, **kwargs)
         return self.conn.getresponse()
 
@@ -33,7 +33,7 @@ class SubClient(object):
         if filters:
             query_string = '?{0}'.format(urllib.urlencode(filters))
         url = '{0}{1}'.format(self.url, query_string)
-        print(url)
+
         return self.do_get(url=url)
 
     def reset(self):

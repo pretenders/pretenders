@@ -1,8 +1,10 @@
+import re
+from collections import OrderedDict
+
 from bottle import request, response, route, run, HTTPResponse
 from bottle import delete, get, post
 
-
-presets = []
+presets = OrderedDict()
 history = []
 
 
@@ -15,6 +17,35 @@ def to_dict(wsgi_headers, include=lambda _: True):
 
 def get_header(header, default=None):
     return request.headers.get(header, default)
+
+
+def select_preset(path):
+    """Select a preset to respond with.
+
+    Look through the presets for a match. If one is found pop off a preset
+    response and return it.
+
+    Return 404 if no preset found that matches.
+    Return 405 if no preset matches required method.
+    """
+    path_match = False
+    for key, preset_list in presets.items():
+        if not len(preset_list):
+            continue
+        preset = preset_list[0]
+        preset_path = preset['match-path']
+        preset_method = preset['match-method']
+        if re.match(preset_path, path):
+            if request.method == preset_method or preset_method == '*':
+                del preset_list[0]
+                return preset
+            else:
+                path_match = True
+
+    if path_match:
+        raise HTTPResponse(b"Path matched but invalid method", status=405)
+    else:
+        raise HTTPResponse(b"No matching preset response", status=404)
 
 
 @route('/mock<path:path>', method='ANY')
@@ -34,7 +65,9 @@ def replay(path):
         'path': relative_url,
     }
     history.append(saved_request)
-    preset = presets.pop(0)
+
+    preset = select_preset(path)
+
     for header, value in preset['headers'].items():
         response.set_header(header, value)
     response.status = preset['status']
@@ -48,12 +81,20 @@ def add_preset():
     """
     headers = to_dict(request.headers,
                       include=lambda x: not x.startswith('X-Pretend-'))
-    presets.append({
+
+    method = get_header('X-Pretend-Match-Method')
+    path = get_header('X-Pretend-Match-Path')
+
+    if (path, method) not in presets:
+        presets[(path, method)] = []
+
+    path_presets = presets[(path, method)]
+    path_presets.append({
         'headers': headers,
-        'body': request.body,
+        'body': request.body.read(),
         'status': int(get_header('X-Pretend-Response-Status', 200)),
-        'match-method': get_header('X-Pretend-Match-Method'),
-        'match-path': get_header('X-Pretend-Match-Path'),
+        'match-method': method,
+        'match-path': path,
     })
 
 
@@ -62,7 +103,7 @@ def clear_presets():
     """
     Delete all recorded presets
     """
-    del presets[:]
+    presets.clear()
 
 
 @get('/history/<ordinal:int>')
