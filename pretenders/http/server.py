@@ -1,10 +1,10 @@
+import re
+from collections import OrderedDict
+
 from bottle import request, response, route, run, HTTPResponse
 from bottle import delete, get, post
 
-PATH_MATCH = 0
-INDEPENDENT_RESPONSES = 1
-mode = PATH_MATCH
-presets = []
+presets = OrderedDict()
 history = []
 
 
@@ -22,42 +22,30 @@ def get_header(header, default=None):
 def select_preset(path):
     """Select a preset to respond with.
 
-    If the current mode is ``INDEPENDENT_RESPONSES`` pop the top preset and
-    return it.
-
-    Otherwise match the path and request method to pick the appropriate preset.
+    Look through the presets for a match. If one is found pop off a preset
+    response and return it.
 
     Return 404 if no preset found that matches.
     Return 405 if no preset matches required method.
     """
-    if mode == INDEPENDENT_RESPONSES:
-        return presets.pop(0)
+    path_match = False
+    for key, preset_list in presets.items():
+        if not len(preset_list):
+            continue
+        preset = preset_list[0]
+        preset_path = preset['match-path']
+        preset_method = preset['match-method']
+        if re.match(preset_path, path):
+            if request.method == preset_method or preset_method == '*':
+                del preset_list[0]
+                return preset
+            else:
+                path_match = True
+
+    if path_match:
+        raise HTTPResponse(b"Path matched but invalid method", status=405)
     else:
-        path_match = False
-        for preset in presets:
-            preset_path = preset['match-path']
-            preset_method = preset['match-method']
-            if preset_path == path:
-                if request.method == preset_method or preset_method == '*':
-                    return preset
-                else:
-                    path_match = True
-
-        if path_match:
-            raise HTTPResponse(b"Path matched but invalid method", status=405)
-        else:
-            raise HTTPResponse(b"No matching preset response", status=404)
-
-
-@post('/mode')
-def set_mode():
-    "Set the mode by which we select presets"
-    global mode
-    msg = request.body.read()
-    if msg == b'path_match':
-        mode = PATH_MATCH
-    elif msg == b'independent_responses':
-        mode = INDEPENDENT_RESPONSES
+        raise HTTPResponse(b"No matching preset response", status=404)
 
 
 @route('/mock<path:path>', method='ANY')
@@ -93,12 +81,20 @@ def add_preset():
     """
     headers = to_dict(request.headers,
                       include=lambda x: not x.startswith('X-Pretend-'))
-    presets.append({
+
+    method = get_header('X-Pretend-Match-Method')
+    path = get_header('X-Pretend-Match-Path')
+
+    if (path, method) not in presets:
+        presets[(path, method)] = []
+
+    path_presets = presets[(path, method)]
+    path_presets.append({
         'headers': headers,
         'body': request.body.read(),
         'status': int(get_header('X-Pretend-Response-Status', 200)),
-        'match-method': get_header('X-Pretend-Match-Method'),
-        'match-path': get_header('X-Pretend-Match-Path'),
+        'match-method': method,
+        'match-path': path,
     })
 
 
@@ -107,7 +103,7 @@ def clear_presets():
     """
     Delete all recorded presets
     """
-    del presets[:]
+    presets.clear()
 
 
 @get('/history/<ordinal:int>')

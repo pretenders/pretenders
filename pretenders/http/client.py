@@ -76,8 +76,6 @@ class Client(object):
         self.history = SubClient(full_host, '/history')
         self._mock = MockClient(full_host, '/mock')
 
-        self._servermode = SubClient(full_host, '/mode')
-
     def reset_all(self):
         self.preset.reset()
         self.history.reset()
@@ -110,12 +108,6 @@ class Request(object):
             self._request_body = self.response.read()
         return self._request_body
 
-    def set_server_mode(self, path_match=False):
-        if path_match:
-            body_text = 'path_match'
-        else:
-            body_text = 'independent_responses'
-        self._servermode.do_post(url='/mode', body=body_text)
 
 if __name__ == '__main__':
     c = Client('localhost', 8000)
