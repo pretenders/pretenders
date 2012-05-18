@@ -35,7 +35,6 @@ def select_preset(path):
         preset = preset_list[0]
         preset_path = preset['match-path']
         preset_method = preset['match-method']
-        print("Method: {0}, Preset Method: {1}".format(preset_method, request.method))
         if re.match(preset_path, path):
             if re.match(preset_method, request.method):
                 del preset_list[0]
