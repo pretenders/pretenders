@@ -62,7 +62,7 @@ class HttpMock(object):
         self.url = ''
         self.method = ''
 
-    def reset_all(self):
+    def reset(self):
         self.preset.reset()
         self.history.reset()
 
