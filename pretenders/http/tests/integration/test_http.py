@@ -156,15 +156,14 @@ def test_multiple_responses_for_a_url():
     http_mock.when('/test_url_pattern').reply(status=301)
     http_mock.when('/test_url_pattern').reply(status=410)
 
-    for url, expected_status_in_sequence in [('/test_url_pattern', 200),
-                                             ('/test_url_pattern', 301),
-                                             ('/test_url_pattern', 410),
-                                             ('/test_url_pattern_2', 201),
-                                             ('/test_url_pattern', 404),
-                                             ('/test_url_pattern_2', 404)
-                                              ]:
+    for url, expected_status in [('/test_url_pattern', 200),
+                                 ('/test_url_pattern', 301),
+                                 ('/test_url_pattern', 410),
+                                 ('/test_url_pattern_2', 201),
+                                 ('/test_url_pattern', 404),
+                                 ('/test_url_pattern_2', 404)]:
         response = fake_client.get(url=url)
-        assert_equals(response.status, expected_status_in_sequence)
+        assert_equals(response.status, expected_status)
 
 
 def test_regular_expression_matching():
@@ -174,21 +173,20 @@ def test_regular_expression_matching():
     for i in range(5):
         http_mock.when(url).reply(status=200)
 
-    for url, expected_status_in_sequence in [('/something/fred', 200),
-                                             ('/something/10dDf', 200),
-                                             ('/something/bbcDDD', 200),
-                                             ('/something/13Fdr', 200),
-                                             ('/something/1', 200),
-                                             ('/something/Aaaa', 404),
-                                              ]:
+    for url, expected_status in [('/something/fred', 200),
+                                 ('/something/10dDf', 200),
+                                 ('/something/bbcDDD', 200),
+                                 ('/something/13Fdr', 200),
+                                 ('/something/1', 200),
+                                 ('/something/Aaaa', 404)]:
         response = fake_client.get(url=url)
-        assert_equals(response.status, expected_status_in_sequence)
+        assert_equals(response.status, expected_status)
 
 
 def test_blank_url_matches_anything():
     "A blank url matcher header matches any url"
     http_mock.reset()
-    http_mock.reply(status=200)
+    http_mock.when(url='', method='POST').reply(status=200)
     response = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 200)
     response = fake_client.post(url='/some/strange/12121/string')
