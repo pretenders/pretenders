@@ -41,8 +41,11 @@ pre-canned response. The mapping is as follows:
 * response status = preset header ``X-Pretend-Response-Status``
 * response headers = all request headers, excluding those beginning with 
   ``X-Pretend-``
+
+It also contains optional matching information to determine which pre-canned
+responses apply to which requests:
 * URL matcher (regex) = preset header ``X-Pretend-Match-Url``
-* HTTP methods to match (regex) = ``X-Pretend-Match-Method``
+* HTTP methods to match (regex) = preset header ``X-Pretend-Match-Method``
 
 Preset responses are returned by the mock service in the order they have been
 preset, as long as they match, i.e. the first precanned response in the first

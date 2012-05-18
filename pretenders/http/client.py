@@ -1,3 +1,4 @@
+from copy import copy
 import urllib
 try:
     from http.client import HTTPConnection
@@ -14,33 +15,23 @@ class SubClient(object):
         self.full_url = '{0}{1}'.format(base_url, self.url)
         self.conn = HTTPConnection(base_url)
 
-    def request(self, *args, **kwargs):
-        print('Requesting with:', args, kwargs)
-        self.conn.request(*args, **kwargs)
+    def http(self, method, *args, **kwargs):
+        # print('Requesting with:', args, kwargs)
+        self.conn.request(method=method, *args, **kwargs)
         return self.conn.getresponse()
 
-    def do_post(self, *args, **kwargs):
-        return self.request(method="POST", *args, **kwargs)
-
-    def do_get(self, *args, **kwargs):
-        return self.request(method="GET", *args, **kwargs)
-
-    def do_delete(self, *args, **kwargs):
-        return self.request(method="DELETE", *args, **kwargs)
+    def get(self, id):
+        return self.http('GET', url='{0}/{1}'.format(self.url, id))
 
     def list(self, filters={}):
         query_string = ''
         if filters:
             query_string = '?{0}'.format(urllib.urlencode(filters))
         url = '{0}{1}'.format(self.url, query_string)
-
-        return self.do_get(url=url)
+        return self.http('GET', url=url)
 
     def reset(self):
-        return self.do_delete(url=self.url)
-
-    def get_by_id(self, unique_id):
-        return self.do_get(url='{0}/{1}'.format(self.url, unique_id))
+        return self.http('DELETE', url=self.url)
 
 
 class PresetClient(SubClient):
@@ -53,12 +44,13 @@ class PresetClient(SubClient):
             'X-Pretend-Match-Method': match_method,
             'X-Pretend-Response-Status': response_status,
         })
-        return self.do_post(url=self.url,
-                            body=response_body,
-                            headers=headers)
+        return self.http('POST',
+                         url=self.url,
+                         body=response_body,
+                         headers=headers)
 
 
-class Client(object):
+class HttpMock(object):
 
     def __init__(self, host, port=9000):
         self.host = host
@@ -67,16 +59,28 @@ class Client(object):
 
         self.preset = PresetClient(full_host, '/preset')
         self.history = SubClient(full_host, '/history')
+        self.url = ''
+        self.method = ''
 
     def reset_all(self):
         self.preset.reset()
         self.history.reset()
 
+    def when(self, url='', method='GET'):
+        mock = copy(self)
+        mock.url = url
+        mock.method = method
+        return mock
+
+    def reply(self, body=b'', status=200, headers={}):
+        self.preset.add(self.url, self.method, status, body, headers)
+        return self
+
     def add_preset(self, *args, **kwargs):
         return self.preset.add(*args, **kwargs)
 
     def get_request(self, sequence_id=None):
-        return Request(self.history.get_by_id(sequence_id))
+        return Request(self.history.get(sequence_id))
 
 
 class CaseInsensitiveDict(dict):

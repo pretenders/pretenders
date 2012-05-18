@@ -1,20 +1,20 @@
 from nose.tools import assert_equals
 
-from pretenders.http.client import Client, SubClient
+from pretenders.http.client import HttpMock, SubClient
 
 
 class MockClient(SubClient):
 
     def get(self, url, *args, **kwargs):
         url = "{0}{1}".format(self.url, url)
-        return self.do_get(url=url, *args, **kwargs)
+        return self.http('GET', url=url, *args, **kwargs)
 
     def post(self, url, *args, **kwargs):
         url = "{0}{1}".format(self.url, url)
-        return self.do_post(url=url, *args, **kwargs)
+        return self.http('POST', url=url, *args, **kwargs)
 
 
-test_client = Client('localhost', 8000)
+test_client = HttpMock('localhost', 8000)
 mock_client = MockClient('localhost:8000', '/mock')
 
 
