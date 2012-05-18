@@ -35,8 +35,9 @@ def select_preset(path):
         preset = preset_list[0]
         preset_path = preset['match-path']
         preset_method = preset['match-method']
+        print("Method: {0}, Preset Method: {1}".format(preset_method, request.method))
         if re.match(preset_path, path):
-            if request.method == preset_method or preset_method == '*':
+            if re.match(preset_method, request.method):
                 del preset_list[0]
                 return preset
             else:
@@ -82,8 +83,8 @@ def add_preset():
     headers = to_dict(request.headers,
                       include=lambda x: not x.startswith('X-Pretend-'))
 
-    method = get_header('X-Pretend-Match-Method')
-    path = get_header('X-Pretend-Match-Path')
+    method = get_header('X-Pretend-Match-Method', '')
+    path = get_header('X-Pretend-Match-Path', '')
 
     if (path, method) not in presets:
         presets[(path, method)] = []
