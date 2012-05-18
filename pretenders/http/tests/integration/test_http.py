@@ -176,6 +176,7 @@ def test_regular_expression_matching():
 
 
 def test_blank_path_matches_anything():
+    "A blank path matcher header matches any path"
     test_client.reset_all()
     add_test_preset("", response_status=200)
     response = test_client._mock.post(url='/some/strange/12121/string')
@@ -185,6 +186,7 @@ def test_blank_path_matches_anything():
 
 
 def test_missing_method_and_path_matches_anything():
+    "Missing matcher headers match anything"
     test_client.reset_all()
     test_client.add_preset(response_status=323,
                            response_body=b'Hello')
