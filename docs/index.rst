@@ -11,6 +11,40 @@ used in system integration tests or manual tests where there is a need to
 simulate the behaviour of third party software that is not necessarily under
 your control.
 
+Example usage
+-------------
+
+Start the server::
+
+    $ python -m pretenders.http.server
+
+HTTP mock in a test case::
+
+    from pretenders.http.client import HttpMock
+
+    # Assume a running server
+    # Initialise the mock client and clear all responses
+    mock = HttpMock('localhost', 8000)
+
+    # For GET requests to /hello reply with a body of 'Hello'
+    mock.when('/hello', 'GET').reply('Hello')
+
+    # For the next POST  or PUT to /somewhere, simulate a BAD REQUEST status code
+    mock.when('/somewhere', '(POST|PUT)').reply(status=400)
+
+    # For the next request (any method, any URL) respond with some JSON data
+    mock.reply('{"temperature": 23}', headers={'Content-Type': 'application/json'})
+
+    # Your code is exercised here
+    ...
+
+    # Verify requests your code made
+    r = mock.get_request(0)
+    assert_equal(r.method, 'GET')
+    assert_equal(r.url, '/weather?city=barcelona')
+
+
+
 Contents:
 
 .. toctree::
