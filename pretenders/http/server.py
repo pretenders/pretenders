@@ -131,17 +131,19 @@ def clear_history():
     del history[:]
 
 
-def run(port=8000):
+def run(host='localhost', port=8000):
     "Start the mock HTTP server"
-    run_bottle(host='localhost', port=port, reloader=True)
+    run_bottle(host=host, port=port, reloader=True)
 
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Start the server')
-    parser.add_argument('--port', dest='port', type=int, default=8000,
-                       help='port number to run the server on (default: 8000)')
+    parser.add_argument('-H', '--host', dest='host', default='localhost',
+                help='host/IP to run the server on (default: localhost)')
+    parser.add_argument('-p', '--port', dest='port', type=int, default=8000,
+                help='port number to run the server on (default: 8000)')
 
     args = parser.parse_args()
-    run(args.port)
+    run(args.host, args.port)
