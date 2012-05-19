@@ -137,4 +137,11 @@ def run(port=8000):
 
 
 if __name__ == "__main__":
-    run()
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Start the server')
+    parser.add_argument('--port', dest='port', type=int, default=8000,
+                       help='port number to run the server on (default: 8000)')
+
+    args = parser.parse_args()
+    run(args.port)
