@@ -37,8 +37,6 @@ our code with external services, regardless of the service protocol.
 pretenders.http - HTTP server
 -----------------------------
 
-(See :ref:`pretend-http` for implementation details)
-
 Typical usage is to mock RESTful/SOAP APIs of external services.
 This will normally require pre-programming the service with responses,
 and enquiring the service later about received requests. This can be done

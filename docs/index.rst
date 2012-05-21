@@ -14,9 +14,9 @@ your control.
 Example usage
 -------------
 
-Start the server::
+Start the server to listen on all network interfaces::
 
-    $ python -m pretenders.http.server
+    $ python -m pretenders.http.server --host 0.0.0.0 --port 8000
 
 HTTP mock in a test case::
 
