@@ -138,6 +138,7 @@ def run(host='localhost', port=8000):
 
 if __name__ == "__main__":
     import argparse
+    import os
 
     parser = argparse.ArgumentParser(description='Start the server')
     parser.add_argument('-H', '--host', dest='host', default='localhost',
@@ -146,4 +147,7 @@ if __name__ == "__main__":
                 help='port number to run the server on (default: 8000)')
 
     args = parser.parse_args()
+    pid = os.getpid()
+    with open('pretender-http.pid', 'w') as f:
+        f.write(str(pid))
     run(args.host, args.port)
