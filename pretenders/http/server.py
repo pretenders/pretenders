@@ -2,7 +2,6 @@ import re
 import traceback
 from collections import OrderedDict
 
-import bottle
 from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
@@ -87,7 +86,6 @@ def replay(url):
     return preset['body']
 
 
-
 @post('/preset')
 def add_preset():
     """
@@ -136,8 +134,7 @@ def get_history(ordinal):
         return saved['body']
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
-    except Exception as e:
-        # print('Exception: {0}'.format(e))
+    except Exception:
         traceback.print_exc()
 
 
