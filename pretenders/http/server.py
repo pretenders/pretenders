@@ -1,12 +1,23 @@
 import re
+import traceback
 from collections import OrderedDict
 
+import bottle
 from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
 
+
+REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
+
 presets = OrderedDict()
 history = []
+
+
+def acceptable_response_header(header):
+    "Use to filter which HTTP headers in the request should be removed"
+    return not (header.startswith('X-Pretend-') or
+                header in REQUEST_ONLY_HEADERS)
 
 
 def to_dict(wsgi_headers, include=lambda _: True):
@@ -66,6 +77,7 @@ def replay(url):
         'url': relative_url,
     }
     history.append(saved_request)
+    # print(saved_request)
 
     preset = select_preset(url)
 
@@ -75,13 +87,13 @@ def replay(url):
     return preset['body']
 
 
+
 @post('/preset')
 def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    headers = to_dict(request.headers,
-                      include=lambda x: not x.startswith('X-Pretend-'))
+    headers = to_dict(request.headers, include=acceptable_response_header)
 
     method = get_header('X-Pretend-Match-Method', '')
     url = get_header('X-Pretend-Match-Url', '')
@@ -90,13 +102,15 @@ def add_preset():
         presets[(url, method)] = []
 
     url_presets = presets[(url, method)]
-    url_presets.append({
+    new_preset = {
         'headers': headers,
         'body': request.body.read(),
         'status': int(get_header('X-Pretend-Response-Status', 200)),
         'match-method': method,
         'match-url': url,
-    })
+    }
+    url_presets.append(new_preset)
+    # print('New preset: {0}'.format(new_preset))
 
 
 @delete('/preset')
@@ -115,12 +129,16 @@ def get_history(ordinal):
     try:
         saved = history[ordinal]
         for header, value in saved['headers'].items():
-            response.set_header(header, value)
+            if acceptable_response_header(header):
+                response.set_header(header, value)
         response.set_header('X-Pretend-Request-Method', saved['method'])
         response.set_header('X-Pretend-Request-Url', saved['url'])
         return saved['body']
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
+    except Exception as e:
+        # print('Exception: {0}'.format(e))
+        traceback.print_exc()
 
 
 @delete('/history')
@@ -150,4 +168,5 @@ if __name__ == "__main__":
     pid = os.getpid()
     with open('pretender-http.pid', 'w') as f:
         f.write(str(pid))
+    # bottle.debug(True)
     run(args.host, args.port)
