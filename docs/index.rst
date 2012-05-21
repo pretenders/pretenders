@@ -3,13 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Pretenders's documentation!
-======================================
+Pretenders: Configurable Fake Servers
+=====================================
 
 Pretenders are Mocks for network applications. They are mainly designed to be
 used in system integration tests or manual tests where there is a need to 
 simulate the behaviour of third party software that is not necessarily under
 your control.
+
+Installation
+------------
+
+Simply type::
+
+    $ pip install pretenders
 
 Example usage
 -------------
@@ -43,9 +50,15 @@ HTTP mock in a test case::
     assert_equal(r.method, 'GET')
     assert_equal(r.url, '/weather?city=barcelona')
 
+Source code
+-----------
 
+Sources can be found at https://github.com/txels/pretenders
 
-Contents:
+Contributions are welcome.
+
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
@@ -53,7 +66,6 @@ Contents:
    intro
    http
 
-Sources can be found at https://github.com/txels/pretenders
 
 Indices and tables
 ==================
