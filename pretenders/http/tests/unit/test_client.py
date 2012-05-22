@@ -1,5 +1,5 @@
 from nose.tools import assert_equals, assert_true, assert_false
-from mock import patch
+from mock import patch, call
 
 from pretenders.http.client import CaseInsensitiveDict, SubClient
 
@@ -53,4 +53,4 @@ def test_subclient_connection_created_only_when_needed(HTTPConnection):
     assert_false(HTTPConnection.called)
     # access the connection
     client.conn
-    assert_equals(HTTPConnection.call_args, ('localhost:8000',))
+    assert_equals(HTTPConnection.call_args, call('localhost:8000',))
