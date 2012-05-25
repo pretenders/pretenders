@@ -23,10 +23,6 @@ def send_dummy_email(from_email='test@test.com',
     s.quit()
 
 
-def test_():
-    send_dummy_email()
-
-
 def test_check_sent_email_content():
     smtp_mock.reset()
     from_email = 'pretenders_from@test.com'
