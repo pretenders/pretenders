@@ -1,6 +1,6 @@
 from nose.tools import assert_equals
 
-from pretenders.http.client import HttpMock, SubClient
+from pretenders.http.client import HTTPMock, SubClient
 
 
 class FakeClient(SubClient):
@@ -14,7 +14,7 @@ class FakeClient(SubClient):
         return self.http('POST', url=url, *args, **kwargs)
 
 
-http_mock = HttpMock('localhost', 8000)
+http_mock = HTTPMock('localhost', 8000)
 fake_client = FakeClient('localhost:8000', '/mock')
 
 
