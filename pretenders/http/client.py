@@ -13,7 +13,13 @@ class SubClient(object):
         self.base_url = base_url
         self.url = url
         self.full_url = '{0}{1}'.format(base_url, self.url)
-        self.conn = HTTPConnection(base_url)
+        self._conn = None
+
+    @property
+    def conn(self):
+        if not self._conn:
+            self._conn = HTTPConnection(self.base_url)
+        return self._conn
 
     def http(self, method, *args, **kwargs):
         # print('Requesting with:', args, kwargs)
