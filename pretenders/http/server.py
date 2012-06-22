@@ -1,6 +1,10 @@
 import re
 import traceback
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    # OrderedDict was introduced in Python 2.7
+    from pretenders.util.ordered_dict import OrderedDict
 
 from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
@@ -23,7 +27,11 @@ def to_dict(wsgi_headers, include=lambda _: True):
     """
     Convert WSGIHeaders to a dict so that it can be JSON-encoded
     """
-    return {k: v for k, v in wsgi_headers.items() if include(k)}
+    ret = {}
+    for k, v in wsgi_headers.items():
+        if include(k):
+            ret[k] = v
+    return ret
 
 
 def get_header(header, default=None):
