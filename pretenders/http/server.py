@@ -4,7 +4,7 @@ try:
     from collections import OrderedDict
 except ImportError:
     # OrderedDict was introduced in Python 2.7
-    from pretenders.util.ordered_dict import OrderedDict
+    from pretenders.compat.ordered_dict import OrderedDict
 
 from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
