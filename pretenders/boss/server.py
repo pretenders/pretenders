@@ -93,21 +93,13 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    headers = to_dict(request.headers, include=acceptable_response_header)
+    preset_body = request.body.read().decode('ascii')
+    new_preset = json.loads(preset_body)
+    rule = tuple(new_preset['rules'])
+    if rule not in presets:
+        presets[rule] = []
 
-    method = get_header('X-Pretend-Match-Method', '')
-    url = get_header('X-Pretend-Match-Url', '')
-
-    if (url, method) not in presets:
-        presets[(url, method)] = []
-
-    url_presets = presets[(url, method)]
-    new_preset = {
-        'headers': headers,
-        'body': request.body.read().decode('ascii'),
-        'status': int(get_header('X-Pretend-Response-Status', 200)),
-        'rules': [url, method],
-    }
+    url_presets = presets[rule]
     url_presets.append(new_preset)
 
 
