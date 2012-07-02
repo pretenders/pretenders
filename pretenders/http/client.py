@@ -21,10 +21,10 @@ class PresetClient(SubClient):
 
 class HTTPMock(object):
 
-    def __init__(self, host, port=9000):
+    def __init__(self, host, boss_port):
         self.host = host
-        self.port = port
-        full_host = "{0}:{1}".format(self.host, self.port)
+        self.boss_port = boss_port
+        full_host = "{0}:{1}".format(self.host, self.boss_port)
 
         self.preset = PresetClient(full_host, '/preset')
         self.history = SubClient(full_host, '/history')
