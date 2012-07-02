@@ -15,7 +15,7 @@ class FakeClient(SubClient):
 
 
 http_mock = HTTPMock('localhost', 8000)
-fake_client = FakeClient('localhost:8000', '/mock')
+fake_client = FakeClient('localhost:8001', '/mock')
 
 
 def add_test_preset(url='/fred/test/one',
