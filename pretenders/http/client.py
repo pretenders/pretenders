@@ -14,7 +14,7 @@ class PresetClient(SubClient):
             'X-Pretend-Response-Status': response_status,
         })
         return self.http('POST',
-                         url=self.url,
+                         url=self.path,
                          body=response_body,
                          headers=headers)
 
