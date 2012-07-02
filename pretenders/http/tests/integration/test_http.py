@@ -20,7 +20,7 @@ fake_client = FakeClient('localhost:8001', '/mock')
 
 def add_test_preset(url='/fred/test/one',
                     method="POST",
-                    body='You tested fred well',
+                    body=b'You tested fred well',
                     status=200):
     http_mock.when(url, method).reply(body, status)
 
@@ -120,12 +120,12 @@ def test_configure_multiple_rules_url_match():
 def test_method_matching():
     "Test that server matches methods correctly."
     http_mock.reset()
-    http_mock.when('/test_get', 'GET').reply('You tested a get', 200)
-    http_mock.when('/test_post', 'POST').reply('You tested a post', 201)
-    http_mock.when('/test_star', '.*').reply('You tested a .*', 202)
-    http_mock.when('/test_star', '.*').reply('You tested a .*', 202)
+    http_mock.when('/test_get', 'GET').reply(b'You tested a get', 200)
+    http_mock.when('/test_post', 'POST').reply(b'You tested a post', 201)
+    http_mock.when('/test_star', '.*').reply(b'You tested a .*', 202)
+    http_mock.when('/test_star', '.*').reply(b'You tested a .*', 202)
     http_mock.when('/test_put_or_post', '(PUT|POST)').reply(
-            'You tested a PUT or a POST',  203)
+            b'You tested a PUT or a POST',  203)
 
     # Only GET works when GET matched
     assert_equals(404, fake_client.post(url="/test_get").status)

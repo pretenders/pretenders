@@ -58,7 +58,7 @@ def replay(url):
         for header, value in preset['headers'].items():
             response.set_header(header, value)
         response.status = preset['status']
-        return preset['body']
+        return base64.b64decode(preset['body'].encode('ascii'))
     else:
         raise HTTPResponse(boss_response.read(),
                            status=boss_response.status)
