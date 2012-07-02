@@ -1,4 +1,6 @@
+import base64
 from copy import copy
+import json
 
 from pretenders.base import SubClient
 
@@ -6,17 +8,19 @@ from pretenders.base import SubClient
 class PresetClient(SubClient):
 
     def add(self, match_url='', match_method='', response_status=200,
-                response_body='', response_headers={}):
-        headers = response_headers.copy()
-        headers.update({
-            'X-Pretend-Match-Url': match_url,
-            'X-Pretend-Match-Method': match_method,
-            'X-Pretend-Response-Status': response_status,
-        })
+                response_body=b'', response_headers={}):
+
+        new_preset = {
+            'headers': response_headers,
+            'body': base64.b64encode(response_body).decode('ascii'),
+            'status': response_status,
+            'rules': [match_url, match_method],
+        }
+        body = json.dumps(new_preset)
+
         return self.http('POST',
                          url=self.path,
-                         body=response_body,
-                         headers=headers)
+                         body=body)
 
 
 class HTTPMock(object):
