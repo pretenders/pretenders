@@ -1,7 +1,6 @@
-from nose.tools import assert_equals, assert_true, assert_false
-from mock import patch, call
+from nose.tools import assert_equals, assert_true
 
-from pretenders.http.client import CaseInsensitiveDict, SubClient
+from pretenders.http.client import CaseInsensitiveDict
 
 
 def test_caseinsensitivedict_creation():
@@ -44,13 +43,3 @@ def test_caseinsensitivedict_raises_keyerror():
     except KeyError:
         key_error_raised = True
     assert_true(key_error_raised)
-
-
-@patch('pretenders.http.client.HTTPConnection')
-def test_subclient_connection_created_only_when_needed(HTTPConnection):
-    "Test that the subclient connection is only created when needed."
-    client = SubClient('localhost:8000', 'test')
-    assert_false(HTTPConnection.called)
-    # access the connection
-    client.conn
-    assert_equals(HTTPConnection.call_args, call('localhost:8000',))

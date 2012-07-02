@@ -1,6 +1,11 @@
+import json
 import re
 import traceback
-from collections import OrderedDict
+try:
+    from collections import OrderedDict
+except ImportError:
+    #2.6 compatibility
+    from pretenders.compat.ordered_dict import OrderedDict
 
 from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
@@ -23,7 +28,11 @@ def to_dict(wsgi_headers, include=lambda _: True):
     """
     Convert WSGIHeaders to a dict so that it can be JSON-encoded
     """
-    return {k: v for k, v in wsgi_headers.items() if include(k)}
+    ret = {}
+    for k, v in wsgi_headers.items():
+        if include(k):
+            ret[k] = v
+    return ret
 
 
 def get_header(header, default=None):
@@ -64,32 +73,19 @@ def select_preset(values):
     raise HTTPResponse(b"No matching preset response", status=404)
 
 
-@route('/mock<url:path>', method='ANY')
-def replay(url):
+@post('/mock')
+def replay():
     """
     Replay a previously recorded preset, and save the request in history
     """
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
-    relative_url = url
-    if request.query_string:
-        relative_url = "{0}?{1}".format(relative_url, request.query_string)
+    mock_request = json.loads(request.body.read().decode('ascii'))
+    history.append(mock_request)
 
-    saved_request = {
-        'body': request.body.read(),
-        'headers': to_dict(request.headers),
-        'method': request.method,
-        'url': relative_url,
-    }
-    history.append(saved_request)
-    # print(saved_request)
-
-    preset = select_preset((url, request.method))
-
-    for header, value in preset['headers'].items():
-        response.set_header(header, value)
-    response.status = preset['status']
-    return preset['body']
+    preset = select_preset(mock_request['match'])
+    response.content_type = 'application/json'
+    return json.dumps(preset)
 
 
 @post('/preset')
@@ -108,12 +104,11 @@ def add_preset():
     url_presets = presets[(url, method)]
     new_preset = {
         'headers': headers,
-        'body': request.body.read(),
+        'body': request.body.read().decode('ascii'),
         'status': int(get_header('X-Pretend-Response-Status', 200)),
         'rules': [url, method],
     }
     url_presets.append(new_preset)
-    # print('New preset: {0}'.format(new_preset))
 
 
 @delete('/preset')
