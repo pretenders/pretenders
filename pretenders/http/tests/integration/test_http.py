@@ -1,20 +1,20 @@
 from nose.tools import assert_equals
 
-from pretenders.http.client import HttpMock, SubClient
+from pretenders.http.client import HTTPMock, SubClient
 
 
 class FakeClient(SubClient):
 
     def get(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.url, url)
+        url = "{0}{1}".format(self.path, url)
         return self.http('GET', url=url, *args, **kwargs)
 
     def post(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.url, url)
+        url = "{0}{1}".format(self.path, url)
         return self.http('POST', url=url, *args, **kwargs)
 
 
-http_mock = HttpMock('localhost', 8000)
+http_mock = HTTPMock('localhost', 8000)
 fake_client = FakeClient('localhost:8000', '/mock')
 
 
@@ -45,7 +45,7 @@ def test_perform_wrong_method_on_configured_url():
     http_mock.reset()
     add_test_preset()
     response = fake_client.get(url='/fred/test/one')
-    assert_equals(response.status, 405)
+    assert_equals(response.status, 404)
 
     historical_call = http_mock.get_request(0)
 
@@ -128,12 +128,12 @@ def test_method_matching():
             'You tested a PUT or a POST',  203)
 
     # Only GET works when GET matched
-    assert_equals(405, fake_client.post(url="/test_get").status)
+    assert_equals(404, fake_client.post(url="/test_get").status)
     assert_equals(200, fake_client.get(url="/test_get").status)
     assert_equals(404, fake_client.get(url="/test_get").status)
 
     # Only POST works when POST matched
-    assert_equals(405, fake_client.get(url="/test_post").status)
+    assert_equals(404, fake_client.get(url="/test_post").status)
     assert_equals(201, fake_client.post(url="/test_post").status)
     assert_equals(404, fake_client.post(url="/test_post").status)
 
@@ -143,7 +143,7 @@ def test_method_matching():
     assert_equals(404, fake_client.post(url="/test_star").status)
 
     # PUT or POST work with (PUT|POST) as the method matched
-    assert_equals(405, fake_client.get(url="/test_put_or_post").status)
+    assert_equals(404, fake_client.get(url="/test_put_or_post").status)
     assert_equals(203, fake_client.post(url="/test_put_or_post").status)
     assert_equals(404, fake_client.post(url="/test_put_or_post").status)
 
