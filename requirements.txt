@@ -1,1 +1,5 @@
 bottle
+Twisted==12.1
+pycrypto==2.6
+pyasn1==0.1.3
+argparse

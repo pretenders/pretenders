@@ -22,7 +22,11 @@ def to_dict(wsgi_headers, include=lambda _: True):
     """
     Convert WSGIHeaders to a dict so that it can be JSON-encoded
     """
-    return {k: v for k, v in wsgi_headers.items() if include(k)}
+    ret = {}
+    for k, v in wsgi_headers.items():
+        if include(k):
+            ret[k] = v
+    return ret
 
 
 def get_header(header, default=None):

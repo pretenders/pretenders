@@ -12,7 +12,8 @@ class SubClient(object):
         self.root_url = root_url
         self.path = path
         self.full_url = '{0}{1}'.format(root_url, self.path)
-        self.conn = HTTPConnection(root_url)
+        self._conn = None
+        HTTPConnection(root_url)
 
     def http(self, method, *args, **kwargs):
         # print('Requesting with:', args, kwargs)
@@ -31,3 +32,9 @@ class SubClient(object):
 
     def reset(self):
         return self.http('DELETE', url=self.path)
+
+    @property
+    def conn(self):
+        if not self._conn:
+            self._conn = HTTPConnection(self.base_url)
+        return self._conn
