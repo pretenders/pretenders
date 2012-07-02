@@ -1,10 +1,16 @@
 01/07/2012 - Easyjet to europython sprint.
 
 [ ] Split current http server into management and mock servers.
-    [ ] Move mocking logic to mock server, and simplify in boss server
-    [ ] Mock http server should talk to management server to retrieve responses for
+    [*] Move mocking logic to mock server, and simplify in boss server
+    [*] Mock http server should talk to management server to retrieve responses for
         requests, and store history.
     [ ] Convert all communication to JSON instead of tricky HTTP headers
+        [*] preset, mock
+        [ ] history
+    [*] JSON data - b64 encode body
+    [ ] Encapsulate JSON-ified http request preset, request... in a class
+    [ ] refactor history to use the JSON-ified data
+    [ ] change 'rules' to 'rule' (http: 'METHOD URL')
 [ ] From management server, spin up mock http server on request.
 [ ] Management server gives the client a unique id (UID) which should be included in
     the url given to it for use against the mock server.
