@@ -50,12 +50,10 @@ def replay(url):
         'url': relative_url,
         'match': [relative_url, request.method],
     }
-    print("body:", body)
     body = json.dumps(body)
     boss_response = boss_client.http('POST', url="/mock", body=body)
     if boss_response.status == 200:
         content = boss_response.read().decode('ascii')
-        print("offending content", content)
         preset = json.loads(content)
         for header, value in preset['headers'].items():
             response.set_header(header, value)

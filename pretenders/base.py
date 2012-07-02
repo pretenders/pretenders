@@ -15,7 +15,6 @@ class SubClient(object):
         self._conn = None
 
     def http(self, method, *args, **kwargs):
-        # print('Requesting with:', args, kwargs)
         self.conn.request(method=method, *args, **kwargs)
         return self.conn.getresponse()
 
