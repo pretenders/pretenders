@@ -12,6 +12,11 @@
     [ ] refactor history to use the JSON-ified data
     [ ] change 'rules' to 'rule' (http: 'METHOD URL')
 [ ] From management server, spin up mock http server on request.
+    [*] Add view for spinning up an http mock server
+    [*] Add client request on init to spin up mock server
+    [ ] Choose a port number that is not currently in use.
+    [ ] Destroy old mock servers
+    [ ] Give client ability to determine destroy timeout of mock server
 [ ] Management server gives the client a unique id (UID) which should be included in
     the url given to it for use against the mock server.
 [ ] Refactor storage in the management server to store by UID
