@@ -14,6 +14,7 @@ BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_client = None
 
+
 def acceptable_response_header(header):
     "Use to filter which HTTP headers in the request should be removed"
     return not (header.startswith('X-Pretend-') or

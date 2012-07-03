@@ -18,6 +18,7 @@ class FakeClient(SubClient):
         url = "{0}{1}".format(self.path, url)
         return self.http('POST', url=url, *args, **kwargs)
 
+
 def mock_conn():
     return HTTPConnection('localhost:8001')
 
