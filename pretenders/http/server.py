@@ -1,11 +1,8 @@
 import base64
 import json
-import re
-import traceback
 
 
 from bottle import request, response, route, HTTPResponse
-from bottle import delete, get, post
 from bottle import run as run_bottle
 
 from pretenders.boss.client import BossClient
@@ -13,12 +10,6 @@ from pretenders.boss.client import BossClient
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_client = None
-
-
-def acceptable_response_header(header):
-    "Use to filter which HTTP headers in the request should be removed"
-    return not (header.startswith('X-Pretend-') or
-                header in REQUEST_ONLY_HEADERS)
 
 
 def to_dict(wsgi_headers, include=lambda _: True):

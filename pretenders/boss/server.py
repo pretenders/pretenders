@@ -7,7 +7,7 @@ except ImportError:
     #2.6 compatibility
     from pretenders.compat.ordered_dict import OrderedDict
 
-from bottle import request, response, route, HTTPResponse
+from bottle import request, response, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
 
@@ -20,8 +20,7 @@ history = []
 
 def acceptable_response_header(header):
     "Use to filter which HTTP headers in the request should be removed"
-    return not (header.startswith('X-Pretend-') or
-                header in REQUEST_ONLY_HEADERS)
+    return header not in REQUEST_ONLY_HEADERS
 
 
 def to_dict(wsgi_headers, include=lambda _: True):
