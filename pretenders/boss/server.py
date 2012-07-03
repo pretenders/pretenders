@@ -81,6 +81,7 @@ def replay():
     """
     Replay a previously recorded preset, and save the request in history
     """
+    print(presets)
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(request.body.read().decode('ascii'))
