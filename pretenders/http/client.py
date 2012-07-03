@@ -19,9 +19,7 @@ class PresetClient(APIHelper):
         }
         body = json.dumps(new_preset)
 
-        return self.http('POST',
-                         url=self.path,
-                         body=body)
+        return self.http('POST', url=self.path, body=body)
 
 
 class HTTPMock(BossClient):
