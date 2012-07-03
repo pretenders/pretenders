@@ -138,6 +138,19 @@ def clear_history():
     del history[:]
 
 
+@get('/http_mock')
+def http_mock():
+    """
+    Client is requesting an http mock instance.
+
+    Launch an http mock instance on a random unused port.
+    Keep track of the pid of the mock instance
+    Kill the mock instance after timeout expired.
+    Return the location of the mock instance.
+    """
+    pass
+
+
 def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     run_bottle(host=host, port=port, reloader=True)

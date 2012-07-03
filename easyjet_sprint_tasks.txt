@@ -11,3 +11,16 @@
 [ ] Refactor storage in the management server to store by UID
 [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
 [ ] Return JSON that the client knows what to do with.
+
+
+Change to flow of starting to test:
+    - Client connects to Boss server.
+    - Requests a mock server eg http mock
+    - Server starts mock server and keeps track of it for closing later.
+
+
+hp = HttpMock("url_to_boss")
+
+hp.mock_url
+
+hp.

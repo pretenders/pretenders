@@ -28,10 +28,10 @@ class HTTPMock(object):
     def __init__(self, host, boss_port):
         self.host = host
         self.boss_port = boss_port
-        full_host = "{0}:{1}".format(self.host, self.boss_port)
+        self.full_host = "{0}:{1}".format(self.host, self.boss_port)
 
-        self.preset = PresetClient(full_host, '/preset')
-        self.history = SubClient(full_host, '/history')
+        self.preset = PresetClient(self.full_host, '/preset')
+        self.history = SubClient(self.full_host, '/history')
         self.url = ''
         self.method = ''
 
