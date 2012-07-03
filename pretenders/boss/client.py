@@ -4,7 +4,7 @@ except ImportError:
     # Python2.6/2.7
     from httplib import HTTPConnection
 
-from pretenders.base import SubClient
+from pretenders.base import APIHelper
 
 
 class BossClient(object):
@@ -15,8 +15,8 @@ class BossClient(object):
         self.host = host
         self.boss_port = boss_port
         self.full_host = "{0}:{1}".format(self.host, self.boss_port)
-        self._conn = None
-        self.boss_accesss = SubClient(self.get_conn, '')
+        self._conn = HTTPConnection(self.full_host)
+        self.boss_accesss = APIHelper(self.connection, '')
 
         self.mock_access_point = self._request_mock_access()
 
@@ -24,8 +24,3 @@ class BossClient(object):
         if self.create_mock_url:
             response = self.boss_accesss.http('GET', url=self.create_mock_url)
             return response.read()
-
-    def get_conn(self):
-        if not self._conn:
-            self._conn = HTTPConnection(self.full_host)
-        return self._conn

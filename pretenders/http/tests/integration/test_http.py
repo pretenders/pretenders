@@ -5,10 +5,10 @@ except ImportError:
     # Python2.6/2.7
     from httplib import HTTPConnection
 
-from pretenders.http.client import HTTPMock, SubClient
+from pretenders.http.client import HTTPMock, APIHelper
 
 
-class FakeClient(SubClient):
+class FakeClient(APIHelper):
 
     def get(self, url, *args, **kwargs):
         url = "{0}{1}".format(self.path, url)
