@@ -1,5 +1,8 @@
 import json
+from os.path import join, dirname, abspath
 import re
+import subprocess
+import sys
 import traceback
 try:
     from collections import OrderedDict
@@ -148,7 +151,15 @@ def http_mock():
     Kill the mock instance after timeout expired.
     Return the location of the mock instance.
     """
-    pass
+    pretenders_base_folder = abspath(dirname(dirname(__file__)))
+    mock_server_script = join(pretenders_base_folder, 'http', 'server.py')
+    f = subprocess.Popen([
+        sys.executable,
+        mock_server_script, "-H", "localhost", "-p", "8001", "-b", "8000"],
+        )
+
+    print(f)
+    return "localhost:8001"
 
 
 def run(host='localhost', port=8000):

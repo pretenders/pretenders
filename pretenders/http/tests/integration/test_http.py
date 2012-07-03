@@ -207,3 +207,14 @@ def test_missing_method_and_url_matches_anything():
     http_mock.reply(b'Hello', 323)
     response = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 323)
+
+
+def test_start_http_mock_server():
+    """
+    Test that the http client kicks off an server via a call to the boss.
+
+    TODO: This will need updating when we change the server to return
+    dynamic port configurations for the mock server.
+    """
+    new_mock = HTTPMock('localhost', 8000)
+    assert_equals(new_mock.mock_access_point, b"localhost:8001")
