@@ -2,10 +2,11 @@ import base64
 from copy import copy
 import json
 
-from pretenders.base import SubClient
+from pretenders.base import APIHelper
+from pretenders.boss.client import BossClient
 
 
-class PresetClient(SubClient):
+class PresetClient(APIHelper):
 
     def add(self, match_url='', match_method='', response_status=200,
                 response_body=b'', response_headers={}):
@@ -23,15 +24,12 @@ class PresetClient(SubClient):
                          body=body)
 
 
-class HTTPMock(object):
+class HTTPMock(BossClient):
 
     def __init__(self, host, boss_port):
-        self.host = host
-        self.boss_port = boss_port
-        full_host = "{0}:{1}".format(self.host, self.boss_port)
-
-        self.preset = PresetClient(full_host, '/preset')
-        self.history = SubClient(full_host, '/history')
+        super(HTTPMock, self).__init__(host, boss_port)
+        self.preset = PresetClient(self.connection, '/preset')
+        self.history = APIHelper(self.connection, '/history')
         self.url = ''
         self.method = ''
 

@@ -1,4 +1,4 @@
-from pretenders.base import SubClient
+from pretenders.base import APIHelper
 
 
 class SMTPMock(object):
@@ -7,7 +7,7 @@ class SMTPMock(object):
         self.host = host
         self.port = port
         full_host = "{0}:{1}".format(self.host, self.port)
-        self.history = SubClient(full_host, '/history')
+        self.history = APIHelper(full_host, '/history')
 
     def reset(self):
         "Call reset on the server"

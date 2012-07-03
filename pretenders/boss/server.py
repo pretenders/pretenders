@@ -78,6 +78,7 @@ def replay():
     """
     Replay a previously recorded preset, and save the request in history
     """
+    print(presets)
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(request.body.read().decode('ascii'))
@@ -136,6 +137,19 @@ def clear_history():
     Delete all recorded requests
     """
     del history[:]
+
+
+@get('/http_mock')
+def http_mock():
+    """
+    Client is requesting an http mock instance.
+
+    Launch an http mock instance on a random unused port.
+    Keep track of the pid of the mock instance
+    Kill the mock instance after timeout expired.
+    Return the location of the mock instance.
+    """
+    pass
 
 
 def run(host='localhost', port=8000):
