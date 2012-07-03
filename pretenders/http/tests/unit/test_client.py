@@ -1,6 +1,7 @@
-from nose.tools import assert_equals, assert_true
+from mock import patch, call
+from nose.tools import assert_equals, assert_true, assert_false
 
-from pretenders.http.client import CaseInsensitiveDict
+from pretenders.http.client import CaseInsensitiveDict, HTTPMock
 
 
 def test_caseinsensitivedict_creation():

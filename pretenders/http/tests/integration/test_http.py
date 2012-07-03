@@ -1,9 +1,14 @@
 from nose.tools import assert_equals
+try:
+    from http.client import HTTPConnection
+except ImportError:
+    # Python2.6/2.7
+    from httplib import HTTPConnection
 
-from pretenders.http.client import HTTPMock, SubClient
+from pretenders.http.client import HTTPMock, APIHelper
 
 
-class FakeClient(SubClient):
+class FakeClient(APIHelper):
 
     def get(self, url, *args, **kwargs):
         url = "{0}{1}".format(self.path, url)
@@ -15,7 +20,9 @@ class FakeClient(SubClient):
 
 
 http_mock = HTTPMock('localhost', 8000)
-fake_client = FakeClient('localhost:8001', '/mock')
+# For now, set to 8001 on fake client.
+# Following the auto-spawn this will need to be derived.
+fake_client = FakeClient(HTTPConnection('localhost:8001'), '/mock')
 
 
 def add_test_preset(url='/fred/test/one',

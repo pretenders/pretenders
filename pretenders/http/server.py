@@ -8,11 +8,12 @@ from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
 
-from pretenders.base import SubClient
+from pretenders.boss.client import BossClient
 
-BOSS_URL = ''
+BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_client = None
+
 
 def acceptable_response_header(header):
     "Use to filter which HTTP headers in the request should be removed"
@@ -64,11 +65,11 @@ def replay(url):
                            status=boss_response.status)
 
 
-def run(host='localhost', port=8000, boss_url=''):
+def run(host='localhost', port=8000, boss_port=''):
     "Start the mock HTTP server"
-    global BOSS_URL, boss_client
-    BOSS_URL = boss_url
-    boss_client = SubClient(boss_url, '')
+    global BOSS_PORT, boss_client
+    BOSS_PORT = boss_port
+    boss_client = BossClient(host, boss_port).boss_accesss
     run_bottle(host=host, port=port, reloader=True)
 
 
@@ -81,12 +82,12 @@ if __name__ == "__main__":
                 help='host/IP to run the server on (default: localhost)')
     parser.add_argument('-p', '--port', dest='port', type=int, default=8001,
                 help='port number to run the server on (default: 8001)')
-    parser.add_argument('-b', '--boss', dest='boss_url',
-                        default='localhost:8000',
-                        help="url for accessing the Boss server.")
+    parser.add_argument('-b', '--boss', dest='boss_port',
+                        default='8000',
+                        help="port for accessing the Boss server.")
     args = parser.parse_args()
     pid = os.getpid()
     with open('pretender-http.pid', 'w') as f:
         f.write(str(pid))
     # bottle.debug(True)
-    run(args.host, args.port, args.boss_url)
+    run(args.host, args.port, args.boss_port)
