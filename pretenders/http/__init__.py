@@ -45,7 +45,7 @@ class RequestInfo(object):
         if request.query_string:
             path = "{0}?{1}".format(path, request.query_string)
 
-        self.body = base64.b64encode(request.body.read()).decode('ascii')
+        self.body = binary_to_ascii(request.body.read())
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
