@@ -4,6 +4,7 @@ import json
 
 from pretenders.base import APIHelper
 from pretenders.boss.client import BossClient
+from pretenders.http import HttpRequest
 
 
 class PresetClient(APIHelper):
@@ -49,45 +50,4 @@ class HTTPMock(BossClient):
         return self
 
     def get_request(self, sequence_id=None):
-        return Request(self.history.get(sequence_id))
-
-
-class CaseInsensitiveDict(dict):
-    "A dictionary that is case insensitive for keys."
-
-    def __init__(self, *args, **kwargs):
-        super(CaseInsensitiveDict, self).__init__(*args, **kwargs)
-        for key, value in self.items():
-            super(CaseInsensitiveDict, self).__delitem__(key)
-            self[key.lower()] = value
-
-    def __delitem__(self, key):
-        return super(CaseInsensitiveDict, self).__delitem__(key.lower())
-
-    def __setitem__(self, key, value):
-        super(CaseInsensitiveDict, self).__setitem__(key.lower(), value)
-
-    def __getitem__(self, key):
-        return super(CaseInsensitiveDict, self).__getitem__(key.lower())
-
-
-class Request(object):
-    """A stored request as issued to our pretend server"""
-    def __init__(self, pretend_response):
-        if pretend_response.status != 200:
-            # TODO use custom exception
-            raise Exception('No saved request')
-        self.response = pretend_response
-        self.headers = CaseInsensitiveDict(self.response.getheaders())
-        self.method = self.headers['X-Pretend-Request-Method']
-        del self.headers['X-Pretend-Request-Method']
-        self.url = self.headers['X-Pretend-Request-Url']
-        del self.headers['X-Pretend-Request-Url']
-        self._request_body = None
-        del self.headers['Server']
-
-    @property
-    def body(self):
-        if not self._request_body:
-            self._request_body = self.response.read()
-        return self._request_body
+        return HttpRequest(self.history.get(sequence_id))

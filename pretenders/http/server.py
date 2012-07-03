@@ -1,26 +1,13 @@
-import base64
-import json
-
-
 from bottle import request, response, route, HTTPResponse
 from bottle import run as run_bottle
 
 from pretenders.boss.client import BossClient
+from pretenders.http import Preset, RequestInfo
+
 
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_client = None
-
-
-def to_dict(wsgi_headers, include=lambda _: True):
-    """
-    Convert WSGIHeaders to a dict so that it can be JSON-encoded
-    """
-    ret = {}
-    for k, v in wsgi_headers.items():
-        if include(k):
-            ret[k] = v
-    return ret
 
 
 def get_header(header, default=None):
@@ -32,25 +19,12 @@ def replay(url):
     """
     Replay a previously recorded preset, and save the request in history
     """
-    relative_url = url
-    if request.query_string:
-        relative_url = "{0}?{1}".format(relative_url, request.query_string)
-    body = {
-        'body': base64.b64encode(request.body.read()).decode('ascii'),
-        'headers': to_dict(request.headers),
-        'method': request.method,
-        'url': relative_url,
-        'match': [relative_url, request.method],
-    }
-    body = json.dumps(body)
+    request_info = RequestInfo(url, request)
+    body = request_info.serialize()
     boss_response = boss_client.http('POST', url="/mock", body=body)
     if boss_response.status == 200:
-        content = boss_response.read().decode('ascii')
-        preset = json.loads(content)
-        for header, value in preset['headers'].items():
-            response.set_header(header, value)
-        response.status = preset['status']
-        return base64.b64decode(preset['body'].encode('ascii'))
+        preset = Preset(boss_response.read())
+        return preset.as_http_response(response)
     else:
         raise HTTPResponse(boss_response.read(),
                            status=boss_response.status)

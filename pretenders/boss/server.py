@@ -11,6 +11,8 @@ from bottle import request, response, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
 
+from pretenders.http import Preset
+
 
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 
@@ -56,11 +58,10 @@ def select_preset(values):
 
     Return 404 if no preset found that matches.
     """
-    url_match = False
     for key, preset_list in presets.items():
         preset = preset_list[0]
         preset_matches = True
-        for rule, value in zip(preset["rules"], values):
+        for rule, value in zip(preset.rule, values):
             if not re.match(rule, value):
                 preset_matches = False
                 break
@@ -82,10 +83,9 @@ def replay():
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(request.body.read().decode('ascii'))
     history.append(mock_request)
-
     preset = select_preset(mock_request['match'])
     response.content_type = 'application/json'
-    return json.dumps(preset)
+    return preset.as_json()
 
 
 @post('/preset')
@@ -93,14 +93,12 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    preset_body = request.body.read().decode('ascii')
-    new_preset = json.loads(preset_body)
-    rule = tuple(new_preset['rules'])
+    preset = Preset(request.body.read())
+    rule = preset.rule
     if rule not in presets:
         presets[rule] = []
-
     url_presets = presets[rule]
-    url_presets.append(new_preset)
+    url_presets.append(preset)
 
 
 @delete('/preset')
