@@ -1,17 +1,12 @@
 import urllib
-try:
-    from http.client import HTTPConnection
-except ImportError:
-    # Python2.6/2.7
-    from httplib import HTTPConnection
 
 
 class SubClient(object):
 
-    def __init__(self, root_url, path):
-        self.root_url = root_url
+    def __init__(self, get_conn, path):
+        print(get_conn, path)
+        self.get_conn = get_conn
         self.path = path
-        self.full_url = '{0}{1}'.format(root_url, self.path)
         self._conn = None
 
     def http(self, method, *args, **kwargs):
@@ -34,5 +29,6 @@ class SubClient(object):
     @property
     def conn(self):
         if not self._conn:
-            self._conn = HTTPConnection(self.root_url)
+            print(self.get_conn)
+            self._conn = self.get_conn()
         return self._conn

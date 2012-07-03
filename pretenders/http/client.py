@@ -3,6 +3,7 @@ from copy import copy
 import json
 
 from pretenders.base import SubClient
+from pretenders.boss.client import BossClient
 
 
 class PresetClient(SubClient):
@@ -23,17 +24,19 @@ class PresetClient(SubClient):
                          body=body)
 
 
-class HTTPMock(object):
+class HTTPMock(BossClient):
 
     def __init__(self, host, boss_port):
-        self.host = host
-        self.boss_port = boss_port
-        self.full_host = "{0}:{1}".format(self.host, self.boss_port)
-
-        self.preset = PresetClient(self.full_host, '/preset')
-        self.history = SubClient(self.full_host, '/history')
+        super(HTTPMock, self).__init__(host, boss_port)
+        self.preset = PresetClient(self.get_conn, '/preset')
+        self.history = SubClient(self.get_conn, '/history')
         self.url = ''
         self.method = ''
+        #self.mock_access_point = self._request_mock_access()
+
+    def _request_mock_access(self):
+        response = self.boss_accesss.http('GET', url='/http_mock')
+        return response.read()
 
     def reset(self):
         self.preset.reset()
@@ -52,6 +55,8 @@ class HTTPMock(object):
 
     def get_request(self, sequence_id=None):
         return Request(self.history.get(sequence_id))
+
+
 
 
 class CaseInsensitiveDict(dict):
