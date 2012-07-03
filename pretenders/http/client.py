@@ -1,10 +1,9 @@
-import base64
 from copy import copy
 import json
 
 from pretenders.base import APIHelper
 from pretenders.boss.client import BossClient
-from pretenders.http import HttpRequest
+from pretenders.http import HttpRequest, binary_to_ascii
 
 
 class PresetClient(APIHelper):
@@ -14,7 +13,7 @@ class PresetClient(APIHelper):
 
         new_preset = {
             'headers': response_headers,
-            'body': base64.b64encode(response_body).decode('ascii'),
+            'body': binary_to_ascii(response_body),
             'status': response_status,
             'rules': [match_url, match_method],
         }
