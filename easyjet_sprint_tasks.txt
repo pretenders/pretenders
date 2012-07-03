@@ -16,7 +16,7 @@
     the url given to it for use against the mock server.
 [ ] Refactor storage in the management server to store by UID
 [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
-[ ] Refactor client/sub client class to share single http connection betweeen
+[*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
 [ ] Return JSON that the client knows what to do with.
 

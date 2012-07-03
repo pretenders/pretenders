@@ -32,11 +32,13 @@ class HTTPMock(BossClient):
         self.history = SubClient(self.get_conn, '/history')
         self.url = ''
         self.method = ''
-        #self.mock_access_point = self._request_mock_access()
 
-    def _request_mock_access(self):
-        response = self.boss_accesss.http('GET', url='/http_mock')
-        return response.read()
+    # TO DO:
+    #     self.mock_access_point = self._request_mock_access()
+
+    # def _request_mock_access(self):
+    #     response = self.boss_accesss.http('GET', url='/http_mock')
+    #     return response.read()
 
     def reset(self):
         self.preset.reset()
@@ -55,8 +57,6 @@ class HTTPMock(BossClient):
 
     def get_request(self, sequence_id=None):
         return Request(self.history.get(sequence_id))
-
-
 
 
 class CaseInsensitiveDict(dict):
