@@ -8,7 +8,7 @@ except ImportError:
 
 class SubClient(object):
 
-    def __init__(self, conn=None, root_url=None, path=''):
+    def __init__(self, root_url, path):
         self.root_url = root_url
         self.path = path
         self.full_url = '{0}{1}'.format(root_url, self.path)
