@@ -1,8 +1,8 @@
 import base64
 import json
 import re
+import socket
 import traceback
-
 
 from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
@@ -90,4 +90,10 @@ if __name__ == "__main__":
     with open('pretender-http.pid', 'w') as f:
         f.write(str(pid))
     # bottle.debug(True)
-    run(args.host, args.port, args.boss_port)
+
+    try:
+        run(args.host, args.port, args.boss_port)
+    except socket.error:
+        print("QUITING")
+        import sys
+        sys.exit(254)

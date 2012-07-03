@@ -1,4 +1,4 @@
-from nose.tools import assert_equals
+from nose.tools import assert_equals, assert_true
 try:
     from http.client import HTTPConnection
 except ImportError:
@@ -20,9 +20,10 @@ class FakeClient(APIHelper):
 
 
 http_mock = HTTPMock('localhost', 8000)
+print(http_mock.mock_access_point)
 # For now, set to 8001 on fake client.
 # Following the auto-spawn this will need to be derived.
-fake_client = FakeClient(HTTPConnection('localhost:8001'), '/mock')
+fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point), '/mock')
 
 
 def add_test_preset(url='/fred/test/one',
@@ -216,4 +217,4 @@ def test_start_http_mock_server():
     dynamic port configurations for the mock server.
     """
     new_mock = HTTPMock('localhost', 8000)
-    assert_equals(new_mock.mock_access_point, b"localhost:8001")
+    assert_true(new_mock.mock_access_point != "localhost:8000")

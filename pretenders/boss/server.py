@@ -1,8 +1,11 @@
+import datetime
 import json
+import os
 from os.path import join, dirname, abspath
 import re
 import subprocess
 import sys
+import time
 import traceback
 try:
     from collections import OrderedDict
@@ -14,9 +17,10 @@ from bottle import request, response, route, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
 
-
+HTTP_MOCK_SERVERS = {}
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
-
+PORT_RANGE = range(8000, 8005)
+BOSS_PORT = None
 presets = OrderedDict()
 history = []
 
@@ -142,8 +146,8 @@ def clear_history():
     del history[:]
 
 
-@get('/http_mock')
-def http_mock():
+@post('/http_mock')
+def create_http_mock():
     """
     Client is requesting an http mock instance.
 
@@ -154,17 +158,48 @@ def http_mock():
     """
     pretenders_base_folder = abspath(dirname(dirname(__file__)))
     mock_server_script = join(pretenders_base_folder, 'http', 'server.py')
-    f = subprocess.Popen([
-        sys.executable,
-        mock_server_script, "-H", "localhost", "-p", "8001", "-b", "8000"],
-        )
 
-    print(f)
-    return "localhost:8001"
+    for port_number in PORT_RANGE:
+
+        process = subprocess.Popen([
+            sys.executable,
+            mock_server_script,
+            "-H", "localhost",
+            "-p", str(port_number),
+            "-b", str(BOSS_PORT)],
+
+            )
+        time.sleep(2)  # Wait this long for failure
+        process.poll()
+        if process.returncode == 254:
+            print("Return code already set. "
+                  "Assuming failed due to socket error.")
+            continue
+        HTTP_MOCK_SERVERS[process.pid] = {
+            'start': str(datetime.datetime.now()),
+            'port': port_number,
+            'pid': process.pid,
+        }
+        return json.dumps({'url': "localhost:{0}".format(port_number),
+                           'id': process.pid})
+
+
+@get('/http_mock')
+def get_http_mock():
+    response.content_type = 'application/json'
+    return json.dumps(HTTP_MOCK_SERVERS)
+
+
+@delete('/http_mock/<pid:int>')
+def delete_http_mock(pid):
+    "Delete http mock servers"
+    os.kill(pid, 0)
 
 
 def run(host='localhost', port=8000):
     "Start the mock HTTP server"
+    global BOSS_PORT
+    BOSS_PORT = port
     run_bottle(host=host, port=port, reloader=True)
 
 
