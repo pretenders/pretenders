@@ -19,11 +19,10 @@ class FakeClient(APIHelper):
         return self.http('POST', url=url, *args, **kwargs)
 
 
-def mock_conn():
-    return HTTPConnection('localhost:8001')
-
 http_mock = HTTPMock('localhost', 8000)
-fake_client = FakeClient(mock_conn, '/mock')
+# For now, set to 8001 on fake client.
+# Following the auto-spawn this will need to be derived.
+fake_client = FakeClient(HTTPConnection('localhost:8001'), '/mock')
 
 
 def add_test_preset(url='/fred/test/one',

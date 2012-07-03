@@ -15,7 +15,7 @@ class BossClient(object):
         self.host = host
         self.boss_port = boss_port
         self.full_host = "{0}:{1}".format(self.host, self.boss_port)
-        self._conn = HTTPConnection(self.full_host)
+        self.connection = HTTPConnection(self.full_host)
         self.boss_accesss = APIHelper(self.connection, '')
 
         self.mock_access_point = self._request_mock_access()
