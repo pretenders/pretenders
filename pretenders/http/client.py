@@ -9,7 +9,9 @@ class PresetClient(APIHelper):
 
     def add(self, match_url='', match_method='', response_status=200,
                 response_body=b'', response_headers={}):
-
+        """
+        Add a new preset to the boss server.
+        """
         new_preset = Preset(
             headers=response_headers,
             body=binary_to_ascii(response_body),
@@ -20,6 +22,23 @@ class PresetClient(APIHelper):
 
 
 class HTTPMock(BossClient):
+    """
+    A mock HTTP server as seen from the test writer.
+
+    The test will first preset responses on the server, and after execution
+    it will enquire the received requests.
+
+    Example usage:
+
+    >>> from pretenders.http.client import HTTPMock
+    >>> mock = HTTPMock('localhost', 8000)
+    >>> mock.when('/hello', 'GET').reply('Hello')
+    >>> # run tests... then read received responses:
+    >>> r = mock.get_request(0)
+    >>> assert_equal(r.method, 'GET')
+    >>> assert_equal(r.url, '/hello?city=barcelona')
+    """
+
     create_mock_url = '/mock_server/http'
 
     def __init__(self, host, boss_port):
@@ -30,19 +49,31 @@ class HTTPMock(BossClient):
         self.method = ''
 
     def reset(self):
+        """
+        Delete all presets and history.
+        """
         self.preset.reset()
         self.history.reset()
         return self
 
     def when(self, url='', method=''):
+        """
+        Set the match rule which is the first part of the Preset.
+        """
         mock = copy(self)
         mock.url = url
         mock.method = method
         return mock
 
     def reply(self, body=b'', status=200, headers={}):
+        """
+        Set the pre-canned reply for the preset.
+        """
         self.preset.add(self.url, self.method, status, body, headers)
         return self
 
     def get_request(self, sequence_id=None):
+        """
+        Get a stored request issued to the mock server, by sequence order.
+        """
         return HttpRequest(self.history.get(sequence_id))
