@@ -194,8 +194,9 @@ def create_http_mock():
 def get_http_mock():
     response.content_type = 'application/json'
     return_content = HTTP_MOCK_SERVERS.copy()
-    return_content['start'] = str(return_content['start'])
-    return_content['end'] = str(return_content['end'])
+    for pid, mock in return_content.items():
+        mock['start'] = str(mock['start'])
+        mock['end'] = str(mock['end'])
 
     return json.dumps(return_content)
 

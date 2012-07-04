@@ -45,3 +45,8 @@ class BossClient(object):
     def delete_mock_url(self):
         return "{0}/{1}".format(self.create_mock_url,
                                 self.mock_access_point_id)
+
+    def get_mock_servers(self):
+        "Get mock servers from the server in dict format"
+        results = self.boss_access.http('GET', '/mock_server')
+        return json.loads(results)
