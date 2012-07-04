@@ -8,7 +8,7 @@
     [*] Encapsulate JSON-ified http request preset, request... in a class
     [ ] Convert all communication to JSON instead of tricky HTTP headers
         [*] preset, mock
-        [ ] history
+        [*] history
     [ ] change 'rules' to 'rule' (http: 'METHOD URL')
 [ ] From management server, spin up mock http server on request.
     [*] Add view for spinning up an http mock server

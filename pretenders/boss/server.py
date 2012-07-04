@@ -1,7 +1,6 @@
 import datetime
 import json
 import os
-from os.path import join, dirname, abspath
 import re
 import subprocess
 import sys
@@ -126,13 +125,7 @@ def get_history(ordinal):
     Access requests issued to the mock server
     """
     try:
-        saved = history[ordinal]
-        for header, value in saved['headers'].items():
-            if acceptable_response_header(header):
-                response.set_header(header, value)
-        response.set_header('X-Pretend-Request-Method', saved['method'])
-        response.set_header('X-Pretend-Request-Url', saved['url'])
-        return saved['body']
+        return json.dumps(history[ordinal])
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
     except Exception:
@@ -206,7 +199,6 @@ def run(host='localhost', port=8000):
 
 if __name__ == "__main__":
     import argparse
-    import os
 
     parser = argparse.ArgumentParser(description='Start the server')
     parser.add_argument('-H', '--host', dest='host', default='localhost',

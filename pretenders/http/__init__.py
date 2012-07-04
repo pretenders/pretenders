@@ -81,39 +81,37 @@ class Preset(object):
         if json_data is not None:
             content = json_data.decode('ascii')
             self.preset = json.loads(content)
-            self.rule = tuple(self.preset['rules'])
         self.preset.update(kwargs)
+
+    def __getattr__(self, attribute):
+        """Access attributes from JSON-dict as if they were class attibutes"""
+        return self.preset[attribute]
+
+    @property
+    def rule(self):
+        return tuple(self.preset['rules'])
+
+    @property
+    def body(self):
+        return ascii_to_binary(self.preset['body'])
 
     def as_dict(self):
         return self.preset
 
     def as_http_response(self, response):
-        for header, value in self.preset['headers'].items():
+        for header, value in self.headers.items():
             response.set_header(header, value)
-        response.status = self.preset['status']
-        return ascii_to_binary(self.preset['body'])
+        response.status = self.status
+        return self.body
 
     def as_json(self):
         return json.dumps(self.preset)
 
 
-class HttpRequest(object):
+class HttpRequest(Preset):
     """A stored HTTP request as issued to our pretend server"""
     def __init__(self, pretend_response):
         if pretend_response.status != 200:
             # TODO use custom exception
             raise Exception('No saved request')
-        self.response = pretend_response
-        self.headers = CaseInsensitiveDict(self.response.getheaders())
-        self.method = self.headers['X-Pretend-Request-Method']
-        del self.headers['X-Pretend-Request-Method']
-        self.url = self.headers['X-Pretend-Request-Url']
-        del self.headers['X-Pretend-Request-Url']
-        self._request_body = None
-        del self.headers['Server']
-
-    @property
-    def body(self):
-        if not self._request_body:
-            self._request_body = self.response.read()
-        return self._request_body
+        super(HttpRequest, self).__init__(pretend_response.read())
