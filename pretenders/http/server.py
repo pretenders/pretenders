@@ -13,7 +13,7 @@ from pretenders.constants import RETURN_CODE_PORT_IN_USE
 
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
-boss_client = None
+boss_api_handler = None
 
 
 def get_header(header, default=None):
@@ -27,7 +27,7 @@ def replay(url):
     """
     request_info = RequestInfo(url, request)
     body = request_info.serialize()
-    boss_response = boss_client.http('POST', url="/mock", body=body)
+    boss_response = boss_api_handler.http('POST', url="/mock", body=body)
     if boss_response.status == 200:
         preset = Preset(boss_response.read())
         return preset.as_http_response(response)
@@ -38,9 +38,9 @@ def replay(url):
 
 def run(host='localhost', port=8000, boss_port=''):
     "Start the mock HTTP server"
-    global BOSS_PORT, boss_client
+    global BOSS_PORT, boss_api_handler
     BOSS_PORT = boss_port
-    boss_client = BossClient(host, boss_port).boss_accesss
+    boss_api_handler = BossClient(host, boss_port).boss_accesss
     run_bottle(host=host, port=port, reloader=True)
 
 

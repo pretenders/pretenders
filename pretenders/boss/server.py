@@ -18,7 +18,10 @@ from bottle import delete, get, post
 from bottle import run as run_bottle
 
 from pretenders.http import Preset
-from pretenders.constants import RETURN_CODE_PORT_IN_USE, MOCK_PORT_RANGE
+from pretenders.constants import (
+    RETURN_CODE_PORT_IN_USE,
+    MOCK_PORT_RANGE,
+    TIMEOUT_MOCK_SERVER)
 
 HTTP_MOCK_SERVERS = {}
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
@@ -174,10 +177,13 @@ def create_http_mock():
             print("Return code already set. "
                   "Assuming failed due to socket error.")
             continue
+        start = datetime.datetime.now()
+        end = start + datetime.timedelta(seconds=TIMEOUT_MOCK_SERVER)
         HTTP_MOCK_SERVERS[process.pid] = {
-            'start': str(datetime.datetime.now()),
+            'start': start,
             'port': port_number,
             'pid': process.pid,
+            'end': end,
         }
         return json.dumps({'url': "localhost:{0}".format(port_number),
                            'id': process.pid})
@@ -187,26 +193,62 @@ def create_http_mock():
 @get('/mock_server')
 def get_http_mock():
     response.content_type = 'application/json'
-    return json.dumps(HTTP_MOCK_SERVERS)
+    return_content = HTTP_MOCK_SERVERS.copy()
+    return_content['start'] = str(return_content['start'])
+    return_content['end'] = str(return_content['end'])
+
+    return json.dumps(return_content)
 
 
 @delete('/mock_server/http/<pid:int>')
 def delete_http_mock(pid):
     "Delete http mock servers"
+    delete_mock_server(pid)
+
+
+@delete('/mock_server')
+def view_delete_mock_server():
+    "Delete an http mock"
+    if request.GET.get('stale'):
+        # Delete all stale requests
+        for pid, server in HTTP_MOCK_SERVERS.items()[:]:
+            if server['end'] > datetime.datetime.now():
+                delete_mock_server(pid)
+
+
+def delete_mock_server(pid):
     os.kill(pid, 0)
     del HTTP_MOCK_SERVERS[pid]
+
+
+def run_maintainer():
+    """
+    Run the maintainer - pruning the number of mock servers running.
+
+    :returns:
+        The pid of the maintainer process.
+    """
+    process = subprocess.Popen([
+            sys.executable,
+            "-m",
+            "pretenders.boss.maintain",
+            "-H", "localhost",
+            "-p", str(BOSS_PORT),
+            ],
+    )
+    return process.pid
 
 
 def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     global BOSS_PORT
     BOSS_PORT = port
+    run_maintainer()
     run_bottle(host=host, port=port, reloader=True)
 
 
 if __name__ == "__main__":
     import argparse
-    import os
 
     parser = argparse.ArgumentParser(description='Start the server')
     parser.add_argument('-H', '--host', dest='host', default='localhost',
