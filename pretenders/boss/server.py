@@ -143,7 +143,7 @@ def clear_history():
     del history[:]
 
 
-@post('/http_mock')
+@post('/mock_server/http')
 def create_http_mock():
     """
     Client is requesting an http mock instance.
@@ -168,7 +168,7 @@ def create_http_mock():
             )
         time.sleep(2)  # Wait this long for failure
         process.poll()
-        if process.returncode == 254:
+        if process.returncode == 2:
             print("Return code already set. "
                   "Assuming failed due to socket error.")
             continue

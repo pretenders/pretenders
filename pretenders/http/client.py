@@ -23,7 +23,7 @@ class PresetClient(APIHelper):
 
 
 class HTTPMock(BossClient):
-    create_mock_url = '/http_mock'
+    create_mock_url = '/mock_server/http'
 
     def __init__(self, host, boss_port):
         super(HTTPMock, self).__init__(host, boss_port)

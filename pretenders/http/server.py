@@ -67,4 +67,4 @@ if __name__ == "__main__":
     except socket.error:
         print("QUITING")
         import sys
-        sys.exit(254)
+        sys.exit(2)
