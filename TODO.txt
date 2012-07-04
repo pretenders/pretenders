@@ -9,7 +9,7 @@
     [ ] Convert all communication to JSON instead of tricky HTTP headers
         [*] preset, mock
         [*] history
-    [ ] change 'rules' to 'rule' (http: 'METHOD URL')
+    [*] change 'rules' to 'rule' (http: 'METHOD URL')
 [ ] From management server, spin up mock http server on request.
     [*] Add view for spinning up an http mock server
     [*] Add client request on init to spin up mock server
@@ -19,6 +19,7 @@
     [ ] Request deletion of old mocks on close of server.
 [*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
+[ ] Add unit tests for helper classes?
 [ ] Convert prints to logs. Improve logging.
 [ ] Multi-client / multi-tenancy
     [ ] Management server gives the client a unique id (UID) which should be included in
@@ -32,6 +33,7 @@
 [ ] Prepare support of non-HTTP protocols
     [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
     [ ] Return JSON that the client knows what to do with.
+[ ] Update sphinx docs
 
 
 Change to flow of starting to test:
