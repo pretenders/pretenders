@@ -1,9 +1,15 @@
+import base64
+import json
+import re
+import socket
+import traceback
+
 from bottle import request, response, route, HTTPResponse
 from bottle import run as run_bottle
 
 from pretenders.boss.client import BossClient
 from pretenders.http import Preset, RequestInfo
-
+from pretenders.constants import RETURN_CODE_PORT_IN_USE
 
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
@@ -55,4 +61,10 @@ if __name__ == "__main__":
     with open('pretender-http.pid', 'w') as f:
         f.write(str(pid))
     # bottle.debug(True)
-    run(args.host, args.port, args.boss_port)
+
+    try:
+        run(args.host, args.port, args.boss_port)
+    except socket.error:
+        print("QUITING")
+        import sys
+        sys.exit(RETURN_CODE_PORT_IN_USE)
