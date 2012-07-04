@@ -6,6 +6,7 @@ except ImportError:
     from httplib import HTTPConnection
 
 from pretenders.http.client import HTTPMock, APIHelper
+from pretenders.constants import MOCK_PORT_RANGE
 
 
 class FakeClient(APIHelper):
@@ -218,3 +219,5 @@ def test_start_http_mock_server():
     """
     new_mock = HTTPMock('localhost', 8000)
     assert_true(new_mock.mock_access_point != "localhost:8000")
+    assert_true(int(new_mock.mock_access_point.split(':')[1])
+                 in MOCK_PORT_RANGE)

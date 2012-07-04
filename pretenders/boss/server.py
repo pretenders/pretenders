@@ -18,11 +18,10 @@ from bottle import delete, get, post
 from bottle import run as run_bottle
 
 from pretenders.http import Preset
-from pretenders.constants import PORT_IN_USE_RETURN_CODE
+from pretenders.constants import PORT_IN_USE_RETURN_CODE, MOCK_PORT_RANGE
 
 HTTP_MOCK_SERVERS = {}
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
-PORT_RANGE = range(8000, 8005)
 BOSS_PORT = None
 presets = OrderedDict()
 history = []
@@ -158,7 +157,7 @@ def create_http_mock():
     Kill the mock instance after timeout expired.
     Return the location of the mock instance.
     """
-    for port_number in PORT_RANGE:
+    for port_number in MOCK_PORT_RANGE:
 
         process = subprocess.Popen([
             sys.executable,
