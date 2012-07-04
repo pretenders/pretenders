@@ -19,16 +19,16 @@
     [ ] Request deletion of old mocks on close of server.
 [*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
-[ ] Support persistence
-    [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
-        at start up so that pids are not lost when the server is restarted
-        (eg on save)
-    [ ] Persist presets and history
 [ ] Convert prints to logs. Improve logging.
 [ ] Multi-client / multi-tenancy
     [ ] Management server gives the client a unique id (UID) which should be included in
         the url given to it for use against the mock server.
     [ ] Refactor storage in the management server to store by UID
+[ ] Support persistence
+    [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
+        at start up so that pids are not lost when the server is restarted
+        (eg on save)
+    [ ] Persist presets and history
 [ ] Prepare support of non-HTTP protocols
     [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
     [ ] Return JSON that the client knows what to do with.
