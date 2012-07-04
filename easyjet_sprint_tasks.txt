@@ -20,6 +20,7 @@
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted
         (eg on save)
+    [ ] Request deletion of old mocks on close of server.
 [ ] Management server gives the client a unique id (UID) which should be included in
     the url given to it for use against the mock server.
 [ ] Refactor storage in the management server to store by UID

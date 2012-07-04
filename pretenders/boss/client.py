@@ -40,3 +40,8 @@ class BossClient(object):
             mock_server_details = json.loads(mock_server_json)
             return mock_server_details["url"], mock_server_details["id"]
         return "", ""
+
+    @property
+    def delete_mock_url(self):
+        return "{0}/{1}".format(self.create_mock_url,
+                                self.mock_access_point_id)
