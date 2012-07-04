@@ -1,9 +1,8 @@
 from copy import copy
-import json
 
 from pretenders.base import APIHelper
 from pretenders.boss.client import BossClient
-from pretenders.http import HttpRequest, binary_to_ascii
+from pretenders.http import binary_to_ascii, HttpRequest, Preset
 
 
 class PresetClient(APIHelper):
@@ -11,15 +10,13 @@ class PresetClient(APIHelper):
     def add(self, match_url='', match_method='', response_status=200,
                 response_body=b'', response_headers={}):
 
-        new_preset = {
-            'headers': response_headers,
-            'body': binary_to_ascii(response_body),
-            'status': response_status,
-            'rules': [match_url, match_method],
-        }
-        body = json.dumps(new_preset)
-
-        return self.http('POST', url=self.path, body=body)
+        new_preset = Preset(
+            headers=response_headers,
+            body=binary_to_ascii(response_body),
+            status=response_status,
+            rules=[match_url, match_method],
+        )
+        return self.http('POST', url=self.path, body=new_preset.as_json())
 
 
 class HTTPMock(BossClient):

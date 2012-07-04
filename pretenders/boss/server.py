@@ -104,7 +104,7 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    preset = Preset(request.body.read())
+    preset = Preset(json_data=request.body.read())
     rule = preset.rule
     if rule not in presets:
         presets[rule] = []
