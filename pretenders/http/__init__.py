@@ -54,7 +54,7 @@ class RequestSerialiser(object):
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
-        self.match = [path, request.method]
+        self.match = "{0} {1}".format(request.method, path)
 
     def serialize(self):
         data = {
@@ -62,7 +62,7 @@ class RequestSerialiser(object):
             'headers': self.headers,
             'method': self.method,
             'url': self.url,
-            'match': [self.url, self.method],
+            'match': self.match
         }
         return json.dumps(data)
 
@@ -76,7 +76,7 @@ class Preset(object):
     :param json_data:
         An optional string representing JSON data. It may include the
         following keys, for an HTTP preset:
-        ``headers``, ``body``, ``status``, ``rules``.
+        ``headers``, ``body``, ``status``, ``rule``.
     :param kwargs:
         Additional keyword arguments will complement or override the
         values in ``json_data``. Normally you will use one or the other.
@@ -91,10 +91,6 @@ class Preset(object):
     def __getattr__(self, attribute):
         """Access attributes from JSON-dict as if they were class attibutes"""
         return self.preset[attribute]
-
-    @property
-    def rule(self):
-        return tuple(self.preset['rules'])
 
     @property
     def body(self):

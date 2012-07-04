@@ -56,8 +56,9 @@ def pop_preset(preset_list, key):
         del presets[key]
 
 
-def select_preset(values):
-    """Select a preset to respond with.
+def select_preset(value):
+    """
+    Select a preset to respond with.
 
     Look through the presets for a match. If one is found pop off a preset
     response and return it.
@@ -70,12 +71,7 @@ def select_preset(values):
     """
     for key, preset_list in presets.items():
         preset = preset_list[0]
-        preset_matches = True
-        for rule, value in zip(preset.rule, values):
-            if not re.match(rule, value):
-                preset_matches = False
-                break
-
+        preset_matches = re.match(preset.rule, value)
         if preset_matches:
             pop_preset(preset_list, key)
             return preset
