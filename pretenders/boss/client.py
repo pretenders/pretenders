@@ -24,6 +24,16 @@ class BossClient(object):
          self.mock_access_point_id) = self._request_mock_access()
 
     def _request_mock_access(self):
+        """
+        Ask the boss to create a mock server by POSTing to ``create_mock_url``
+
+        :returns:
+            A tuple containing:
+
+                position 0: url to the mock server
+                position 1: unique id of the mock server (for teardown
+                            purposes)
+        """
         if self.create_mock_url:
             response = self.boss_accesss.http('POST', url=self.create_mock_url)
             mock_server_json = response.read().decode('ascii')
