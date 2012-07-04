@@ -38,3 +38,8 @@ Change to flow of starting to test:
     - Client connects to Boss server.
     - Requests a mock server eg http mock
     - Server starts mock server and keeps track of it for closing later.
+
+--------------------------------------------------------------
+Other future tasks:
+[ ] Document usage example
+[ ] Add static file serving for manual Ajax testing
