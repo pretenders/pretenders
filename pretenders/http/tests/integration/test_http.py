@@ -49,7 +49,7 @@ def test_configure_request_and_check_values():
 
 
 def test_perform_wrong_method_on_configured_url():
-    "Expect this to fail until we implement method matching in the server."
+    "Test method matching in the server."
     http_mock.reset()
     add_test_preset()
     response = fake_client.get(url='/fred/test/one')
