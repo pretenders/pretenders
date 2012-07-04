@@ -28,15 +28,15 @@ class HTTPMock(BossClient):
     The test will first preset responses on the server, and after execution
     it will enquire the received requests.
 
-    Example usage:
+    Example usage::
 
-    >>> from pretenders.http.client import HTTPMock
-    >>> mock = HTTPMock('localhost', 8000)
-    >>> mock.when('/hello', 'GET').reply('Hello')
-    >>> # run tests... then read received responses:
-    >>> r = mock.get_request(0)
-    >>> assert_equal(r.method, 'GET')
-    >>> assert_equal(r.url, '/hello?city=barcelona')
+        from pretenders.http.client import HTTPMock
+        mock = HTTPMock('localhost', 8000)
+        mock.when('/hello', 'GET').reply('Hello')
+        # run tests... then read received responses:
+        r = mock.get_request(0)
+        assert_equal(r.method, 'GET')
+        assert_equal(r.url, '/hello?city=barcelona')
     """
 
     create_mock_url = '/mock_server/http'
