@@ -40,7 +40,12 @@ def ascii_to_binary(data):
     return base64.b64decode(data.encode('ascii'))
 
 
-class RequestInfo(object):
+class RequestSerialiser(object):
+    """
+    Utility class to proxy request from mock to boss.
+
+    It is used to serialise requests as JSON data.
+    """
     def __init__(self, path, request):
         if request.query_string:
             path = "{0}?{1}".format(path, request.query_string)
@@ -63,20 +68,20 @@ class RequestInfo(object):
 
 
 class Preset(object):
+    """
+    A preset instance represents a pre-programmed response.
+
+    It can be initialised from JSON data or from the detailed fields.
+
+    :param json_data:
+        An optional string representing JSON data. It may include the
+        following keys, for an HTTP preset:
+        ``headers``, ``body``, ``status``, ``rules``.
+    :param kwargs:
+        Additional keyword arguments will complement or override the
+        values in ``json_data``. Normally you will use one or the other.
+    """
     def __init__(self, json_data=None, **kwargs):
-        """
-        A preset instance represents a pre-programmed response.
-
-        It can be initialised from JSON data or from the detailed fields.
-
-        :param json_data:
-            An optional string representing JSON data. It may include the
-            following keys, for an HTTP preset:
-            ``headers``, ``body``, ``status``, ``rules``.
-        :param kwargs:
-            Additional keyword arguments will complement or override the
-            values in ``json_data``. Normally you will use one or the other.
-        """
         self.preset = {}
         if json_data is not None:
             content = json_data.decode('ascii')
