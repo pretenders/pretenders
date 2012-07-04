@@ -9,7 +9,7 @@ from bottle import run as run_bottle
 
 from pretenders.boss.client import BossClient
 from pretenders.http import Preset, RequestInfo
-
+from pretenders.constants import PORT_IN_USE_RETURN_CODE
 
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
@@ -67,4 +67,4 @@ if __name__ == "__main__":
     except socket.error:
         print("QUITING")
         import sys
-        sys.exit(2)
+        sys.exit(PORT_IN_USE_RETURN_CODE)

@@ -18,6 +18,7 @@ from bottle import delete, get, post
 from bottle import run as run_bottle
 
 from pretenders.http import Preset
+from pretenders.constants import PORT_IN_USE_RETURN_CODE
 
 HTTP_MOCK_SERVERS = {}
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
@@ -170,7 +171,7 @@ def create_http_mock():
             )
         time.sleep(2)  # Wait this long for failure
         process.poll()
-        if process.returncode == 2:
+        if process.returncode == PORT_IN_USE_RETURN_CODE:
             print("Return code already set. "
                   "Assuming failed due to socket error.")
             continue
@@ -194,6 +195,7 @@ def get_http_mock():
 def delete_http_mock(pid):
     "Delete http mock servers"
     os.kill(pid, 0)
+    del HTTP_MOCK_SERVERS[pid]
 
 
 def run(host='localhost', port=8000):
