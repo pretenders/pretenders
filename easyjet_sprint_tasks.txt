@@ -1,15 +1,14 @@
-01/07/2012 - Easyjet to europython sprint.
+01/07/2012 - Easyjet + europython sprint.
 
 [ ] Split current http server into management and mock servers.
     [*] Move mocking logic to mock server, and simplify in boss server
     [*] Mock http server should talk to management server to retrieve responses for
         requests, and store history.
+    [*] JSON data - b64 encode body
+    [*] Encapsulate JSON-ified http request preset, request... in a class
     [ ] Convert all communication to JSON instead of tricky HTTP headers
         [*] preset, mock
         [ ] history
-    [*] JSON data - b64 encode body
-    [ ] Encapsulate JSON-ified http request preset, request... in a class
-    [ ] refactor history to use the JSON-ified data
     [ ] change 'rules' to 'rule' (http: 'METHOD URL')
 [ ] From management server, spin up mock http server on request.
     [*] Add view for spinning up an http mock server
@@ -17,18 +16,22 @@
     [*] Choose a port number that is not currently in use.
     [ ] Destroy old mock servers
     [ ] Give client ability to determine destroy timeout of mock server
+    [ ] Request deletion of old mocks on close of server.
+[*] Refactor client/sub client class to share single http connection betweeen
+    subclients rather than needing 2/3 per test.
+[ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted
         (eg on save)
-    [ ] Request deletion of old mocks on close of server.
+    [ ] Persist presets and history
 [ ] Convert prints to logs. Improve logging.
-[ ] Management server gives the client a unique id (UID) which should be included in
-    the url given to it for use against the mock server.
-[ ] Refactor storage in the management server to store by UID
-[ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
-[*] Refactor client/sub client class to share single http connection betweeen
-    subclients rather than needing 2/3 per test.
-[ ] Return JSON that the client knows what to do with.
+[ ] Multi-client / multi-tenancy
+    [ ] Management server gives the client a unique id (UID) which should be included in
+        the url given to it for use against the mock server.
+    [ ] Refactor storage in the management server to store by UID
+[ ] Prepare support of non-HTTP protocols
+    [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
+    [ ] Return JSON that the client knows what to do with.
 
 
 Change to flow of starting to test:
