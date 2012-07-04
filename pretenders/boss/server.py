@@ -27,6 +27,10 @@ presets = OrderedDict()
 history = []
 
 
+class NoPortAvailableException(Exception):
+    pass
+
+
 def acceptable_response_header(header):
     "Use to filter which HTTP headers in the request should be removed"
     return header not in REQUEST_ONLY_HEADERS
@@ -153,14 +157,12 @@ def create_http_mock():
     Kill the mock instance after timeout expired.
     Return the location of the mock instance.
     """
-    pretenders_base_folder = abspath(dirname(dirname(__file__)))
-    mock_server_script = join(pretenders_base_folder, 'http', 'server.py')
-
     for port_number in PORT_RANGE:
 
         process = subprocess.Popen([
             sys.executable,
-            mock_server_script,
+            "-m",
+            "pretenders.http.server",
             "-H", "localhost",
             "-p", str(port_number),
             "-b", str(BOSS_PORT)],
@@ -179,6 +181,7 @@ def create_http_mock():
         }
         return json.dumps({'url': "localhost:{0}".format(port_number),
                            'id': process.pid})
+    raise NoPortAvailableException("All ports in range in use")
 
 
 @get('/http_mock')
