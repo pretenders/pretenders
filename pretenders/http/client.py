@@ -2,7 +2,7 @@ from copy import copy
 
 from pretenders.base import APIHelper
 from pretenders.boss.client import BossClient
-from pretenders.http import binary_to_ascii, HttpRequest, Preset
+from pretenders.http import binary_to_ascii, MockHttpRequest, Preset
 
 
 class PresetClient(APIHelper):
@@ -74,4 +74,4 @@ class HTTPMock(BossClient):
         """
         Get a stored request issued to the mock server, by sequence order.
         """
-        return HttpRequest(self.history.get(sequence_id))
+        return MockHttpRequest(self.history.get(sequence_id))

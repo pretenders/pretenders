@@ -67,52 +67,79 @@ class RequestSerialiser(object):
         return json.dumps(data)
 
 
-class Preset(object):
+class JsonHelper(object):
     """
-    A preset instance represents a pre-programmed response.
+    Encapsulation of JSON data that can be reused for HTTP traffic.
 
-    It can be initialised from JSON data or from the detailed fields.
+    It can be initialised from JSON data or from detailed fields,
+    that will end up as key/values in a dictionary.
+
+    The JSON-ified data has some specific keys that are treated
+    in a special way, as they represent parts of the HTTP requests
+    and responses: ``headers``, ``body``, ``status``.
+
+    ``body`` gets a special treatment, as it may contain binary
+    data. It is converted to and from Base64 to make it serialisable
+    in JSON.
 
     :param json_data:
         An optional string representing JSON data. It may include the
         following keys, for an HTTP preset:
-        ``headers``, ``body``, ``status``, ``rule``.
     :param kwargs:
         Additional keyword arguments will complement or override the
         values in ``json_data``. Normally you will use one or the other.
     """
     def __init__(self, json_data=None, **kwargs):
-        self.preset = {}
+        self.data = {}
         if json_data is not None:
             content = json_data.decode('ascii')
-            self.preset = json.loads(content)
-        self.preset.update(kwargs)
+            self.data = json.loads(content)
+        self.data.update(kwargs)
 
     def __getattr__(self, attribute):
         """Access attributes from JSON-dict as if they were class attibutes"""
-        return self.preset[attribute]
+        return self.data[attribute]
 
     @property
     def body(self):
-        return ascii_to_binary(self.preset['body'])
+        """The body field, as binary data"""
+        return ascii_to_binary(self.data['body'])
 
     def as_dict(self):
-        return self.preset
+        """The contained data, as a dictionary"""
+        return self.data
 
     def as_http_response(self, response):
+        """
+        Generate an HTTP response from the data.
+
+        ``body``, ``headers``, and ``status`` keys are used as such in
+        the HTTP response.
+
+        :param response:
+            The ``bottle`` object that represents the response.
+        """
         for header, value in self.headers.items():
             response.set_header(header, value)
         response.status = self.status
         return self.body
 
     def as_json(self):
-        return json.dumps(self.preset)
+        """The contained data, as a JSON-serialised string"""
+        return json.dumps(self.data)
 
 
-class HttpRequest(Preset):
+class Preset(JsonHelper):
+    """
+    A preset instance represents a pre-programmed response.
+    """
+    pass
+
+
+class MockHttpRequest(JsonHelper):
     """A stored HTTP request as issued to our pretend server"""
     def __init__(self, pretend_response):
         if pretend_response.status != 200:
             # TODO use custom exception
             raise Exception('No saved request')
-        super(HttpRequest, self).__init__(pretend_response.read())
+        super(MockHttpRequest, self).__init__(pretend_response.read())
