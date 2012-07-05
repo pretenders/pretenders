@@ -14,23 +14,23 @@ from pretenders.constants import RETURN_CODE_PORT_IN_USE
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_api_handler = None
-
+UID = None
 
 def get_header(header, default=None):
     return request.headers.get(header, default)
 
 
-@route('/mock/<uid:int>/<url:path>', method='ANY')
-def replay(uid, url):
+@route('<url:path>', method='ANY')
+def replay(url):
     """
     Replay a previously recorded preset, and save the request in history
     """
     f = open('/tmp/replay', 'a')
-    f.write('replay in http.server called on {0}/{1}\n'.format(uid, url))
+    f.write('replay in http.server called on {0}/{1}\n'.format(UID, url))
 
     request_info = RequestInfo(url, request)
     body = request_info.serialize()
-    boss_url = "/mock/{0}".format(uid)
+    boss_url = "/mock/{0}".format(UID)
     f.write('forwarding to boss at {0} (port {1})\n'.format(boss_url, BOSS_PORT))
 
     boss_response = boss_api_handler.http(
@@ -48,10 +48,11 @@ def replay(uid, url):
                            status=boss_response.status)
 
 
-def run(host='localhost', port=8000, boss_port=''):
+def run(uid, host='localhost', port=8000, boss_port=''):
     "Start the mock HTTP server"
-    global BOSS_PORT, boss_api_handler
+    global BOSS_PORT, boss_api_handler, UID
     BOSS_PORT = boss_port
+    UID = uid
     boss_api_handler = BossClient(host, boss_port).boss_access
     run_bottle(host=host, port=port, reloader=True)
 
@@ -68,6 +69,7 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--boss', dest='boss_port',
                         default='8000',
                         help="port for accessing the Boss server.")
+    parser.add_argument('-i', '--uid', dest='uid')
     args = parser.parse_args()
     pid = os.getpid()
     with open('pretender-http.pid', 'w') as f:
@@ -75,7 +77,7 @@ if __name__ == "__main__":
     # bottle.debug(True)
 
     try:
-        run(args.host, args.port, args.boss_port)
+        run(args.uid, args.host, args.port, args.boss_port)
     except socket.error:
         print("QUITING")
         import sys

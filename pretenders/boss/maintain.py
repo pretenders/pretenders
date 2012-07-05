@@ -11,7 +11,7 @@ def run(host, port):
     time.sleep(2)
     boss_client = BossClient(host, port)
     while 1:
-        boss_client.boss_access.http('DELETE', url='/mock_server?stale')
+        boss_client.boss_access.http('DELETE', url='/mock_server?stale=1')
         time.sleep(STALE_DELETE_FREQUENCY)
 
 

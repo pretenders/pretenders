@@ -17,20 +17,19 @@ def test_clear_down_of_stale_mock_servers_taking_place():
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
     http_mock = HTTPMock('localhost', 8000)
-    results = http_mock.get_mock_servers()
+    mock_servers = http_mock.get_mock_servers()
 
-    print(results)
-    assert_true(len(results > 0))
-    assert_true(http_mock.mock_access_point_id in results)
+    assert_true(len(mock_servers) > 0)
+    assert_true('{0}'.format(http_mock.mock_access_point_id) in mock_servers)
 
     # Sleep for enough time for the maintainer to have run and killed the
     # process. which means the total of STALE_DELETE_FREQUENCY + timeout
     #
-    time.sleep(STALE_DELETE_FREQUENCY + TIMEOUT_MOCK_SERVER)
+    timeout = mock_servers[http_mock.mock_access_point_id]['timeout_secs']
+    time.sleep(STALE_DELETE_FREQUENCY + timeout)
 
     post_delete_set = http_mock.get_mock_servers()
     assert_false(http_mock.mock_access_point_id in post_delete_set)
-    assert_true(False)
 
 
 def test_clear_down_only_happens_if_no_request_for_timeout_period():
@@ -39,8 +38,11 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
     http_mock = HTTPMock('localhost', 8000)
-    mock_server = http_mock.get_mock_servers()[http_mock.mock_access_point_id]
-    timeout_server = mock_server['timeout']
+    mock_servers = http_mock.get_mock_servers()
+    print(mock_servers)
+    print (http_mock.mock_access_point_id)
+    mock_server = mock_servers[http_mock.mock_access_point_id]
+    timeout_server = mock_server['timeout_secs']
     assert_equal(mock_server['last_call'], mock_server['start'])
 
     for i in xrange(3):

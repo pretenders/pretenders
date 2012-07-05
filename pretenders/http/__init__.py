@@ -80,6 +80,9 @@ class Preset(object):
     def as_json(self):
         return json.dumps(self.preset)
 
+    def __str__(self):
+        return str(self.preset)
+
 
 class HttpRequest(object):
     """A stored HTTP request as issued to our pretend server"""

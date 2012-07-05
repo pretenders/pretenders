@@ -13,7 +13,6 @@ class FakeClient(APIHelper):
 
     def get(self, url, *args, **kwargs):
         url = "{0}{1}".format(self.path, url)
-        print("requesting on {0}".format(url))
         return self.http('GET', url=url, *args, **kwargs)
 
     def post(self, url, *args, **kwargs):
@@ -22,11 +21,7 @@ class FakeClient(APIHelper):
 
 
 http_mock = HTTPMock('localhost', 8000)
-print(http_mock.mock_access_point)
-# For now, set to 8001 on fake client.
-# Following the auto-spawn this will need to be derived.
-fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point),
-                         http_mock.mock_access_url)
+fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point), '')
 
 
 def add_test_preset(url='/fred/test/one',
@@ -55,9 +50,7 @@ def test_perform_wrong_method_on_configured_url():
     "Test method matching in the server."
     http_mock.reset()
     add_test_preset()
-    print("performing get to /fred/test/another")
-    print(http_mock.mock_access_point)
-    print(http_mock.mock_access_url)
+
     response = fake_client.get(url='/fred/test/another')
     assert_equals(response.status, 404)
 
@@ -104,8 +97,6 @@ def test_configure_multiple_rules_independent():
                                  ('/test_400', 400),
                                  ('/test_500', 500),
                                  ('/test_410', 410)]:
-        print(url, expected_status)
-        print(http_mock.mock_access_point)
         response = fake_client.get(url=url)
         assert_equals(response.status, expected_status)
 

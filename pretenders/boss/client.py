@@ -23,8 +23,6 @@ class BossClient(object):
         (self.mock_access_point,
          self.mock_access_point_id) = self._request_mock_access()
 
-        self.mock_access_url = "/mock/{0}".format(self.mock_access_point_id)
-
     def _request_mock_access(self):
         """
         Ask the boss to create a mock server by POSTing to ``create_mock_url``
@@ -50,5 +48,5 @@ class BossClient(object):
 
     def get_mock_servers(self):
         "Get mock servers from the server in dict format"
-        results = self.boss_access.http(method='GET', url='/mock_server')
-        return json.loads(results)
+        response = self.boss_access.http(method='GET', url='/mock_server')
+        return json.loads(response.read().decode('ascii'))
