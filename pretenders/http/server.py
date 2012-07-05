@@ -8,7 +8,7 @@ from bottle import request, response, route, HTTPResponse
 from bottle import run as run_bottle
 
 from pretenders.boss.client import BossClient
-from pretenders.http import Preset, RequestInfo
+from pretenders.http import Preset, RequestSerialiser
 from pretenders.constants import RETURN_CODE_PORT_IN_USE
 
 BOSS_PORT = ''
@@ -25,21 +25,17 @@ def replay(url):
     """
     Replay a previously recorded preset, and save the request in history
     """
-    f = open('/tmp/replay', 'a')
-    f.write('replay in http.server called on {0}/{1}\n'.format(UID, url))
 
-    request_info = RequestInfo(url, request)
+    request_info = RequestSerialiser(url, request)
+
     body = request_info.serialize()
     boss_url = "/mock/{0}".format(UID)
-    f.write('forwarding to boss at {0} (port {1})\n'.format(boss_url, BOSS_PORT))
 
     boss_response = boss_api_handler.http(
         'POST',
         url=boss_url,
         body=body
     )
-    f.write("boss replied with a {0}\n".format(boss_response.status))
-    f.close()
     if boss_response.status == 200:
         preset = Preset(boss_response.read())
         return preset.as_http_response(response)

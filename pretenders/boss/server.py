@@ -2,7 +2,6 @@ from copy import deepcopy
 import datetime
 import json
 import os
-from os.path import join, dirname, abspath
 import re
 import signal
 import subprocess
@@ -64,8 +63,9 @@ def pop_preset(preset_list, key):
         del presets[key]
 
 
-def select_preset(values):
-    """Select a preset to respond with.
+def select_preset(value):
+    """
+    Select a preset to respond with.
 
     Look through the presets for a match. If one is found pop off a preset
     response and return it.
@@ -79,12 +79,7 @@ def select_preset(values):
     for key, preset_list in presets.items():
 
         preset = preset_list[0]
-        preset_matches = True
-        for rule, value in zip(preset.rule, values):
-            if not re.match(rule, value):
-                preset_matches = False
-                break
-
+        preset_matches = re.match(preset.rule, value)
         if preset_matches:
             pop_preset(preset_list, key)
             return preset
@@ -114,7 +109,7 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    preset = Preset(request.body.read())
+    preset = Preset(json_data=request.body.read())
     rule = preset.rule
     if rule not in presets:
         presets[rule] = []
@@ -136,13 +131,7 @@ def get_history(ordinal):
     Access requests issued to the mock server
     """
     try:
-        saved = history[ordinal]
-        for header, value in saved['headers'].items():
-            if acceptable_response_header(header):
-                response.set_header(header, value)
-        response.set_header('X-Pretend-Request-Method', saved['method'])
-        response.set_header('X-Pretend-Request-Url', saved['url'])
-        return saved['body']
+        return json.dumps(history[ordinal])
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
     except Exception:

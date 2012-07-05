@@ -24,11 +24,10 @@ http_mock = HTTPMock('localhost', 8000)
 fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point), '')
 
 
-def add_test_preset(url='/fred/test/one',
-                    method="POST",
+def add_test_preset(rule='POST /fred/test/one',
                     body=b'You tested fred well',
                     status=200):
-    http_mock.when(url, method).reply(body, status)
+    http_mock.when(rule).reply(body, status)
 
 
 def test_configure_request_and_check_values():
@@ -88,10 +87,10 @@ def test_configure_multiple_rules_independent():
         rather than depending on the order of the call.
     """
     http_mock.reset()
-    http_mock.when('/test_200').reply(status=200)
-    http_mock.when('/test_400').reply(status=400)
-    http_mock.when('/test_500').reply(status=500)
-    http_mock.when('/test_410').reply(status=410)
+    http_mock.when('.* /test_200').reply(status=200)
+    http_mock.when('.* /test_400').reply(status=400)
+    http_mock.when('.* /test_500').reply(status=500)
+    http_mock.when('.* /test_410').reply(status=410)
 
     for url, expected_status in [('/test_200', 200),
                                  ('/test_400', 400),
@@ -109,10 +108,10 @@ def test_configure_multiple_rules_url_match():
     """We get responses based on the url used.
     """
     http_mock.reset()
-    http_mock.when('/test_500').reply(status=500)
-    http_mock.when('/test_410').reply(status=410)
-    http_mock.when('/test_200').reply(status=200)
-    http_mock.when('/test_400').reply(status=400)
+    http_mock.when('.* /test_500').reply(status=500)
+    http_mock.when('.* /test_410').reply(status=410)
+    http_mock.when('.* /test_200').reply(status=200)
+    http_mock.when('.* /test_400').reply(status=400)
 
     for url, expected_status in [('/test_200', 200),
                                  ('/test_400', 400),
@@ -127,11 +126,11 @@ def test_configure_multiple_rules_url_match():
 def test_method_matching():
     "Test that server matches methods correctly."
     http_mock.reset()
-    http_mock.when('/test_get', 'GET').reply(b'You tested a get', 200)
-    http_mock.when('/test_post', 'POST').reply(b'You tested a post', 201)
-    http_mock.when('/test_star', '.*').reply(b'You tested a .*', 202)
-    http_mock.when('/test_star', '.*').reply(b'You tested a .*', 202)
-    http_mock.when('/test_put_or_post', '(PUT|POST)').reply(
+    http_mock.when('GET /test_get').reply(b'You tested a get', 200)
+    http_mock.when('POST /test_post').reply(b'You tested a post', 201)
+    http_mock.when('.* /test_star').reply(b'You tested a .*', 202)
+    http_mock.when('.* /test_star').reply(b'You tested a .*', 202)
+    http_mock.when('(PUT|POST) /test_put_or_post').reply(
             b'You tested a PUT or a POST',  203)
 
     # Only GET works when GET matched
@@ -158,10 +157,10 @@ def test_method_matching():
 def test_multiple_responses_for_a_url():
     "Test each url pattern can have a multitude of responses"
     http_mock.reset()
-    http_mock.when('/test_url_pattern').reply(status=200)
-    http_mock.when('/test_url_pattern_2').reply(status=201)
-    http_mock.when('/test_url_pattern').reply(status=301)
-    http_mock.when('/test_url_pattern').reply(status=410)
+    http_mock.when('.* /test_url_pattern').reply(status=200)
+    http_mock.when('.* /test_url_pattern_2').reply(status=201)
+    http_mock.when('.* /test_url_pattern').reply(status=301)
+    http_mock.when('.* /test_url_pattern').reply(status=410)
 
     for url, expected_status in [('/test_url_pattern', 200),
                                  ('/test_url_pattern', 301),
@@ -175,7 +174,7 @@ def test_multiple_responses_for_a_url():
 
 def test_regular_expression_matching():
     "Test with regular expression matching"
-    url = r'^/something/([a-zA-Z0-9\-_]*)/?'
+    url = r'^GET /something/([a-zA-Z0-9\-_]*)/?'
     http_mock.reset()
     for i in range(5):
         http_mock.when(url).reply(status=200)
@@ -193,7 +192,7 @@ def test_regular_expression_matching():
 def test_blank_url_matches_anything():
     "A blank url matcher header matches any url"
     http_mock.reset()
-    http_mock.when(url='', method='POST').reply(status=200)
+    http_mock.when('POST').reply(status=200)
     response = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 200)
     response = fake_client.post(url='/some/strange/12121/string')

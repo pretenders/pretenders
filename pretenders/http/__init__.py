@@ -40,7 +40,12 @@ def ascii_to_binary(data):
     return base64.b64decode(data.encode('ascii'))
 
 
-class RequestInfo(object):
+class RequestSerialiser(object):
+    """
+    Utility class to proxy request from mock to boss.
+
+    It is used to serialise requests as JSON data.
+    """
     def __init__(self, path, request):
         if request.query_string:
             path = "{0}?{1}".format(path, request.query_string)
@@ -49,7 +54,7 @@ class RequestInfo(object):
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
-        self.match = [path, request.method]
+        self.match = "{0} {1}".format(request.method, path)
 
     def serialize(self):
         data = {
@@ -57,50 +62,87 @@ class RequestInfo(object):
             'headers': self.headers,
             'method': self.method,
             'url': self.url,
-            'match': [self.url, self.method],
+            'match': self.match
         }
         return json.dumps(data)
 
 
-class Preset(object):
-    def __init__(self, data):
-        content = data.decode('ascii')
-        self.preset = json.loads(content)
-        self.rule = tuple(self.preset['rules'])
+class JsonHelper(object):
+    """
+    Encapsulation of JSON data that can be reused for HTTP traffic.
+
+    It can be initialised from JSON data or from detailed fields,
+    that will end up as key/values in a dictionary.
+
+    The JSON-ified data has some specific keys that are treated
+    in a special way, as they represent parts of the HTTP requests
+    and responses: ``headers``, ``body``, ``status``.
+
+    ``body`` gets a special treatment, as it may contain binary
+    data. It is converted to and from Base64 to make it serialisable
+    in JSON.
+
+    :param json_data:
+        An optional string representing JSON data. It may include the
+        following keys, for an HTTP preset:
+    :param kwargs:
+        Additional keyword arguments will complement or override the
+        values in ``json_data``. Normally you will use one or the other.
+    """
+    def __init__(self, json_data=None, **kwargs):
+        self.data = {}
+        if json_data is not None:
+            content = json_data.decode('ascii')
+            self.data = json.loads(content)
+        self.data.update(kwargs)
+
+    def __getattr__(self, attribute):
+        """Access attributes from JSON-dict as if they were class attibutes"""
+        return self.data[attribute]
+
+    @property
+    def body(self):
+        """The body field, as binary data"""
+        return ascii_to_binary(self.data['body'])
 
     def as_dict(self):
-        return self.preset
+        """The contained data, as a dictionary"""
+        return self.data
 
     def as_http_response(self, response):
-        for header, value in self.preset['headers'].items():
+        """
+        Generate an HTTP response from the data.
+
+        ``body``, ``headers``, and ``status`` keys are used as such in
+        the HTTP response.
+
+        :param response:
+            The ``bottle`` object that represents the response.
+        """
+        for header, value in self.headers.items():
             response.set_header(header, value)
-        response.status = self.preset['status']
-        return ascii_to_binary(self.preset['body'])
+        response.status = self.status
+        return self.body
 
     def as_json(self):
-        return json.dumps(self.preset)
+        """The contained data, as a JSON-serialised string"""
+        return json.dumps(self.data)
 
     def __str__(self):
         return str(self.preset)
 
 
-class HttpRequest(object):
+class Preset(JsonHelper):
+    """
+    A preset instance represents a pre-programmed response.
+    """
+    pass
+
+
+class MockHttpRequest(JsonHelper):
     """A stored HTTP request as issued to our pretend server"""
     def __init__(self, pretend_response):
         if pretend_response.status != 200:
             # TODO use custom exception
             raise Exception('No saved request')
-        self.response = pretend_response
-        self.headers = CaseInsensitiveDict(self.response.getheaders())
-        self.method = self.headers['X-Pretend-Request-Method']
-        del self.headers['X-Pretend-Request-Method']
-        self.url = self.headers['X-Pretend-Request-Url']
-        del self.headers['X-Pretend-Request-Url']
-        self._request_body = None
-        del self.headers['Server']
-
-    @property
-    def body(self):
-        if not self._request_body:
-            self._request_body = self.response.read()
-        return self._request_body
+        super(MockHttpRequest, self).__init__(pretend_response.read())
