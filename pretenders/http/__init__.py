@@ -125,17 +125,15 @@ class JsonHelper(object):
         return self.body
 
     def as_json(self):
-        """The contained data, as a JSON-serialised string"""
+        """The contained data, as a JSON-serialised string."""
         return json.dumps(self.data)
 
     def __str__(self):
-        return str(self.preset)
+        return str(self.data)
 
 
 class Preset(JsonHelper):
-    """
-    A preset instance represents a pre-programmed response.
-    """
+    """A preset instance represents a pre-programmed response."""
     pass
 
 
