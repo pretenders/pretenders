@@ -1,5 +1,11 @@
+try:
+    from logging.config import dictConfig
+except ImportError:
+    from pretenders.compat.dictconfig import dictConfig
 import os
 import urllib
+
+from pretenders.settings import LOGGING_CONFIG
 
 
 def in_parent_process():
@@ -11,6 +17,10 @@ def save_pid_file(filename):
     pid = os.getpid()
     with open(filename, 'w') as f:
         f.write(str(pid))
+
+
+def setup_logging():
+    dictConfig(LOGGING_CONFIG)
 
 
 class ResourceNotFound(Exception):

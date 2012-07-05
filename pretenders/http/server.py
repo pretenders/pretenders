@@ -4,7 +4,7 @@ import socket
 import bottle
 from bottle import route, HTTPResponse
 
-from pretenders.base import in_parent_process, save_pid_file
+from pretenders.base import in_parent_process, save_pid_file, setup_logging
 from pretenders.boss.client import BossClient
 from pretenders.constants import RETURN_CODE_PORT_IN_USE
 from pretenders.http import Preset, RequestSerialiser
@@ -28,7 +28,7 @@ def replay(url):
     """
     request_info = RequestSerialiser(url, bottle.request)
     body = request_info.serialize()
-    LOGGER.info("Replaying URL for request", body)
+    LOGGER.info("Replaying URL for request: \n{0}".format(body))
     boss_response = boss_api_handler.http(
                         'POST',
                         url="/mock/{0}".format(UID),
@@ -37,7 +37,7 @@ def replay(url):
         preset = Preset(boss_response.read())
         return preset.as_http_response(bottle.response)
     else:
-        LOGGER.error("Cannot find matching request", body)
+        LOGGER.error("Cannot find matching request\n{0}".format(body))
         raise HTTPResponse(boss_response.read(),
                            status=boss_response.status)
 
@@ -49,6 +49,7 @@ def run(uid, host='localhost', port=8000, boss_port=''):
     UID = uid
     boss_api_handler = BossClient(host, boss_port).boss_access
     if in_parent_process():
+        setup_logging()
         save_pid_file('pretenders-mock-{0}.pid'.format(uid))
     bottle.run(host=host, port=port, reloader=True)
 
@@ -73,6 +74,6 @@ if __name__ == "__main__":
     try:
         run(args.uid, args.host, args.port, args.boss_port)
     except socket.error:
-        logger.info("QUITING")
+        LOGGER.info("QUITTING")
         import sys
         sys.exit(RETURN_CODE_PORT_IN_USE)

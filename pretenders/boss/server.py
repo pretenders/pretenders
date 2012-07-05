@@ -16,7 +16,7 @@ except ImportError:
 import bottle
 from bottle import delete, get, post, HTTPResponse
 
-from pretenders.base import in_parent_process, save_pid_file
+from pretenders.base import in_parent_process, save_pid_file, setup_logging
 from pretenders.boss import MockServer
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
@@ -210,15 +210,15 @@ def delete_http_mock(uid):
 @delete('/mock_server')
 def view_delete_mock_server():
     "Delete an http mock"
-    LOGGER.debug("Got DELETE request", bottle.request.GET)
+    LOGGER.debug("Got DELETE request: {0}".format(bottle.request.GET))
     if bottle.request.GET.get('stale'):
         LOGGER.debug("Got request to delete stale mock servers")
         # Delete all stale requests
         now = datetime.datetime.now()
         for uid, server in HTTP_MOCK_SERVERS.copy().items():
-            LOGGER.debug("Server: ", server)
+            LOGGER.debug("Server: {0}".format(server))
             if server.last_call + server.timeout < now:
-                LOGGER.info("Deleting server with UID: ", uid)
+                LOGGER.info("Deleting server with UID: {0}".format(uid))
                 delete_mock_server(uid)
 
 
@@ -253,6 +253,7 @@ def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     global BOSS_PORT
     BOSS_PORT = port
+    setup_logging()
     if in_parent_process():
         run_maintainer()
         save_pid_file('pretenders-boss.pid')
