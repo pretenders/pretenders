@@ -7,7 +7,9 @@ LOGGING_CONFIG = {
     },
 
     'formatters': {
-        'verbose': {'format': '%(asctime)s %(levelname)s:%(name)s: %(message)s'},
+        'verbose': {
+            'format': '%(asctime)s %(levelname)s:%(name)s: %(message)s'
+        },
     },
 
     'handlers': {
