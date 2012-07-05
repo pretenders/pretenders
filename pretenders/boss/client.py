@@ -5,7 +5,9 @@ except ImportError:
     # Python2.6/2.7
     from httplib import HTTPConnection
 
+from pretenders.base import ResourceNotFound, UnexpectedResponseStatus
 from pretenders.base import APIHelper
+from pretenders.boss import MockServer
 
 
 class BossClient(object):
@@ -46,7 +48,16 @@ class BossClient(object):
         return "{0}/{1}".format(self.create_mock_url,
                                 self.mock_access_point_id)
 
-    def get_mock_servers(self):
+    def get_mock_server(self):
         "Get mock servers from the server in dict format"
-        response = self.boss_access.http(method='GET', url='/mock_server')
-        return json.loads(response.read().decode('ascii'))
+        response = self.boss_access.http(
+            method='GET',
+            url='/mock_server/{0}'.format(self.mock_access_point_id),
+        )
+        if response.status == 200:
+            return MockServer.from_json_response(response)
+        elif response.status == 404:
+            raise ResourceNotFound(
+                    'The mock server for this client was shutdown.')
+        else:
+            raise UnexpectedResponseStatus(response.status)

@@ -20,6 +20,7 @@ from bottle import delete, get, post
 from bottle import run as run_bottle
 
 from pretenders.http import Preset
+from pretenders.boss import MockServer
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
     MOCK_PORT_RANGE,
@@ -97,7 +98,7 @@ def replay(uid):
     Replay a previously recorded preset, and save the request in history
     """
     # Make a note that this mock server is still in use.
-    HTTP_MOCK_SERVERS[uid]['last_call'] = datetime.datetime.now()
+    HTTP_MOCK_SERVERS[uid].keep_alive()
 
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
@@ -188,36 +189,33 @@ def create_http_mock():
                   "Assuming failed due to socket error.")
             continue
         start = datetime.datetime.now()
-        HTTP_MOCK_SERVERS[uid] = {
-            'start': start,
-            'port': port_number,
-            'pid': process.pid,
-            'timeout_secs': TIMEOUT_MOCK_SERVER,
-            'timeout': datetime.timedelta(seconds=TIMEOUT_MOCK_SERVER),
-            'last_call': start,
-            'uid': uid,
-        }
+        HTTP_MOCK_SERVERS[uid] = MockServer(
+            start=start,
+            port=port_number,
+            pid=process.pid,
+            timeout=datetime.timedelta(seconds=TIMEOUT_MOCK_SERVER),
+            last_call=start,
+            uid=uid,
+        )
         return json.dumps({
             'url': "localhost:{0}".format(port_number),
             'id': uid})
     raise NoPortAvailableException("All ports in range in use")
 
 
-@get('/mock_server')
-def get_http_mock():
+@get('/mock_server/<uid:int>')
+def get_http_mock(uid):
     response.content_type = 'application/json'
-    return_content = deepcopy(HTTP_MOCK_SERVERS)
-    for pid, mock in return_content.items():
-        mock['start'] = str(mock['start'])
-        mock['last_call'] = str(mock['last_call'])
-        mock['timeout'] = str(mock['timeout'])
-    return json.dumps(return_content)
+    try:
+        return HTTP_MOCK_SERVERS[uid].as_json()
+    except KeyError:
+        raise HTTPResponse(b"No matching http mock", status=404)
 
 
-@delete('/mock_server/http/<pid:int>')
-def delete_http_mock(pid):
+@delete('/mock_server/http/<uid:int>')
+def delete_http_mock(uid):
     "Delete http mock servers"
-    delete_mock_server(pid)
+    delete_mock_server(uid)
 
 
 @delete('/mock_server')
@@ -230,13 +228,13 @@ def view_delete_mock_server():
         now = datetime.datetime.now()
         for uid, server in HTTP_MOCK_SERVERS.copy().items():
             print(server)
-            if server['last_call'] + server['timeout'] < now:
+            if server.last_call + server.timeout < now:
                 delete_mock_server(uid)
 
 
 def delete_mock_server(uid):
-    print("**DEL** Perforoming delete on {0}".format(uid))
-    pid = HTTP_MOCK_SERVERS[uid]['pid']
+    print("Perforoming delete on {0}".format(uid))
+    pid = HTTP_MOCK_SERVERS[uid].pid
     print("attempting to kill pid {0}".format(pid))
     os.kill(pid, signal.SIGINT)
     del HTTP_MOCK_SERVERS[uid]
