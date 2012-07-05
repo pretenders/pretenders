@@ -87,12 +87,15 @@ def select_preset(values):
     raise HTTPResponse(b"No matching preset response", status=404)
 
 
-@post('/mock')
-def replay():
+@post('/mock/<uid:int>')
+def replay(uid):
     """
     Replay a previously recorded preset, and save the request in history
     """
     print(presets)
+    # Make a note that this mock server is still in use.
+    HTTP_MOCK_SERVERS[uid]['last_call'] = datetime.datetime.now()
+
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(request.body.read().decode('ascii'))
@@ -178,15 +181,16 @@ def create_http_mock():
                   "Assuming failed due to socket error.")
             continue
         start = datetime.datetime.now()
-        end = start + datetime.timedelta(seconds=TIMEOUT_MOCK_SERVER)
         HTTP_MOCK_SERVERS[process.pid] = {
             'start': start,
             'port': port_number,
             'pid': process.pid,
-            'end': end,
+            'timeout_period': TIMEOUT_MOCK_SERVER,
+            'last_call': start,
         }
-        return json.dumps({'url': "localhost:{0}".format(port_number),
-                           'id': process.pid})
+        return json.dumps({
+            'url': "localhost:{0}".format(port_number),
+            'id': process.pid})
     raise NoPortAvailableException("All ports in range in use")
 
 
@@ -196,7 +200,7 @@ def get_http_mock():
     return_content = HTTP_MOCK_SERVERS.copy()
     for pid, mock in return_content.items():
         mock['start'] = str(mock['start'])
-        mock['end'] = str(mock['end'])
+        mock['last_call'] = str(mock['last_call'])
 
     return json.dumps(return_content)
 
@@ -212,8 +216,9 @@ def view_delete_mock_server():
     "Delete an http mock"
     if request.GET.get('stale'):
         # Delete all stale requests
+        now = datetime.datetime.now()
         for pid, server in HTTP_MOCK_SERVERS.items()[:]:
-            if server['end'] > datetime.datetime.now():
+            if server['last_call'] + server['timeout'] < now:
                 delete_mock_server(pid)
 
 
@@ -244,7 +249,8 @@ def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     global BOSS_PORT
     BOSS_PORT = port
-    run_maintainer()
+    if os.environ.get('BOTTLE_CHILD', 'false') != 'true':
+        run_maintainer()
     run_bottle(host=host, port=port, reloader=True)
 
 
