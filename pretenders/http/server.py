@@ -1,23 +1,24 @@
-import base64
-import json
-import re
+import logging
 import socket
-import traceback
 
-from bottle import request, response, route, HTTPResponse
-from bottle import run as run_bottle
+import bottle
+from bottle import route, HTTPResponse
 
+from pretenders.base import in_parent_process, save_pid_file
 from pretenders.boss.client import BossClient
-from pretenders.http import Preset, RequestSerialiser
 from pretenders.constants import RETURN_CODE_PORT_IN_USE
+from pretenders.http import Preset, RequestSerialiser
 
+
+LOGGER = logging.getLogger('pretenders.http.server')
 BOSS_PORT = ''
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_api_handler = None
 UID = None
 
+
 def get_header(header, default=None):
-    return request.headers.get(header, default)
+    return bottle.request.headers.get(header, default)
 
 
 @route('<url:path>', method='ANY')
@@ -25,21 +26,18 @@ def replay(url):
     """
     Replay a previously recorded preset, and save the request in history
     """
-
-    request_info = RequestSerialiser(url, request)
-
+    request_info = RequestSerialiser(url, bottle.request)
     body = request_info.serialize()
-    boss_url = "/mock/{0}".format(UID)
-
+    LOGGER.info("Replaying URL for request", body)
     boss_response = boss_api_handler.http(
-        'POST',
-        url=boss_url,
-        body=body
-    )
+                        'POST',
+                        url="/mock/{0}".format(UID),
+                        body=body)
     if boss_response.status == 200:
         preset = Preset(boss_response.read())
-        return preset.as_http_response(response)
+        return preset.as_http_response(bottle.response)
     else:
+        LOGGER.error("Cannot find matching request", body)
         raise HTTPResponse(boss_response.read(),
                            status=boss_response.status)
 
@@ -50,31 +48,31 @@ def run(uid, host='localhost', port=8000, boss_port=''):
     BOSS_PORT = boss_port
     UID = uid
     boss_api_handler = BossClient(host, boss_port).boss_access
-    run_bottle(host=host, port=port, reloader=True)
+    if in_parent_process():
+        save_pid_file('pretenders-mock-{0}.pid'.format(uid))
+    bottle.run(host=host, port=port, reloader=True)
 
 
 if __name__ == "__main__":
     import argparse
-    import os
 
     parser = argparse.ArgumentParser(description='Start the server')
     parser.add_argument('-H', '--host', dest='host', default='localhost',
                 help='host/IP to run the server on (default: localhost)')
     parser.add_argument('-p', '--port', dest='port', type=int, default=8001,
                 help='port number to run the server on (default: 8001)')
-    parser.add_argument('-b', '--boss', dest='boss_port',
-                        default='8000',
-                        help="port for accessing the Boss server.")
+    parser.add_argument('-b', '--boss', dest='boss_port', default='8000',
+                help="port for accessing the Boss server.")
+    parser.add_argument('-d', '--debug', dest="debug", default=False,
+                action="store_true",
+                help='start a build right after creation')
     parser.add_argument('-i', '--uid', dest='uid')
     args = parser.parse_args()
-    pid = os.getpid()
-    with open('pretender-http.pid', 'w') as f:
-        f.write(str(pid))
-    # bottle.debug(True)
+    bottle.debug(args.debug)
 
     try:
         run(args.uid, args.host, args.port, args.boss_port)
     except socket.error:
-        print("QUITING")
+        logger.info("QUITING")
         import sys
         sys.exit(RETURN_CODE_PORT_IN_USE)

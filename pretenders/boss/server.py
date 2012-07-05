@@ -13,11 +13,10 @@ except ImportError:
     #2.6 compatibility
     from pretenders.compat.ordered_dict import OrderedDict
 
-from bottle import request, response, HTTPResponse
-from bottle import delete, get, post
-from bottle import run as run_bottle
+import bottle
+from bottle import delete, get, post, HTTPResponse
 
-from pretenders.base import in_parent_process
+from pretenders.base import in_parent_process, save_pid_file
 from pretenders.boss import MockServer
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
@@ -56,7 +55,7 @@ def to_dict(wsgi_headers, include=lambda _: True):
 
 
 def get_header(header, default=None):
-    return request.headers.get(header, default)
+    return bottle.request.headers.get(header, default)
 
 
 def pop_preset(preset_list, key):
@@ -99,10 +98,10 @@ def replay(uid):
 
     if not len(presets):
         raise HTTPResponse(b"No preset response", status=404)
-    mock_request = json.loads(request.body.read().decode('ascii'))
+    mock_request = json.loads(bottle.request.body.read().decode('ascii'))
     history.append(mock_request)
     preset = select_preset(mock_request['match'])
-    response.content_type = 'application/json'
+    bottle.response.content_type = 'application/json'
     return preset.as_json()
 
 
@@ -111,7 +110,7 @@ def add_preset():
     """
     Save the incoming request body as a preset response
     """
-    preset = Preset(json_data=request.body.read())
+    preset = Preset(json_data=bottle.request.body.read())
     rule = preset.rule
     if rule not in presets:
         presets[rule] = []
@@ -195,7 +194,7 @@ def create_http_mock():
 
 @get('/mock_server/<uid:int>')
 def get_http_mock(uid):
-    response.content_type = 'application/json'
+    bottle.response.content_type = 'application/json'
     try:
         return HTTP_MOCK_SERVERS[uid].as_json()
     except KeyError:
@@ -211,8 +210,8 @@ def delete_http_mock(uid):
 @delete('/mock_server')
 def view_delete_mock_server():
     "Delete an http mock"
-    LOGGER.debug("Got DELETE request", request.GET)
-    if request.GET.get('stale'):
+    LOGGER.debug("Got DELETE request", bottle.request.GET)
+    if bottle.request.GET.get('stale'):
         LOGGER.debug("Got request to delete stale mock servers")
         # Delete all stale requests
         now = datetime.datetime.now()
@@ -256,7 +255,8 @@ def run(host='localhost', port=8000):
     BOSS_PORT = port
     if in_parent_process():
         run_maintainer()
-    run_bottle(host=host, port=port, reloader=True)
+        save_pid_file('pretenders-boss.pid')
+    bottle.run(host=host, port=port, reloader=True)
 
 
 if __name__ == "__main__":
@@ -267,10 +267,10 @@ if __name__ == "__main__":
                 help='host/IP to run the server on (default: localhost)')
     parser.add_argument('-p', '--port', dest='port', type=int, default=8000,
                 help='port number to run the server on (default: 8000)')
+    parser.add_argument('-d', '--debug', dest="debug", default=False,
+                action="store_true",
+                help='start a build right after creation')
 
     args = parser.parse_args()
-    pid = os.getpid()
-    with open('pretender-http.pid', 'w') as f:
-        f.write(str(pid))
-    # bottle.debug(True)
+    bottle.debug(args.debug)
     run(args.host, args.port)
