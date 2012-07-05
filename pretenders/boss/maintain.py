@@ -7,12 +7,15 @@ STALE_DELETE_FREQUENCY = 5
 
 
 def run(host, port):
-    "Run the maintainer"
-    time.sleep(2)
+    """
+    Run the maintainer.
+
+    Which regularly triggers the boss to delete stale Mock servers.
+    """
     boss_client = BossClient(host, port)
-    while 1:
-        boss_client.boss_access.http('DELETE', url='/mock_server?stale=1')
+    while True:
         time.sleep(STALE_DELETE_FREQUENCY)
+        boss_client.boss_access.http('DELETE', url='/mock_server?stale=1')
 
 
 if __name__ == "__main__":
