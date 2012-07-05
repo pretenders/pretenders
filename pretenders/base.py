@@ -1,6 +1,14 @@
 import urllib
 
 
+class ResourceNotFound(Exception):
+    pass
+
+
+class UnexpectedResponseStatus(Exception):
+    pass
+
+
 class APIHelper(object):
 
     def __init__(self, connection, path):

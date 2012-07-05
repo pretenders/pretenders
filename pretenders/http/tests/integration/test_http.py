@@ -21,10 +21,7 @@ class FakeClient(APIHelper):
 
 
 http_mock = HTTPMock('localhost', 8000)
-print(http_mock.mock_access_point)
-# For now, set to 8001 on fake client.
-# Following the auto-spawn this will need to be derived.
-fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point), '/mock')
+fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point), '')
 
 
 def add_test_preset(rule='POST /fred/test/one',
@@ -52,13 +49,14 @@ def test_perform_wrong_method_on_configured_url():
     "Test method matching in the server."
     http_mock.reset()
     add_test_preset()
-    response = fake_client.get(url='/fred/test/one')
+
+    response = fake_client.get(url='/fred/test/another')
     assert_equals(response.status, 404)
 
     historical_call = http_mock.get_request(0)
 
     assert_equals(historical_call.method, 'GET')
-    assert_equals(historical_call.url, '/fred/test/one')
+    assert_equals(historical_call.url, '/fred/test/another')
     assert_equals(historical_call.body, b'')
 
 

@@ -5,7 +5,9 @@ except ImportError:
     # Python2.6/2.7
     from httplib import HTTPConnection
 
+from pretenders.base import ResourceNotFound, UnexpectedResponseStatus
 from pretenders.base import APIHelper
+from pretenders.boss import MockServer
 
 
 class BossClient(object):
@@ -18,7 +20,7 @@ class BossClient(object):
         self.full_host = "{0}:{1}".format(self.host, self.boss_port)
 
         self.connection = HTTPConnection(self.full_host)
-        self.boss_accesss = APIHelper(self.connection, '')
+        self.boss_access = APIHelper(self.connection, '')
 
         (self.mock_access_point,
          self.mock_access_point_id) = self._request_mock_access()
@@ -35,7 +37,7 @@ class BossClient(object):
                             purposes)
         """
         if self.create_mock_url:
-            response = self.boss_accesss.http('POST', url=self.create_mock_url)
+            response = self.boss_access.http('POST', url=self.create_mock_url)
             mock_server_json = response.read().decode('ascii')
             mock_server_details = json.loads(mock_server_json)
             return mock_server_details["url"], mock_server_details["id"]
@@ -45,3 +47,17 @@ class BossClient(object):
     def delete_mock_url(self):
         return "{0}/{1}".format(self.create_mock_url,
                                 self.mock_access_point_id)
+
+    def get_mock_server(self):
+        "Get mock servers from the server in dict format"
+        response = self.boss_access.http(
+            method='GET',
+            url='/mock_server/{0}'.format(self.mock_access_point_id),
+        )
+        if response.status == 200:
+            return MockServer.from_json_response(response)
+        elif response.status == 404:
+            raise ResourceNotFound(
+                    'The mock server for this client was shutdown.')
+        else:
+            raise UnexpectedResponseStatus(response.status)

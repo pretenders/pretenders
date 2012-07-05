@@ -128,6 +128,9 @@ class JsonHelper(object):
         """The contained data, as a JSON-serialised string"""
         return json.dumps(self.data)
 
+    def __str__(self):
+        return str(self.preset)
+
 
 class Preset(JsonHelper):
     """
