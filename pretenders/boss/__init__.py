@@ -18,6 +18,7 @@ def get_datetime_from_string(date_string):
 
 
 class MockServer(object):
+    """Information related to a spawned mock server."""
 
     def __init__(self, start, port, pid, uid, timeout, last_call):
         self.data = {
@@ -29,6 +30,9 @@ class MockServer(object):
             'last_call': last_call,
         }
 
+    def __str__(self):
+        return str(self.data)
+
     def __getattr__(self, key):
         try:
             return self.data[key]
@@ -37,6 +41,7 @@ class MockServer(object):
 
     @classmethod
     def from_json_response(cls, response):
+        """Create an instance from the body of a JSON response."""
         creating_dict = json.loads(response.read().decode('ascii'))
         creating_dict['start'] = get_datetime_from_string(
                                     creating_dict['start'])
@@ -47,6 +52,7 @@ class MockServer(object):
         return cls(**creating_dict)
 
     def as_json(self):
+        """Convert to JSON."""
         json_data = {}
         json_data.update(self.data)
         json_data['start'] = str(json_data['start'])
