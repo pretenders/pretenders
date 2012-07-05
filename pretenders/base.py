@@ -1,4 +1,9 @@
+import os
 import urllib
+
+
+def in_parent_process():
+    return os.environ.get('BOTTLE_CHILD', 'false') != 'true':
 
 
 class ResourceNotFound(Exception):

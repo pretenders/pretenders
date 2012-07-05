@@ -1,13 +1,12 @@
-from copy import deepcopy
 import datetime
 import json
+import logging
 import os
 import re
 import signal
 import subprocess
 import sys
 import time
-import traceback
 try:
     from collections import OrderedDict
 except ImportError:
@@ -18,13 +17,16 @@ from bottle import request, response, HTTPResponse
 from bottle import delete, get, post
 from bottle import run as run_bottle
 
-from pretenders.http import Preset
+from pretenders.base import in_parent_process
 from pretenders.boss import MockServer
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
     MOCK_PORT_RANGE,
     TIMEOUT_MOCK_SERVER)
+from pretenders.http import Preset
 
+
+LOGGER = logging.getLogger('pretenders.boss.server')
 UID_COUNTER = 0
 HTTP_MOCK_SERVERS = {}
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
@@ -135,7 +137,7 @@ def get_history(ordinal):
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
     except Exception:
-        traceback.print_exc()
+        LOGGER.exception('Unexpected exception')
 
 
 @delete('/history')
@@ -159,8 +161,8 @@ def create_http_mock():
     global UID_COUNTER
     UID_COUNTER += 1
     uid = UID_COUNTER
-    for port_number in MOCK_PORT_RANGE:
 
+    for port_number in MOCK_PORT_RANGE:
         process = subprocess.Popen([
             sys.executable,
             "-m",
@@ -169,13 +171,12 @@ def create_http_mock():
             "-p", str(port_number),
             "-b", str(BOSS_PORT),
             "-i", str(uid),
-            ]
-            )
+            ])
         time.sleep(2)  # Wait this long for failure
         process.poll()
         if process.returncode == RETURN_CODE_PORT_IN_USE:
-            print("Return code already set. "
-                  "Assuming failed due to socket error.")
+            LOGGER.info("Return code already set. "
+                        "Assuming failed due to socket error.")
             continue
         start = datetime.datetime.now()
         HTTP_MOCK_SERVERS[uid] = MockServer(
@@ -210,21 +211,23 @@ def delete_http_mock(uid):
 @delete('/mock_server')
 def view_delete_mock_server():
     "Delete an http mock"
-    print("Got DELETE request", request.GET.get('stale'))
+    LOGGER.debug("Got DELETE request", request.GET)
     if request.GET.get('stale'):
-        print("Got request to delete stale mock servers")
+        LOGGER.debug("Got request to delete stale mock servers")
         # Delete all stale requests
         now = datetime.datetime.now()
         for uid, server in HTTP_MOCK_SERVERS.copy().items():
-            print(server)
+            LOGGER.debug("Server: ", server)
             if server.last_call + server.timeout < now:
+                LOGGER.info("Deleting server with UID: ", uid)
                 delete_mock_server(uid)
 
 
 def delete_mock_server(uid):
-    print("Perforoming delete on {0}".format(uid))
+    "Delete a mock server by ``uid``"
+    LOGGER.info("Performing delete on {0}".format(uid))
     pid = HTTP_MOCK_SERVERS[uid].pid
-    print("attempting to kill pid {0}".format(pid))
+    LOGGER.info("attempting to kill pid {0}".format(pid))
     os.kill(pid, signal.SIGINT)
     del HTTP_MOCK_SERVERS[uid]
 
@@ -251,7 +254,7 @@ def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     global BOSS_PORT
     BOSS_PORT = port
-    if os.environ.get('BOTTLE_CHILD', 'false') != 'true':
+    if in_parent_process():
         run_maintainer()
     run_bottle(host=host, port=port, reloader=True)
 
