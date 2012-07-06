@@ -3,12 +3,12 @@ LOGGING_CONFIG = {
     'disable_existing_loggers': True,
     'root': {
         'level': 'DEBUG',
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
     },
 
     'formatters': {
         'verbose': {
-            'format': '%(asctime)s %(levelname)s:%(name)s: %(message)s'
+            'format': '%(asctime)s %(levelname)s:%(name)s:%(lineno)d: %(message)s'
         },
     },
 
@@ -17,7 +17,13 @@ LOGGING_CONFIG = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose'
-        }
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'pretenders.log',
+            'formatter': 'verbose'
+        },
     }
 }
 
