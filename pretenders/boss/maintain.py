@@ -1,6 +1,9 @@
 import os
 import time
+import subprocess
+import sys
 
+from pretenders.boss import data
 from pretenders.boss.client import BossClient
 
 STALE_DELETE_FREQUENCY = 5
@@ -17,6 +20,23 @@ def run(host, port):
         time.sleep(STALE_DELETE_FREQUENCY)
         boss_client.boss_access.http('DELETE', url='/mock_server?stale=1')
 
+
+def launch_maintainer():
+    """
+    Run the maintainer - pruning the number of mock servers running.
+
+    :returns:
+        The pid of the maintainer process.
+    """
+    process = subprocess.Popen([
+            sys.executable,
+            "-m",
+            "pretenders.boss.maintain",
+            "-H", "localhost",
+            "-p", str(data.BOSS_PORT),
+            ],
+    )
+    return process.pid
 
 if __name__ == "__main__":
     import argparse
