@@ -34,13 +34,3 @@ except ImportError:
     pass
 
 LOGGING_STARTED = False
-
-try:
-    from logging.config import dictConfig
-except ImportError:
-    # Backwards compatible with py < 2.7
-    from pretenders.compat.dictconfig import dictConfig
-
-if not LOGGING_STARTED:
-    dictConfig(LOGGING_CONFIG)
-    LOGGING_STARTED = True

@@ -1,11 +1,12 @@
 try:
     from logging.config import dictConfig
 except ImportError:
+    # Backwards compatible with py < 2.7
     from pretenders.compat.dictconfig import dictConfig
 import os
 import urllib
 
-from pretenders.settings import LOGGING_CONFIG
+from pretenders import settings
 
 
 def in_parent_process():
@@ -20,8 +21,9 @@ def save_pid_file(filename):
 
 
 def setup_logging():
-    print("Setting up logging: \n{0}".format(LOGGING_CONFIG))
-    dictConfig(LOGGING_CONFIG)
+    if not settings.LOGGING_STARTED:
+        dictConfig(settings.LOGGING_CONFIG)
+        settings.LOGGING_STARTED = True
 
 
 class ResourceNotFound(Exception):
