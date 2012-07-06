@@ -1,13 +1,13 @@
 import json
-import logging
 
 import bottle
 from bottle import post, HTTPResponse
 
+from pretenders.base import get_logger
 from pretenders.boss import data
 from pretenders.boss.views.preset import select_preset
 
-LOGGER = logging.getLogger('pretenders.boss.views.mock')
+LOGGER = get_logger('pretenders.boss.views.mock')
 
 
 @post('/mock/<uid:int>')

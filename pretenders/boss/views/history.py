@@ -1,11 +1,11 @@
 import json
-import logging
 
 from bottle import delete, get, HTTPResponse
 
+from pretenders.base import get_logger
 from pretenders.boss import data
 
-LOGGER = logging.getLogger('pretenders.boss.views.history')
+LOGGER = get_logger('pretenders.boss.views.history')
 
 
 @get('/history/<ordinal:int>')

@@ -1,14 +1,12 @@
-import logging
-
 import bottle
 
-from pretenders.base import in_parent_process, save_pid_file, setup_logging
+from pretenders.base import get_logger, in_parent_process, save_pid_file
 from pretenders.boss import data
 from pretenders.boss.maintain import launch_maintainer
 # Import views so that they get initialised for bottle.
 from pretenders.boss.views import history, mock_server, preset, mock
 
-LOGGER = logging.getLogger('pretenders.boss.server')
+LOGGER = get_logger('pretenders.boss.server')
 
 
 def run(host='localhost', port=8000):

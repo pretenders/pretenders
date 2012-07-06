@@ -1,3 +1,4 @@
+import logging
 try:
     from logging.config import dictConfig
 except ImportError:
@@ -24,6 +25,11 @@ def setup_logging():
     if not settings.LOGGING_STARTED:
         dictConfig(settings.LOGGING_CONFIG)
         settings.LOGGING_STARTED = True
+
+
+def get_logger(name):
+    setup_logging()
+    return logging.getLogger(name)
 
 
 class ResourceNotFound(Exception):
