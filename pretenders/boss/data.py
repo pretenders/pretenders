@@ -1,4 +1,3 @@
-import logging
 import os
 import signal
 try:
@@ -7,7 +6,9 @@ except ImportError:
     #2.6 compatibility
     from pretenders.compat.ordered_dict import OrderedDict
 
-LOGGER = logging.getLogger('pretenders.boss.data')
+from pretenders.base import get_logger
+
+LOGGER = get_logger('pretenders.boss.data')
 
 
 UID_COUNTER = 0

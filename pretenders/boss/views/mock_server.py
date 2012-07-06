@@ -1,6 +1,5 @@
 import datetime
 import json
-import logging
 import subprocess
 import sys
 import time
@@ -8,16 +7,17 @@ import time
 import bottle
 from bottle import delete, get, post, HTTPResponse
 
-from pretenders.exceptions import NoPortAvailableException
+from pretenders.base import get_logger
 from pretenders.boss import MockServer
 from pretenders.boss import data
 from pretenders.boss.data import delete_mock_server
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
     MOCK_PORT_RANGE)
+from pretenders.exceptions import NoPortAvailableException
 
 
-LOGGER = logging.getLogger('pretenders.boss.views.launch')
+LOGGER = get_logger('pretenders.boss.views.launch')
 
 
 @post('/mock_server/http')
