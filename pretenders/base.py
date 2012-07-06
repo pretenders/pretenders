@@ -20,6 +20,7 @@ def save_pid_file(filename):
 
 
 def setup_logging():
+    print("Setting up logging: \n{0}".format(LOGGING_CONFIG))
     dictConfig(LOGGING_CONFIG)
 
 

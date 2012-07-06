@@ -14,10 +14,11 @@ LOGGER = logging.getLogger('pretenders.boss.server')
 def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     data.BOSS_PORT = port
-    setup_logging()
     if in_parent_process():
         launch_maintainer()
         save_pid_file('pretenders-boss.pid')
+    else:
+        setup_logging()
     bottle.run(host=host, port=port, reloader=True)
 
 
