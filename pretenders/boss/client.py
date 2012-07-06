@@ -8,22 +8,28 @@ except ImportError:
 from pretenders.base import ResourceNotFound, UnexpectedResponseStatus
 from pretenders.base import APIHelper
 from pretenders.boss import MockServer
+from pretenders.constants import TIMEOUT_MOCK_SERVER
 
 
 class BossClient(object):
 
-    create_mock_url = ''
+    boss_mock_type = ''
 
-    def __init__(self, host, boss_port):
+    def __init__(self, host, port, mock_timeout=TIMEOUT_MOCK_SERVER):
         self.host = host
-        self.boss_port = boss_port
-        self.full_host = "{0}:{1}".format(self.host, self.boss_port)
+        self.port = port
+        self.mock_timeout = mock_timeout
+        self.full_host = "{0}:{1}".format(self.host, self.port)
 
         self.connection = HTTPConnection(self.full_host)
         self.boss_access = APIHelper(self.connection, '')
 
         (self.mock_access_point,
          self.mock_access_point_id) = self._request_mock_access()
+
+    @property
+    def create_mock_url(self):
+        return "/mock_server/{0}".format(self.boss_mock_type)
 
     def _request_mock_access(self):
         """
@@ -36,8 +42,11 @@ class BossClient(object):
                 position 1: unique id of the mock server (for teardown
                             purposes)
         """
-        if self.create_mock_url:
-            response = self.boss_access.http('POST', url=self.create_mock_url)
+        if self.boss_mock_type:
+            post_body = json.dumps({'mock_timeout': self.mock_timeout})
+            response = self.boss_access.http('POST',
+                                             url=self.create_mock_url,
+                                             body=post_body)
             mock_server_json = response.read().decode('ascii')
             mock_server_details = json.loads(mock_server_json)
             return mock_server_details["url"], mock_server_details["id"]
