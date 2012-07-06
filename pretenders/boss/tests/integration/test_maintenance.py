@@ -17,7 +17,7 @@ def test_clear_down_of_stale_mock_servers_taking_place():
     #Test that stale mock servers are cleared out
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-    http_mock = HTTPMock('localhost', 8000)
+    http_mock = HTTPMock('localhost', 8000, mock_timeout=5)
     mock_server = http_mock.get_mock_server()
 
     assert_equal(http_mock.mock_access_point_id, mock_server.uid)
@@ -35,7 +35,7 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     # recently made a request.
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-    http_mock = HTTPMock('localhost', 8000)
+    http_mock = HTTPMock('localhost', 8000, mock_timeout=5)
     mock_server = http_mock.get_mock_server()
 
     timeout_server = mock_server.timeout_in_secs
