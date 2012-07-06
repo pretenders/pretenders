@@ -48,6 +48,7 @@ class BossClient(object):
                                              url=self.create_mock_url,
                                              body=post_body)
             mock_server_json = response.read().decode('ascii')
+            print(mock_server_json)
             mock_server_details = json.loads(mock_server_json)
             return mock_server_details["url"], mock_server_details["id"]
         return "", ""
