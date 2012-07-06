@@ -9,10 +9,8 @@ from pretenders.boss.client import BossClient
 from pretenders.constants import RETURN_CODE_PORT_IN_USE
 from pretenders.http import Preset, RequestSerialiser
 
-
 LOGGER = logging.getLogger('pretenders.http.server')
 BOSS_PORT = ''
-REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 boss_api_handler = None
 UID = None
 
