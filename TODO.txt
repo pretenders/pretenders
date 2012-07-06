@@ -16,8 +16,9 @@
     [*] Choose a port number that is not currently in use.
     [*] Destroy old mock servers
     [*] Give client ability to determine destroy timeout of mock server
-    [ ] Request deletion of old mocks on close of server.
     [*] Refactor out some non-view stuff into separate modules.
+    [ ] Request deletion of old mocks on close of server.
+    [ ] Move data variables to appropriate view modules.
 [*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
 [ ] Add unit tests for helper classes?
