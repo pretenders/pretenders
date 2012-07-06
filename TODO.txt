@@ -21,7 +21,7 @@
 [*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
 [ ] Add unit tests for helper classes?
-[ ] Convert prints to logs. Improve logging.
+[C] Convert prints to logs. Improve logging.
 [ ] Multi-client / multi-tenancy
     [ ] Management server gives the client a unique id (UID) which should be included in
         the url given to it for use against the mock server.
