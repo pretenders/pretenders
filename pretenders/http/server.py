@@ -1,15 +1,14 @@
-import logging
 import socket
 
 import bottle
 from bottle import route, HTTPResponse
 
-from pretenders.base import in_parent_process, save_pid_file, setup_logging
+from pretenders.base import get_logger, in_parent_process, save_pid_file
 from pretenders.boss.client import BossClient
 from pretenders.constants import RETURN_CODE_PORT_IN_USE
 from pretenders.http import Preset, RequestSerialiser
 
-LOGGER = logging.getLogger('pretenders.http.server')
+LOGGER = get_logger('pretenders.http.server')
 BOSS_PORT = ''
 boss_api_handler = None
 UID = None
@@ -47,7 +46,6 @@ def run(uid, host='localhost', port=8000, boss_port=''):
     UID = uid
     boss_api_handler = BossClient(host, boss_port).boss_access
     if in_parent_process():
-        setup_logging()
         save_pid_file('pretenders-mock-{0}.pid'.format(uid))
     bottle.run(host=host, port=port, reloader=True)
 

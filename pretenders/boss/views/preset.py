@@ -1,13 +1,13 @@
-import logging
 import re
 
 import bottle
 from bottle import delete, post, HTTPResponse
 
-from pretenders.http import Preset
+from pretenders.base import get_logger
 from pretenders.boss import data
+from pretenders.http import Preset
 
-LOGGER = logging.getLogger('pretenders.boss.views.preset')
+LOGGER = get_logger('pretenders.boss.views.preset')
 
 
 def select_preset(value):

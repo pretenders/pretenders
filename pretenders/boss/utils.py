@@ -1,5 +1,3 @@
-import logging
-
 import bottle
 
 try:
@@ -8,9 +6,10 @@ except ImportError:
     #2.6 compatibility
     from pretenders.compat.ordered_dict import OrderedDict
 
+from pretenders.base import get_logger
 from pretenders.constants import REQUEST_ONLY_HEADERS
 
-LOGGER = logging.getLogger('pretenders.boss.utils')
+LOGGER = get_logger('pretenders.boss.utils')
 
 
 def acceptable_response_header(header):
