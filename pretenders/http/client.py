@@ -39,10 +39,24 @@ class HTTPMock(BossClient):
         assert_equal(r.url, '/hello?city=barcelona')
     """
 
-    create_mock_url = '/mock_server/http'
+    boss_mock_type = 'http'
 
-    def __init__(self, host, boss_port):
-        super(HTTPMock, self).__init__(host, boss_port)
+    def __init__(self, host, port, mock_timeout=120):
+        """
+        Create an HTTPMock client for testing purposes.
+
+        :param host:
+            The host of the boss server.
+
+        :param port:
+            The port to connect to of the boss.
+
+        :param mock_timeout:
+            The timeout (in seconds) to be passed to the boss when
+            instantiating the mock HTTP server. If a request is not received by
+            the mock server in this time, it will be closed down by the boss.
+        """
+        super(HTTPMock, self).__init__(host, port, mock_timeout)
         self.preset = PresetClient(self.connection, '/preset')
         self.history = APIHelper(self.connection, '/history')
         self.rule = ''

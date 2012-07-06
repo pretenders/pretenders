@@ -161,6 +161,10 @@ def create_http_mock():
     UID_COUNTER += 1
     uid = UID_COUNTER
 
+    post_body = bottle.request.body.read().decode('ascii')
+
+    mock_timeout = json.loads(post_body)['mock_timeout']
+
     for port_number in MOCK_PORT_RANGE:
         process = subprocess.Popen([
             sys.executable,
@@ -182,7 +186,7 @@ def create_http_mock():
             start=start,
             port=port_number,
             pid=process.pid,
-            timeout=datetime.timedelta(seconds=TIMEOUT_MOCK_SERVER),
+            timeout=datetime.timedelta(seconds=mock_timeout),
             last_call=start,
             uid=uid,
         )
