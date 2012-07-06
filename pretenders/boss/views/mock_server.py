@@ -20,7 +20,7 @@ from pretenders.constants import (
 LOGGER = logging.getLogger('pretenders.boss.views.launch')
 
 
-@post('/launch/http')
+@post('/mock_server/http')
 def create_http_mock():
     """
     Client is requesting an http mock instance.
