@@ -8,7 +8,7 @@ from pretenders.boss.apps import mock_server
 from pretenders.boss.apps.history import save_history
 from pretenders.boss.apps.preset import preset_count, select_preset
 
-LOGGER = get_logger('pretenders.boss.apps.mock')
+LOGGER = get_logger('pretenders.boss.apps.replay')
 
 
 @post('/mock/<uid:int>')
