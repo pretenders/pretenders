@@ -17,19 +17,21 @@
     [*] Destroy old mock servers
     [*] Give client ability to determine destroy timeout of mock server
     [*] Refactor out some non-view stuff into separate modules.
-    [ ] Move data variables to appropriate view modules.
+    [C] Move data variables to appropriate view modules.
 [*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
 [ ] Add unit tests for helper classes?
-[C] Convert prints to logs. Improve logging.
+[*] Convert prints to logs. Improve logging.
 [ ] Multi-client / multi-tenancy
-    [ ] Management server gives the client a unique id (UID) which should be included in
+    [A] Management server gives the client a unique id (UID) which should be included in
         the url given to it for use against the mock server.
-    [ ] Refactor storage in the management server to store by UID
+    [A] Refactor storage in the management server to store by UID
 [ ] Refactor server startup
-    [ ] Spin up boss tool for test writers.
+    [C] Spin up boss tool for test writers.
 [ ] Update sphinx docs
-[ ] Document usage example
+    [C] Ensure they are up-to-date with latest code
+    [C] Document usage example
+    [C] Add an overview of how the internals (launching of servers) work
 ------Version 1.0------
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
