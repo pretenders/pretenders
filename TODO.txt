@@ -29,9 +29,9 @@
 [ ] Refactor server startup
     [C] Spin up boss tool for test writers.
 [ ] Update sphinx docs
-    [ ] Ensure they are up-to-date with latest code
-    [ ] Document usage example
-    [ ] Add an overview of how the internals (launching of servers) work
+    [C] Ensure they are up-to-date with latest code
+    [C] Document usage example
+    [C] Add an overview of how the internals (launching of servers) work
 ------Version 1.0------
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
