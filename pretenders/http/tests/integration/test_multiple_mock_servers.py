@@ -36,23 +36,27 @@ def test_multiple_mock_servers_only_see_their_presets_and_history():
     # We alternate between the client calls, asserting that the responses match
     # those set up above.
     for i in range(2):
-        response = first_fake_client.post(url='/someplace',
-                                          body=b"first_mock_{0}".format(i))
+        post_body = "first_mock_{0}".format(i).encode()
+        response = first_fake_client.post(
+                        url='/someplace',
+                        body=post_body)
         assert_response_equal(response, first_mock_response_body, 200)
 
         # Check that the historical values match those requested.
         request = first_mock.get_request(i)
         assert_equals(request.method, 'POST')
         assert_equals(request.url, '/someplace')
-        assert_equals(request.body, b'first_mock_{0}'.format(i))
+        assert_equals(request.body, post_body)
 
     for i in range(2):
+        post_body = "second_mock_{0}".format(i).encode()
+
         response = second_fake_client.post(url='/someplace',
-                                           body=b"second_mock_{0}".format(i))
+                                           body=post_body)
         assert_response_equal(response, second_mock_response_body, 601)
 
         # Check that the historical values match those requested.
         request = second_mock.get_request(i)
         assert_equals(request.method, 'POST')
         assert_equals(request.url, '/someplace')
-        assert_equals(request.body, b'second_mock_{0}'.format(i))
+        assert_equals(request.body, post_body)
