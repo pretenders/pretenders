@@ -33,7 +33,12 @@
     [C] Document usage example
     [C] Add an overview of how the internals (launching of servers) work
 ------Version 1.0------
+[ ] Specifiy number of replies for a rule::
 
+        mock.when('POST /someplace').reply("a first mock body",
+                                           status=200,
+                                           times=20)
+    With a default of 1.
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted
