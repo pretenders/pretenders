@@ -23,14 +23,20 @@
 [ ] Add unit tests for helper classes?
 [C] Convert prints to logs. Improve logging.
 [ ] Multi-client / multi-tenancy
-    [ ] Management server gives the client a unique id (UID) which should be included in
-        the url given to it for use against the mock server.
+    [ ] Management server gives the client a unique id (UID) which should be
+        included in the url given to it for use against the mock server.
     [ ] Refactor storage in the management server to store by UID
 [ ] Refactor server startup
     [ ] Spin up boss tool for test writers.
 [ ] Update sphinx docs
     [ ] Document usage example
 ------Version 1.0------
+[ ] Specifiy number of replies for a rule::
+
+        mock.when('POST /someplace').reply("a first mock body",
+                                           status=200,
+                                           times=20)
+    With a default of 1.
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted

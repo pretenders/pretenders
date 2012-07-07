@@ -1,27 +1,12 @@
 from nose.tools import assert_equals, assert_true
-try:
-    from http.client import HTTPConnection
-except ImportError:
-    # Python2.6/2.7
-    from httplib import HTTPConnection
 
-from pretenders.http.client import HTTPMock, APIHelper
+from pretenders.http.client import HTTPMock
 from pretenders.constants import MOCK_PORT_RANGE
-
-
-class FakeClient(APIHelper):
-
-    def get(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.path, url)
-        return self.http('GET', url=url, *args, **kwargs)
-
-    def post(self, url, *args, **kwargs):
-        url = "{0}{1}".format(self.path, url)
-        return self.http('POST', url=url, *args, **kwargs)
+from pretenders.http.tests.integration import get_fake_client
 
 
 http_mock = HTTPMock('localhost', 8000)
-fake_client = FakeClient(HTTPConnection(http_mock.mock_access_point), '')
+fake_client = get_fake_client(http_mock)
 
 
 def add_test_preset(rule='POST /fred/test/one',
