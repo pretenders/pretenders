@@ -2,8 +2,8 @@
 
 [*] Split current http server into management and mock servers.
     [*] Move mocking logic to mock server, and simplify in boss server
-    [*] Mock http server should talk to management server to retrieve responses for
-        requests, and store history.
+    [*] Mock http server should talk to management server to retrieve responses
+        for requests, and store history.
     [*] JSON data - b64 encode body
     [*] Encapsulate JSON-ified http request preset, request... in a class
     [*] Convert all communication to JSON instead of tricky HTTP headers
@@ -23,8 +23,8 @@
 [ ] Add unit tests for helper classes?
 [*] Convert prints to logs. Improve logging.
 [ ] Multi-client / multi-tenancy
-    [A] Management server gives the client a unique id (UID) which should be included in
-        the url given to it for use against the mock server.
+    [A] Management server gives the client a unique id (UID) which should be
+        included in the url given to it for use against the mock server.
     [A] Refactor storage in the management server to store by UID
 [ ] Refactor server startup
     [C] Spin up boss tool for test writers.
@@ -33,6 +33,7 @@
     [C] Document usage example
     [C] Add an overview of how the internals (launching of servers) work
 ------Version 1.0------
+
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted
