@@ -5,6 +5,7 @@ from bottle import post, HTTPResponse
 
 from pretenders.base import get_logger
 from pretenders.boss import data
+from pretenders.boss.views import mock_server
 from pretenders.boss.views.preset import select_preset
 
 LOGGER = get_logger('pretenders.boss.views.mock')
@@ -23,7 +24,7 @@ def replay(uid):
             * Status Code 404 if there are no matching presets.
     """
     # Make a note that this mock server is still in use.
-    data.HTTP_MOCK_SERVERS[uid].keep_alive()
+    mock_server.keep_alive(uid)
 
     if not len(data.PRESETS):
         raise HTTPResponse(b"No preset response", status=404)
