@@ -4,11 +4,11 @@ import bottle
 from bottle import post, HTTPResponse
 
 from pretenders.base import get_logger
-from pretenders.boss.views import mock_server
-from pretenders.boss.views.history import save_history
-from pretenders.boss.views.preset import preset_count, select_preset
+from pretenders.boss.apps import mock_server
+from pretenders.boss.apps.history import save_history
+from pretenders.boss.apps.preset import preset_count, select_preset
 
-LOGGER = get_logger('pretenders.boss.views.mock')
+LOGGER = get_logger('pretenders.boss.apps.mock')
 
 
 @post('/mock/<uid:int>')

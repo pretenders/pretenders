@@ -4,7 +4,7 @@ from bottle import delete, get, HTTPResponse
 
 from pretenders.base import get_logger
 
-LOGGER = get_logger('pretenders.boss.views.history')
+LOGGER = get_logger('pretenders.boss.apps.history')
 HISTORY = []
 
 

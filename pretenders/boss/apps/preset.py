@@ -12,7 +12,7 @@ except ImportError:
 from pretenders.base import get_logger
 from pretenders.http import Preset
 
-LOGGER = get_logger('pretenders.boss.views.preset')
+LOGGER = get_logger('pretenders.boss.apps.preset')
 PRESETS = OrderedDict()
 
 

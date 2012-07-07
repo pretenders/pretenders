@@ -18,7 +18,7 @@ from pretenders.boss import data
 from pretenders.exceptions import NoPortAvailableException
 
 
-LOGGER = get_logger('pretenders.boss.views.mock_server')
+LOGGER = get_logger('pretenders.boss.apps.mock_server')
 UID_COUNTER = 0
 HTTP_MOCK_SERVERS = {}
 
