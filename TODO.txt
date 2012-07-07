@@ -29,11 +29,11 @@
 [ ] Refactor server startup
     [C] Spin up boss tool for test writers.
 [ ] Update sphinx docs
-    [ ] Document usage example
     [C] Ensure they are up-to-date with latest code
     [C] Document usage example
     [C] Add an overview of how the internals (launching of servers) work
-
+[ ] Keep track of started ports so as to save time when starting new mock
+    servers
 ------Version 1.0------
 [ ] Specifiy number of replies for a rule::
 
