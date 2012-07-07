@@ -28,7 +28,7 @@ def replay(url):
     LOGGER.info("Replaying URL for request: \n{0}".format(body))
     boss_response = boss_api_handler.http(
                         'POST',
-                        url="/mock/{0}".format(UID),
+                        url="/replay/{0}".format(UID),
                         body=body)
     if boss_response.status == 200:
         preset = Preset(boss_response.read())
