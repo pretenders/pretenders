@@ -27,6 +27,9 @@
     [ ] Management server gives the client a unique id (UID) which should be included in
         the url given to it for use against the mock server.
     [ ] Refactor storage in the management server to store by UID
+[ ] Update sphinx docs
+[ ] Document usage example
+------Version 1.0------
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted
@@ -35,15 +38,9 @@
 [ ] Prepare support of non-HTTP protocols
     [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
     [ ] Return JSON that the client knows what to do with.
-[ ] Update sphinx docs
-
-
-Change to flow of starting to test:
-    - Client connects to Boss server.
-    - Requests a mock server eg http mock
-    - Server starts mock server and keeps track of it for closing later.
+------Version 1.1------
 
 --------------------------------------------------------------
 Other future tasks:
-[ ] Document usage example
+
 [ ] Add static file serving for manual Ajax testing
