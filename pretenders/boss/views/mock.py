@@ -4,10 +4,9 @@ import bottle
 from bottle import post, HTTPResponse
 
 from pretenders.base import get_logger
-from pretenders.boss import data
 from pretenders.boss.views import mock_server
 from pretenders.boss.views.history import save_history
-from pretenders.boss.views.preset import select_preset
+from pretenders.boss.views.preset import preset_count, select_preset
 
 LOGGER = get_logger('pretenders.boss.views.mock')
 
@@ -27,7 +26,7 @@ def replay(uid):
     # Make a note that this mock server is still in use.
     mock_server.keep_alive(uid)
 
-    if not len(data.PRESETS):
+    if preset_count() == 0:
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(bottle.request.body.read().decode('ascii'))
     save_history(mock_request)
