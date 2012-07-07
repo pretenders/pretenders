@@ -29,7 +29,7 @@
 [ ] Refactor server startup
     [ ] Spin up boss tool for test writers.
 [ ] Update sphinx docs
-[ ] Document usage example
+    [ ] Document usage example
 ------Version 1.0------
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
