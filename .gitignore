@@ -2,8 +2,11 @@
 *.swp
 *.pyc
 *.pyo
+*.pid
+*.log
 .*/
+tags
 dist/
 *.egg-info/
 docs/_build
-tags
+pep8.txt
