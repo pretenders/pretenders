@@ -40,7 +40,8 @@
         (eg on save)
     [ ] Persist presets and history
 [ ] Prepare support of non-HTTP protocols
-    [ ] Refactor history storage and retrieval to be less dependent on HTTP calls.
+    [ ] Refactor history storage and retrieval to be less dependent on HTTP
+        calls.
     [ ] Return JSON that the client knows what to do with.
 ------Version 1.1------
 
