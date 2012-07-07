@@ -13,7 +13,14 @@ LOGGER = logging.getLogger('pretenders.boss.views.mock')
 @post('/mock/<uid:int>')
 def replay(uid):
     """
-    Replay a previously recorded preset, and save the request in history
+    Replay a previously recorded preset, and save the request in history.
+
+    Update the mock server identified by ``uid``.
+
+    :returns:
+        An HTTP response
+            * Status Code 200 containing json data found in preset.
+            * Status Code 404 if there are no matching presets.
     """
     # Make a note that this mock server is still in use.
     data.HTTP_MOCK_SERVERS[uid].keep_alive()
