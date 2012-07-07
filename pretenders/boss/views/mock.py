@@ -6,6 +6,7 @@ from bottle import post, HTTPResponse
 from pretenders.base import get_logger
 from pretenders.boss import data
 from pretenders.boss.views import mock_server
+from pretenders.boss.views.history import save_history
 from pretenders.boss.views.preset import select_preset
 
 LOGGER = get_logger('pretenders.boss.views.mock')
@@ -29,7 +30,7 @@ def replay(uid):
     if not len(data.PRESETS):
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(bottle.request.body.read().decode('ascii'))
-    data.HISTORY.append(mock_request)
+    save_history(mock_request)
     selected = select_preset(mock_request['match'])
     bottle.response.content_type = 'application/json'
     return selected.as_json()

@@ -9,10 +9,8 @@ from pretenders.base import get_logger
 LOGGER = get_logger('pretenders.boss.data')
 
 
-UID_COUNTER = 0
 BOSS_PORT = None
 PRESETS = OrderedDict()
-HISTORY = []
 
 
 def pop_preset(preset_list, key):
