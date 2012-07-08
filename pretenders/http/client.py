@@ -57,8 +57,10 @@ class HTTPMock(BossClient):
             the mock server in this time, it will be closed down by the boss.
         """
         super(HTTPMock, self).__init__(host, port, mock_timeout)
-        self.preset = PresetClient(self.connection, '/preset')
-        self.history = APIHelper(self.connection, '/history')
+        self.preset = PresetClient(self.connection, '/preset/{0}'.format(
+                                                    self.mock_access_point_id))
+        self.history = APIHelper(self.connection, '/history/{0}'.format(
+                                                  self.mock_access_point_id))
         self.rule = ''
 
     def reset(self):
