@@ -22,10 +22,10 @@
     subclients rather than needing 2/3 per test.
 [ ] Add unit tests for helper classes?
 [*] Convert prints to logs. Improve logging.
-[ ] Multi-client / multi-tenancy
-    [A] Management server gives the client a unique id (UID) which should be
-        included in the url given to it for use against the mock server.
-    [A] Refactor storage in the management server to store by UID
+[*] Multi-client / multi-tenancy
+    [*] Management server gives the client a unique id (UID) which should be included in
+        the url given to it for use against the mock server.
+    [*] Refactor storage in the management server to store by UID
 [ ] Refactor server startup
     [C] Spin up boss tool for test writers.
 [ ] Update sphinx docs
