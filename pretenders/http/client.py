@@ -8,7 +8,7 @@ from pretenders.http import binary_to_ascii, MockHttpRequest, Preset
 class PresetClient(APIHelper):
 
     def add(self, match_rule='', response_status=200,
-                response_body=b'', response_headers={}):
+                response_body=b'', response_headers={}, times=1):
         """
         Add a new preset to the boss server.
         """
@@ -16,7 +16,8 @@ class PresetClient(APIHelper):
             headers=response_headers,
             body=binary_to_ascii(response_body),
             status=response_status,
-            rule=match_rule
+            rule=match_rule,
+            times=times,
         )
         return self.http('POST', url=self.path, body=new_preset.as_json())
 
@@ -79,11 +80,11 @@ class HTTPMock(BossClient):
         mock.rule = rule
         return mock
 
-    def reply(self, body=b'', status=200, headers={}):
+    def reply(self, body=b'', status=200, headers={}, times=1):
         """
         Set the pre-canned reply for the preset.
         """
-        self.preset.add(self.rule, status, body, headers)
+        self.preset.add(self.rule, status, body, headers, times)
         return self
 
     def get_request(self, sequence_id=None):

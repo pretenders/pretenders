@@ -207,6 +207,15 @@ def test_setup_reply_forever():
         assert_equals(response.status, 202)
 
 
+def test_setup_with_zero_times():
+    "Test that with zero times we get a 404 for the mock requests"
+    http_mock.reset()
+    http_mock.when('POST').reply(status=202, times=0)
+    for _ in range(2):
+        response = fake_client.post(url='/some/strange/12121/string')
+        assert_equals(response.status, 404)
+
+
 def test_missing_method_and_url_matches_anything():
     "Missing matcher headers match anything"
     http_mock.reset()

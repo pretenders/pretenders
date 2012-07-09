@@ -10,7 +10,9 @@ except ImportError:
     from pretenders.compat.ordered_dict import OrderedDict
 
 from collections import defaultdict
+
 from pretenders.base import get_logger
+from pretenders.constants import FOREVER
 from pretenders.http import Preset
 
 
@@ -44,14 +46,18 @@ def select_preset(uid, value):
         preset = preset_list[0]
         preset_matches = re.match(preset.rule, value)
         if preset_matches:
-            pop_preset(preset_dict, key)
+            knock_off_preset(preset_dict, key)
             return preset
 
     raise HTTPResponse(b"No matching preset response", status=404)
 
 
-def pop_preset(preset_dict, key):
-    """Pop a preset in the list at ``key`` within ``preset_dict``.
+def knock_off_preset(preset_dict, key):
+    """Knock a count off the preset at in list ``key`` within ``preset_dict``.
+
+    Reduces the ``times`` paramter of a preset.
+    Once the ``times`` reduces to zero it is removed.
+    If ``times`` is ``FOREVER`` nothing happens.
 
     :param preset_dict:
         A dictionary containing preset dictionaries specific for a uid.
@@ -59,9 +65,17 @@ def pop_preset(preset_dict, key):
     :param key:
         The key pointing to the list to look up and pop an item from.
     """
-    del preset_dict[key][0]
-    if not preset_dict[key]:
-        del preset_dict[key]
+    preset = preset_dict[key][0]
+    if preset.times:
+        if preset.times == FOREVER:
+            return
+        else:
+            preset.times -= 1
+
+    if preset.times == 0:
+        del preset_dict[key][0]
+        if not preset_dict[key]:
+            del preset_dict[key]
 
 
 @post('/preset/<uid:int>')
@@ -70,11 +84,12 @@ def add_preset(uid):
     Save the incoming request body as a preset response
     """
     preset = Preset(json_data=bottle.request.body.read())
-    rule = preset.rule
-    if rule not in PRESETS[uid]:
-        PRESETS[uid][rule] = []
-    url_presets = PRESETS[uid][rule]
-    url_presets.append(preset)
+    if preset.times:
+        rule = preset.rule
+        if rule not in PRESETS[uid]:
+            PRESETS[uid][rule] = []
+        url_presets = PRESETS[uid][rule]
+        url_presets.append(preset)
 
 
 @delete('/preset/<uid:int>')
