@@ -3,13 +3,13 @@ from nose.tools import (
 from mock import Mock
 
 from pretenders.constants import MOCK_PORT_RANGE
-from pretenders.boss.apps.mock_server import available_ports, HTTP_MOCK_SERVERS
+from pretenders.boss.apps.mock_server import available_ports, MOCK_SERVERS
 
 
 def test_available_ports():
     """
     Test ``available_ports`` filters out ports that are in use by
-    ``HTTP_MOCK_SERVERS``.
+    ``MOCK_SERVERS``.
     """
     ports = available_ports()
 
@@ -21,7 +21,7 @@ def test_available_ports():
 
     mock_server = Mock()
     mock_server.port = mock_port
-    HTTP_MOCK_SERVERS[1] = mock_server
+    MOCK_SERVERS[1] = mock_server
 
     # Now they should not be equal
     ports = available_ports()
