@@ -34,7 +34,7 @@
     [C] Add an overview of how the internals (launching of servers) work
 [*] Keep track of started ports so as to save time when starting new mock
     servers
-[A] Specifiy number of replies for a rule::
+[*] Specifiy number of replies for a rule::
 
         mock.when('POST /someplace').reply("a first mock body",
                                            status=200,
