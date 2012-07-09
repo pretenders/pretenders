@@ -26,10 +26,10 @@ def replay(uid):
     # Make a note that this mock server is still in use.
     mock_server.keep_alive(uid)
 
-    if preset_count() == 0:
+    if preset_count(uid) == 0:
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(bottle.request.body.read().decode('ascii'))
-    save_history(mock_request)
-    selected = select_preset(mock_request['match'])
+    save_history(uid, mock_request)
+    selected = select_preset(uid, mock_request['match'])
     bottle.response.content_type = 'application/json'
     return selected.as_json()

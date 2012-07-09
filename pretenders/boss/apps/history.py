@@ -1,36 +1,37 @@
 import json
+from collections import defaultdict
 
 from bottle import delete, get, HTTPResponse
 
 from pretenders.base import get_logger
 
 LOGGER = get_logger('pretenders.boss.apps.history')
-HISTORY = []
+HISTORY = defaultdict(list)
 
 
-def save_history(request):
+def save_history(uid, request):
     """
     Save a value in history
     """
-    HISTORY.append(request)
+    HISTORY[uid].append(request)
 
 
-@get('/history/<ordinal:int>')
-def get_history(ordinal):
+@get('/history/<uid:int>/<ordinal:int>')
+def get_history(uid, ordinal):
     """
     Access requests issued to the mock server
     """
     try:
-        return json.dumps(HISTORY[ordinal])
+        return json.dumps(HISTORY[uid][ordinal])
     except IndexError:
         raise HTTPResponse(b"No recorded request", status=404)
     except Exception:
         LOGGER.exception('Unexpected exception')
 
 
-@delete('/history')
-def clear_history():
+@delete('/history/<uid:int>')
+def clear_history(uid):
     """
     Delete all recorded requests
     """
-    del HISTORY[:]
+    del HISTORY[uid][:]
