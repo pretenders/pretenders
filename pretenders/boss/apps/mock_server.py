@@ -25,10 +25,10 @@ HTTP_MOCK_SERVERS = {}
 
 
 def available_ports():
-    "Get a list of ports available for starting mock servers"
+    "Get a set of ports available for starting mock servers"
     ports_in_use = set(map(lambda x: x.port, HTTP_MOCK_SERVERS.values()))
-    available_set = set(MOCK_PORT_RANGE).difference(set(ports_in_use))
-    return list(available_set)
+    available_set = MOCK_PORT_RANGE.difference(ports_in_use)
+    return available_set
 
 
 def keep_alive(uid):

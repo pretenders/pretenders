@@ -13,18 +13,19 @@ def test_available_ports():
     """
     ports = available_ports()
 
-    assert_equals(ports, list(MOCK_PORT_RANGE))
+    assert_equals(ports, MOCK_PORT_RANGE)
 
-    assert_true(MOCK_PORT_RANGE[2] in ports)
+    mock_port = list(MOCK_PORT_RANGE)[2]
+    assert_true(mock_port in ports)
     # Now add a mock server
 
     mock_server = Mock()
-    mock_server.port = MOCK_PORT_RANGE[2]
+    mock_server.port = mock_port
     HTTP_MOCK_SERVERS[1] = mock_server
 
     # Now they should not be equal
     ports = available_ports()
 
-    assert_not_equals(ports, list(MOCK_PORT_RANGE))
+    assert_not_equals(ports, MOCK_PORT_RANGE)
 
-    assert_false(MOCK_PORT_RANGE[2] in ports)
+    assert_false(mock_port in ports)
