@@ -21,6 +21,14 @@ from pretenders.exceptions import NoPortAvailableException
 LOGGER = get_logger('pretenders.boss.apps.mock_server')
 UID_COUNTER = 0
 HTTP_MOCK_SERVERS = {}
+"Dictionary containing details of currently active mock servers"
+
+
+def available_ports():
+    "Get a set of ports available for starting mock servers"
+    ports_in_use = set(map(lambda x: x.port, HTTP_MOCK_SERVERS.values()))
+    available_set = MOCK_PORT_RANGE.difference(ports_in_use)
+    return available_set
 
 
 def keep_alive(uid):
@@ -47,7 +55,7 @@ def create_http_mock():
     post_body = bottle.request.body.read().decode('ascii')
     mock_timeout = json.loads(post_body)['mock_timeout']
 
-    for port_number in MOCK_PORT_RANGE:
+    for port_number in available_ports():
         process = subprocess.Popen([
             sys.executable,
             "-m",
