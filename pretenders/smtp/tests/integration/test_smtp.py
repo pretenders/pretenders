@@ -19,13 +19,12 @@ def send_dummy_email(from_email='test@test.com',
     msg['From'] = from_email
     msg['To'] = to_email
 
-    s = smtplib.SMTP(smtp_mock.host, smtp_mock.mock_port)
+    s = smtplib.SMTP(smtp_mock.host, smtp_mock.port)
     s.sendmail(from_email, [to_email], msg.as_string())
     s.quit()
 
 
 def test_check_sent_email_content():
-    raise SkipTest()
     smtp_mock.reset()
     from_email = 'pretenders_from@test.com'
     to_email = 'pretenders_to@test.com'

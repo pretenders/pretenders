@@ -27,6 +27,16 @@ class BossClient(object):
         (self.mock_access_point,
          self.mock_access_point_id) = self._request_mock_access()
 
+        self.history = APIHelper(self.connection, '/history/{0}'.format(
+                                                  self.mock_access_point_id))
+
+    def reset(self):
+        """
+        Delete all history.
+        """
+        self.history.reset()
+        return self
+
     @property
     def create_mock_url(self):
         return "/mock_server/{0}".format(self.boss_mock_type)

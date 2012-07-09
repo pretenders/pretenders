@@ -20,7 +20,7 @@ def get_datetime_from_string(date_string):
 class MockServer(object):
     """Information related to a spawned mock server."""
 
-    def __init__(self, start, port, pid, uid, timeout, last_call):
+    def __init__(self, start, port, pid, uid, timeout, last_call, type):
         self.data = {
             'start': start,
             'port': port,
@@ -28,6 +28,7 @@ class MockServer(object):
             'uid': uid,
             'timeout': timeout,
             'last_call': last_call,
+            'type': type,
         }
 
     def __str__(self):

@@ -60,16 +60,14 @@ class HTTPMock(BossClient):
         super(HTTPMock, self).__init__(host, port, mock_timeout)
         self.preset = PresetClient(self.connection, '/preset/{0}'.format(
                                                     self.mock_access_point_id))
-        self.history = APIHelper(self.connection, '/history/{0}'.format(
-                                                  self.mock_access_point_id))
         self.rule = ''
 
     def reset(self):
         """
-        Delete all presets and history.
+        Delete all presets.
         """
+        super(HTTPMock, self).reset()
         self.preset.reset()
-        self.history.reset()
         return self
 
     def when(self, rule=''):
