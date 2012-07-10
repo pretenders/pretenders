@@ -62,5 +62,3 @@ class APIHelper(object):
 
     def reset(self):
         return self.http('DELETE', url=self.path)
-
-
