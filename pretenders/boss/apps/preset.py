@@ -66,11 +66,10 @@ def knock_off_preset(preset_dict, key):
         The key pointing to the list to look up and pop an item from.
     """
     preset = preset_dict[key][0]
-    if preset.times:
-        if preset.times == FOREVER:
-            return
-        else:
-            preset.times -= 1
+    if preset.times == FOREVER:
+        return
+    elif preset.times > 0:
+        preset.times -= 1
 
     if preset.times == 0:
         del preset_dict[key][0]
@@ -84,12 +83,16 @@ def add_preset(uid):
     Save the incoming request body as a preset response
     """
     preset = Preset(json_data=bottle.request.body.read())
-    if preset.times:
-        rule = preset.rule
-        if rule not in PRESETS[uid]:
-            PRESETS[uid][rule] = []
-        url_presets = PRESETS[uid][rule]
-        url_presets.append(preset)
+    if preset.times != FOREVER and preset.times <= 0:
+        raise HTTPResponse(("Preset has {0} times. Must be greater than "
+                             "zero.".format(preset.times).encode()),
+                           status=400)
+
+    rule = preset.rule
+    if rule not in PRESETS[uid]:
+        PRESETS[uid][rule] = []
+    url_presets = PRESETS[uid][rule]
+    url_presets.append(preset)
 
 
 @delete('/preset/<uid:int>')
