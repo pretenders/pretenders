@@ -20,27 +20,27 @@
     [*] Move data variables to appropriate view modules.
 [*] Refactor client/sub client class to share single http connection betweeen
     subclients rather than needing 2/3 per test.
-[ ] Add unit tests for helper classes?
 [*] Convert prints to logs. Improve logging.
 [*] Multi-client / multi-tenancy
     [*] Management server gives the client a unique id (UID) which should be included in
         the url given to it for use against the mock server.
     [*] Refactor storage in the management server to store by UID
+[*] Keep track of started ports so as to save time when starting new mock
+    servers
+[*] Specifiy number of replies for a rule::
+
+        mock.when('POST /someplace').reply("a first mock body",
+                                           status=200,
+                                           times=20)
+    With a default of 1.
 [ ] Refactor server startup
     [C] Spin up boss tool for test writers.
 [ ] Update sphinx docs
     [C] Ensure they are up-to-date with latest code
     [C] Document usage example
     [C] Add an overview of how the internals (launching of servers) work
-[*] Keep track of started ports so as to save time when starting new mock
-    servers
+[ ] Add unit tests for helper classes?
 ------Version 1.0------
-[ ] Specifiy number of replies for a rule::
-
-        mock.when('POST /someplace').reply("a first mock body",
-                                           status=200,
-                                           times=20)
-    With a default of 1.
 [ ] Support persistence
     [ ] Change dict ``HTTP_MOCK_SERVERS`` in boss/server.py to be obtainable
         at start up so that pids are not lost when the server is restarted

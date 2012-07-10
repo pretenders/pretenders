@@ -1,7 +1,8 @@
-from nose.tools import assert_equals, assert_true
+from nose.tools import assert_equals, assert_true, assert_raises
 
+from pretenders.constants import MOCK_PORT_RANGE, FOREVER
+from pretenders.exceptions import ConfigurationError
 from pretenders.http.client import HTTPMock
-from pretenders.constants import MOCK_PORT_RANGE
 from pretenders.http.tests.integration import get_fake_client
 
 
@@ -180,8 +181,41 @@ def test_blank_url_matches_anything():
     http_mock.when('POST').reply(status=200)
     response = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 200)
+    # Check subsequent call 404s
     response = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 404)
+
+
+def test_setup_reply_multiple_times():
+    "A times argument can be used to reply multiple times for the same url."
+    http_mock.reset()
+    http_mock.when('POST').reply(status=202, times=3)
+    for expected_status in [202, 202, 202, 404]:
+        response = fake_client.post(url='/some/strange/12121/string')
+        assert_equals(response.status, expected_status)
+
+
+def test_setup_reply_forever():
+    """``FOREVER`` should make the url always respond with the given response.
+
+    Clearly this doesn't test that it will *always* return the response. It
+    tests that it does at least do it for 10 requests though.
+    """
+    http_mock.reset()
+    http_mock.when('POST').reply(status=202, times=FOREVER)
+    for _ in range(10):
+        response = fake_client.post(url='/some/strange/12121/string')
+        assert_equals(response.status, 202)
+
+
+def test_setup_with_zero_or_negative_times():
+    "Test that with zero times we get a 404 for the mock requests"
+    http_mock.reset()
+    assert_raises(ConfigurationError,
+                  http_mock.when('POST').reply, status=202, times=0)
+
+    assert_raises(ConfigurationError,
+                  http_mock.when('POST').reply, status=202, times=-2)
 
 
 def test_missing_method_and_url_matches_anything():
