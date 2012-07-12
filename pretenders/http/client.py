@@ -1,30 +1,7 @@
 from copy import copy
 
-from pretenders.base import APIHelper
 from pretenders.boss.client import BossClient
-from pretenders.exceptions import ConfigurationError
-from pretenders.http import binary_to_ascii, MockHttpRequest, Preset
-
-
-class PresetClient(APIHelper):
-
-    def add(self, match_rule='', response_status=200,
-                response_body=b'', response_headers={}, times=1):
-        """
-        Add a new preset to the boss server.
-        """
-        new_preset = Preset(
-            headers=response_headers,
-            body=binary_to_ascii(response_body),
-            status=response_status,
-            rule=match_rule,
-            times=times,
-        )
-
-        response = self.http('POST', url=self.path, body=new_preset.as_json())
-        if response.status != 200:
-            raise ConfigurationError(response.read().decode())
-        return response
+from pretenders.http import MockHttpRequest
 
 
 class HTTPMock(BossClient):
@@ -47,7 +24,7 @@ class HTTPMock(BossClient):
 
     boss_mock_type = 'http'
 
-    def __init__(self, host, port, mock_timeout=120):
+    def __init__(self, host, port, pretender_timeout=120):
         """
         Create an HTTPMock client for testing purposes.
 
@@ -57,25 +34,13 @@ class HTTPMock(BossClient):
         :param port:
             The port to connect to of the boss.
 
-        :param mock_timeout:
+        :param pretender_timeout:
             The timeout (in seconds) to be passed to the boss when
             instantiating the mock HTTP server. If a request is not received by
             the mock server in this time, it will be closed down by the boss.
         """
-        super(HTTPMock, self).__init__(host, port, mock_timeout)
-        self.preset = PresetClient(self.connection, '/preset/{0}'.format(
-                                                    self.mock_access_point_id))
-        self.history = APIHelper(self.connection, '/history/{0}'.format(
-                                                  self.mock_access_point_id))
+        super(HTTPMock, self).__init__(host, port, pretender_timeout)
         self.rule = ''
-
-    def reset(self):
-        """
-        Delete all presets and history.
-        """
-        self.preset.reset()
-        self.history.reset()
-        return self
 
     def when(self, rule=''):
         """
