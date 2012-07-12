@@ -2,17 +2,17 @@ import smtpd
 import asyncore
 
 from pretenders.base import get_logger
-from pretenders.base.mock_server import MockServer
+from pretenders.base.pretender import Pretender
 from pretenders.smtp import SMTPSerialiser
 
 LOGGER = get_logger('pretenders.http.server')
 
 
-class MockSMTPServer(smtpd.SMTPServer, MockServer):
+class MockSMTPServer(smtpd.SMTPServer, Pretender):
 
     def __init__(self, host, port, **kwargs):
         smtpd.SMTPServer.__init__(self, (host, port), None)
-        MockServer.__init__(self, host=host, port=port, **kwargs)
+        Pretender.__init__(self, host=host, port=port, **kwargs)
 
     def process_message(self, peer, mailfrom, rcpttos, data):
         print('Receiving message from:', peer)

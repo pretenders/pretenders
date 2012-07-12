@@ -2,7 +2,7 @@ import bottle
 from bottle import route, HTTPResponse
 
 from pretenders.base import get_logger
-from pretenders.base.mock_server import MockServer
+from pretenders.base.pretender import Pretender
 from pretenders.http import Preset, RequestSerialiser
 
 LOGGER = get_logger('pretenders.http.server')
@@ -12,7 +12,7 @@ def get_header(header, default=None):
     return bottle.request.headers.get(header, default)
 
 
-class MockHTTPServer(MockServer):
+class MockHTTPServer(Pretender):
 
     def __init__(self, *args, **kwargs):
         super(MockHTTPServer, self).__init__(*args, **kwargs)

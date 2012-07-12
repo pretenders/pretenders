@@ -4,7 +4,7 @@ except ImportError:
     # Python2.6/2.7
     from httplib import HTTPConnection
 
-from pretenders.http.client import APIHelper
+from pretenders.base import APIHelper
 
 
 class FakeClient(APIHelper):
@@ -19,4 +19,4 @@ class FakeClient(APIHelper):
 
 
 def get_fake_client(boss_client):
-    return FakeClient(HTTPConnection(boss_client.mock_access_point), '')
+    return FakeClient(HTTPConnection(boss_client.pretend_access_point), '')

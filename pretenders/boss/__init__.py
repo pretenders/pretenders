@@ -17,8 +17,8 @@ def get_datetime_from_string(date_string):
                              "%Y-%m-%d %H:%M:%S")
 
 
-class MockServer(object):
-    """Information related to a spawned mock server."""
+class PretenderModel(object):
+    """Information related to a spawned pretender."""
 
     def __init__(self, start, port, pid, uid, timeout, last_call, type):
         self.data = {

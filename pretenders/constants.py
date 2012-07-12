@@ -1,6 +1,6 @@
 RETURN_CODE_PORT_IN_USE = 2
-MOCK_PORT_RANGE = set(range(8001, 8015))
-TIMEOUT_MOCK_SERVER = 10
+PRETEND_PORT_RANGE = set(range(8001, 8015))
+TIMEOUT_PRETENDER = 10
 REQUEST_ONLY_HEADERS = ['User-Agent', 'Connection', 'Host', 'Accept']
 FOREVER = 'FOREVER'
 """Keyword used to define ``forever``.

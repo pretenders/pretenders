@@ -2,8 +2,8 @@ from nose.tools import (
     assert_equals, assert_not_equals, assert_true, assert_false)
 from mock import Mock
 
-from pretenders.constants import MOCK_PORT_RANGE
-from pretenders.boss.apps.mock_server import available_ports, MOCK_SERVERS
+from pretenders.constants import PRETEND_PORT_RANGE
+from pretenders.boss.apps.pretender import available_ports, PRETENDERS
 
 
 def test_available_ports():
@@ -13,19 +13,19 @@ def test_available_ports():
     """
     ports = available_ports()
 
-    assert_equals(ports, MOCK_PORT_RANGE)
+    assert_equals(ports, PRETEND_PORT_RANGE)
 
-    mock_port = list(MOCK_PORT_RANGE)[2]
+    mock_port = list(PRETEND_PORT_RANGE)[2]
     assert_true(mock_port in ports)
     # Now add a mock server
 
-    mock_server = Mock()
-    mock_server.port = mock_port
-    MOCK_SERVERS[1] = mock_server
+    pretend_server = Mock()
+    pretend_server.port = mock_port
+    PRETENDERS[1] = pretend_server
 
     # Now they should not be equal
     ports = available_ports()
 
-    assert_not_equals(ports, MOCK_PORT_RANGE)
+    assert_not_equals(ports, PRETEND_PORT_RANGE)
 
     assert_false(mock_port in ports)
