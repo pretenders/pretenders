@@ -57,6 +57,7 @@
     [ ] Alter the way that mock servers are started so that asynccore doesn't
         block the main process.
     [ ] Add documentation to all appropriate places.
+[ ] SOAP mock support
 --------------------------------------------------------------
 Other future tasks:
 
