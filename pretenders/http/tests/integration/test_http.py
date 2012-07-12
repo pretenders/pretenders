@@ -1,6 +1,6 @@
 from nose.tools import assert_equals, assert_true, assert_raises
 
-from pretenders.constants import MOCK_PORT_RANGE, FOREVER
+from pretenders.constants import PRETEND_PORT_RANGE, FOREVER
 from pretenders.exceptions import ConfigurationError
 from pretenders.http.client import HTTPMock
 from pretenders.http.tests.integration import get_fake_client
@@ -226,7 +226,7 @@ def test_missing_method_and_url_matches_anything():
     assert_equals(response.status, 323)
 
 
-def test_start_http_mock_server():
+def test_start_http_pretender():
     """
     Test that the http client kicks off an server via a call to the boss.
 
@@ -234,6 +234,6 @@ def test_start_http_mock_server():
     dynamic port configurations for the mock server.
     """
     new_mock = HTTPMock('localhost', 8000)
-    assert_true(new_mock.mock_access_point != "localhost:8000")
-    assert_true(int(new_mock.mock_access_point.split(':')[1])
-                 in MOCK_PORT_RANGE)
+    assert_true(new_mock.pretend_access_point != "localhost:8000")
+    assert_true(int(new_mock.pretend_access_point.split(':')[1])
+                 in PRETEND_PORT_RANGE)

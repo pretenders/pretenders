@@ -10,24 +10,24 @@ import bottle
 from bottle import delete, get, post, HTTPResponse
 
 from pretenders.base import get_logger
-from pretenders.boss import MockServer
+from pretenders.boss import PretenderModel
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
-    MOCK_PORT_RANGE)
+    PRETEND_PORT_RANGE)
 from pretenders.boss import data
 from pretenders.exceptions import NoPortAvailableException
 
 
-LOGGER = get_logger('pretenders.boss.apps.mock_server')
+LOGGER = get_logger('pretenders.boss.apps.pretender')
 UID_COUNTER = 0
-HTTP_MOCK_SERVERS = {}
-"Dictionary containing details of currently active mock servers"
+PRETENDERS = {}
+"Dictionary containing details of currently active pretenders"
 
 
 def available_ports():
-    "Get a set of ports available for starting mock servers"
-    ports_in_use = set(map(lambda x: x.port, HTTP_MOCK_SERVERS.values()))
-    available_set = MOCK_PORT_RANGE.difference(ports_in_use)
+    "Get a set of ports available for starting pretenders"
+    ports_in_use = set(map(lambda x: x.port, PRETENDERS.values()))
+    available_set = PRETEND_PORT_RANGE.difference(ports_in_use)
     return available_set
 
 
@@ -35,31 +35,40 @@ def keep_alive(uid):
     """
     Notification from a mock server that it must be kept  alive.
     """
-    HTTP_MOCK_SERVERS[uid].keep_alive()
+    PRETENDERS[uid].keep_alive()
 
 
-@post('/mock_server/http')
-def create_http_mock():
+@get('/pretender/<uid:int>')
+def pretender_get(uid):
+    bottle.response.content_type = 'application/json'
+    try:
+        return PRETENDERS[uid].as_json()
+    except KeyError:
+        raise HTTPResponse(b"No matching http mock", status=404)
+
+
+@post('/pretender/<protocol:re:[a-z]+>')
+def create_pretender(protocol):
     """
-    Client is requesting an http mock instance.
+    Client is requesting a mock instance.
 
-    Launch an http mock instance on a random unused port.
-    Keep track of the pid of the mock instance
-    Kill the mock instance after timeout expired.
-    Return the location of the mock instance.
+    Launch a pretender using protocol ``protocol`` on a random unused port.
+    Keep track of the pid of the pretender
+    Kill the pretender instance after timeout expired.
+    Return the location of the pretender instance.
     """
     global UID_COUNTER
     UID_COUNTER += 1
     uid = UID_COUNTER
 
     post_body = bottle.request.body.read().decode('ascii')
-    mock_timeout = json.loads(post_body)['mock_timeout']
+    pretender_timeout = json.loads(post_body)['pretender_timeout']
 
     for port_number in available_ports():
         process = subprocess.Popen([
             sys.executable,
             "-m",
-            "pretenders.http.server",
+            "pretenders.{0}.server".format(protocol),
             "-H", "localhost",
             "-p", str(port_number),
             "-b", str(data.BOSS_PORT),
@@ -72,13 +81,14 @@ def create_http_mock():
                         "Assuming failed due to socket error.")
             continue
         start = datetime.datetime.now()
-        HTTP_MOCK_SERVERS[uid] = MockServer(
+        PRETENDERS[uid] = PretenderModel(
             start=start,
             port=port_number,
             pid=process.pid,
-            timeout=datetime.timedelta(seconds=mock_timeout),
+            timeout=datetime.timedelta(seconds=pretender_timeout),
             last_call=start,
             uid=uid,
+            type=protocol
         )
         return json.dumps({
             'url': "localhost:{0}".format(port_number),
@@ -86,40 +96,36 @@ def create_http_mock():
     raise NoPortAvailableException("All ports in range in use")
 
 
-@get('/mock_server/<uid:int>')
-def mock_server_get(uid):
-    bottle.response.content_type = 'application/json'
-    try:
-        return HTTP_MOCK_SERVERS[uid].as_json()
-    except KeyError:
-        raise HTTPResponse(b"No matching http mock", status=404)
-
-
-def delete_mock_server(uid):
-    "Delete a mock server by ``uid``"
+def delete_pretender(uid):
+    "Delete a pretender by ``uid``"
     LOGGER.info("Performing delete on {0}".format(uid))
-    pid = HTTP_MOCK_SERVERS[uid].pid
+    pid = PRETENDERS[uid].pid
     LOGGER.info("attempting to kill pid {0}".format(pid))
     os.kill(pid, signal.SIGINT)
-    del HTTP_MOCK_SERVERS[uid]
+    del PRETENDERS[uid]
 
 
-@delete('/mock_server/http/<uid:int>')
+@delete('/pretender/http/<uid:int>')
 def delete_http_mock(uid):
     "Delete http mock servers"
-    delete_mock_server(uid)
+    delete_pretender(uid)
 
 
-@delete('/mock_server')
-def mock_server_delete():
-    "Delete an http mock"
+@delete('/pretender')
+def pretender_delete():
+    """Delete pretenders with filters
+
+    Currently only supports ``stale`` argument which deletes all those that
+    have not had a request made in a period longer than the time out set on
+    creation.
+    """
     LOGGER.debug("Got DELETE request: {0}".format(bottle.request.GET))
     if bottle.request.GET.get('stale'):
-        LOGGER.debug("Got request to delete stale mock servers")
+        LOGGER.debug("Got request to delete stale pretenders")
         # Delete all stale requests
         now = datetime.datetime.now()
-        for uid, server in HTTP_MOCK_SERVERS.copy().items():
-            LOGGER.debug("Server: {0}".format(server))
+        for uid, server in PRETENDERS.copy().items():
+            LOGGER.debug("Pretender: {0}".format(server))
             if server.last_call + server.timeout < now:
-                LOGGER.info("Deleting server with UID: {0}".format(uid))
-                delete_mock_server(uid)
+                LOGGER.info("Deleting pretender with UID: {0}".format(uid))
+                delete_pretender(uid)
