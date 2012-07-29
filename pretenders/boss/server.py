@@ -1,10 +1,12 @@
 import bottle
 
+from pretenders import settings
 from pretenders.base import get_logger, in_parent_process, save_pid_file
 from pretenders.boss import data
 from pretenders.boss.maintain import launch_maintainer
 # Import apps so that they get initialised for bottle.
 from pretenders.boss.apps import history, pretender, preset, replay
+
 
 LOGGER = get_logger('pretenders.boss.server')
 
@@ -13,7 +15,9 @@ def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     data.BOSS_PORT = port
     if in_parent_process():
-        launch_maintainer()
+        if settings.RUN_MAINTAINER:
+            LOGGER.debug('Starting maintainer process')
+            launch_maintainer()
         save_pid_file('pretenders-boss.pid')
     bottle.run(host=host, port=port, reloader=True)
 
