@@ -5,7 +5,7 @@ from pretenders.base import get_logger
 from pretenders.base.pretender import Pretender
 from pretenders.smtp import SMTPSerialiser
 
-LOGGER = get_logger('pretenders.http.server')
+LOGGER = get_logger('pretenders.smtp.server')
 
 
 class MockSMTPServer(smtpd.SMTPServer, Pretender):
@@ -23,7 +23,7 @@ class MockSMTPServer(smtpd.SMTPServer, Pretender):
         smtp_info = SMTPSerialiser(
             peer=peer, mailfrom=mailfrom, rcpttos=rcpttos, data=data)
         body = smtp_info.serialize()
-        LOGGER.info("Replaying storing SMTP message: \n{0}".format(body))
+        LOGGER.info("Storing SMTP message: \n{0}".format(body))
         self.store_history_retrieve_preset(body)
         return
 
