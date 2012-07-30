@@ -21,7 +21,8 @@ class MockSMTPServer(smtpd.SMTPServer, Pretender):
         print('Message addressed to  :', rcpttos)
         print('Message length        :', len(data))
         smtp_info = SMTPSerialiser(
-            peer=peer, mailfrom=mailfrom, rcpttos=rcpttos, data=data)
+            peer=peer, mailfrom=mailfrom, rcpttos=rcpttos, data=data,
+            match='')
         body = smtp_info.serialize()
         LOGGER.info("Storing SMTP message: \n{0}".format(body))
         self.store_history_retrieve_preset(body)
