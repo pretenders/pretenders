@@ -65,6 +65,8 @@ def create_pretender(protocol):
     pretender_timeout = json.loads(post_body)['pretender_timeout']
 
     for port_number in available_ports():
+        LOGGER.info("Attempt to start {0} pretender on port {1}".format(
+            protocol, port_number))
         process = subprocess.Popen([
             sys.executable,
             "-m",
@@ -90,6 +92,8 @@ def create_pretender(protocol):
             uid=uid,
             type=protocol
         )
+        LOGGER.info("Started {0} pretender on port {1}".format(
+            protocol, port_number))
         return json.dumps({
             'url': "localhost:{0}".format(port_number),
             'id': uid})

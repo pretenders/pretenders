@@ -28,6 +28,9 @@ LOGGING_CONFIG = {
 }
 
 
+RUN_MAINTAINER = True
+
+
 try:
     from local_settings import *
 except ImportError:

@@ -29,6 +29,7 @@ def replay(uid):
     if preset_count(uid) == 0:
         raise HTTPResponse(b"No preset response", status=404)
     mock_request = json.loads(bottle.request.body.read().decode('ascii'))
+    LOGGER.debug('[UID:{0}] Saving history:\n{1}'.format(uid, mock_request))
     save_history(uid, mock_request)
     selected = select_preset(uid, mock_request['match'])
     bottle.response.content_type = 'application/json'
