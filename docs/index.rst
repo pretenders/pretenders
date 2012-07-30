@@ -25,8 +25,10 @@ Start the server to listen on all network interfaces::
 
     $ python -m pretenders.http.server --host 0.0.0.0 --port 8000
 
-HTTP mock in a test case::
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+HTTP mock in a test case
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code::
 
     from pretenders.http.client import HttpMock
 
@@ -51,8 +53,10 @@ HTTP mock in a test case::
     assert_equal(r.method, 'GET')
     assert_equal(r.url, '/weather?city=barcelona')
 
-SMTP mock in a test case::
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+SMTP mock in a test case
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code::
 
     # Create a mock smtp service
     smtp_mock = SMTPMock('localhost', 8000)
