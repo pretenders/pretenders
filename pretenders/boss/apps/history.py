@@ -29,6 +29,17 @@ def get_history(uid, ordinal):
         LOGGER.exception('Unexpected exception')
 
 
+@get('/history/<uid:int>')
+def get_all_history(uid):
+    """
+    Access all requests issued to the mock server
+    """
+    try:
+        return json.dumps(HISTORY[uid])
+    except:
+        LOGGER.exception('Unexpected exception')
+
+
 @delete('/history/<uid:int>')
 def clear_history(uid):
     """
