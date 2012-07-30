@@ -25,19 +25,19 @@ def send_dummy_email(from_email='test@test.com',
 
 
 def test_check_sent_email_content():
-    #raise SkipTest()
     smtp_mock.reset()
+
     from_email = 'pretenders_from@test.com'
     to_email = 'pretenders_to@test.com'
     subject = 'Test Email!!'
     content = "Hey, thought I'd send you a message"
     send_dummy_email(from_email, to_email, subject, content)
-    email_message = smtp_mock.get_email(0)
 
-    assert_equals(email_message['subject'], subject)
-    assert_equals(email_message['from_address'], from_email)
-    assert_equals(email_message['to_address'], to_email)
-    assert_equals(email_message['content'], content)
+    email_message = smtp_mock.get_email(0)
+    assert_equals(email_message['Subject'], subject)
+    assert_equals(email_message['From'], from_email)
+    assert_equals(email_message['To'], to_email)
+    assert_equals(email_message.get_payload(), content)
 
 
 def test_reset_works():
