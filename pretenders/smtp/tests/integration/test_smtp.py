@@ -34,26 +34,26 @@ def test_check_sent_email_content():
     send_dummy_email(from_email, to_email, subject, content)
     email_message = smtp_mock.get_email(0)
 
-    assert_equals(email_message['subject'], subject)
-    assert_equals(email_message['from_address'], from_email)
-    assert_equals(email_message['to_address'], to_email)
-    assert_equals(email_message['content'], content)
+    assert_equals(email_message['Subject'], subject)
+    assert_equals(email_message['From'], from_email)
+    assert_equals(email_message['To'], to_email)
+    assert_equals(email_message.content, content)
 
 
 def test_reset_works():
     #raise SkipTest()
     smtp_mock.reset()
     send_dummy_email()
-    assert_equals(1, len(smtp_mock.get_email()))
+    assert_equals(1, len(smtp_mock.get_emails()))
     # Now reset it and check it works
     smtp_mock.reset()
-    assert_equals(0, len(smtp_mock.get_email()))
+    assert_equals(0, len(smtp_mock.get_emails()))
 
 
 def test_history_stores_multiple_emails():
     #raise SkipTest()
     smtp_mock.reset()
     send_dummy_email()
-    assert_equals(1, len(smtp_mock.get_email()))
+    assert_equals(1, len(smtp_mock.get_emails()))
     send_dummy_email()
-    assert_equals(2, len(smtp_mock.get_email()))
+    assert_equals(2, len(smtp_mock.get_emails()))

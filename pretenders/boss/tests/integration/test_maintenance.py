@@ -50,7 +50,6 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
         # Check that we are still running
         pretender = http_mock.get_pretender()
 
-        print(http_mock.pretend_access_point_id)
         # Make a call to the mock server.
         pretender_client = APIHelper(
                         HTTPConnection(http_mock.pretend_access_point),

@@ -195,7 +195,7 @@ class BaseConfigurator(object):
         else:
             rest = rest[m.end():]
             d = self.config[m.groups()[0]]
-            #print d, rest
+
             while rest:
                 m = self.DOT_PATTERN.match(rest)
                 if m:
