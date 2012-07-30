@@ -49,6 +49,8 @@ class BossClient(object):
 
         (self.pretend_access_point,
          self.pretend_access_point_id) = self._request_mock_access()
+        if self.pretend_access_point:
+            self.pretend_port = self.pretend_access_point.split(':')[1]
 
         self.history = APIHelper(self.connection,
                                  '/history/{0}'.format(

@@ -19,13 +19,13 @@ def send_dummy_email(from_email='test@test.com',
     msg['From'] = from_email
     msg['To'] = to_email
 
-    s = smtplib.SMTP(smtp_mock.host, smtp_mock.port)
+    s = smtplib.SMTP(smtp_mock.host, smtp_mock.pretend_port)
     s.sendmail(from_email, [to_email], msg.as_string())
     s.quit()
 
 
 def test_check_sent_email_content():
-    raise SkipTest()
+    #raise SkipTest()
     smtp_mock.reset()
     from_email = 'pretenders_from@test.com'
     to_email = 'pretenders_to@test.com'
@@ -41,7 +41,7 @@ def test_check_sent_email_content():
 
 
 def test_reset_works():
-    raise SkipTest()
+    #raise SkipTest()
     smtp_mock.reset()
     send_dummy_email()
     assert_equals(1, len(smtp_mock.get_email()))
@@ -51,7 +51,7 @@ def test_reset_works():
 
 
 def test_history_stores_multiple_emails():
-    raise SkipTest()
+    #raise SkipTest()
     smtp_mock.reset()
     send_dummy_email()
     assert_equals(1, len(smtp_mock.get_email()))
