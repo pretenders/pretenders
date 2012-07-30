@@ -54,7 +54,7 @@
 [ ] SMTP mock support
     [*] Refactor http/server.py out into a base mock server class.
     [*] Create a subclass of the base mock server class for use with SMTP.
-    [ ] Alter the way that mock servers are started so that asynccore doesn't
+    [*] Alter the way that mock servers are started so that asynccore doesn't
         block the main process.
     [ ] Add documentation to all appropriate places.
 [ ] SOAP mock support

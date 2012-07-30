@@ -7,7 +7,7 @@ Pretenders: Configurable Fake Servers
 =====================================
 
 Pretenders are Mocks for network applications. They are mainly designed to be
-used in system integration tests or manual tests where there is a need to 
+used in system integration tests or manual tests where there is a need to
 simulate the behaviour of third party software that is not necessarily under
 your control.
 
@@ -26,6 +26,7 @@ Start the server to listen on all network interfaces::
     $ python -m pretenders.http.server --host 0.0.0.0 --port 8000
 
 HTTP mock in a test case::
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     from pretenders.http.client import HttpMock
 
@@ -49,6 +50,26 @@ HTTP mock in a test case::
     r = mock.get_request(0)
     assert_equal(r.method, 'GET')
     assert_equal(r.url, '/weather?city=barcelona')
+
+SMTP mock in a test case::
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+    # Create a mock smtp service
+    smtp_mock = SMTPMock('localhost', 8000)
+
+    # Get the port number that this is faking on and
+    # assign as appropriate to config files that the system being tested uses
+    settings.SMTP_HOST = "localhost:{0}".format(smtp_mock.pretend_port)
+
+    # ...run functionality that should cause an email to be sent
+
+    # Check that an email was sent
+    email_message = smtp_mock.get_email(0)
+    assert_equals(email_message['Subject'], "Thank you for your order")
+    assert_equals(email_message['From'], "foo@bar.com")
+    assert_equals(email_message['To'], "customer@address.com")
+    assert_true("Your order will be with you" in email_message.content)
+
 
 Source code
 -----------
