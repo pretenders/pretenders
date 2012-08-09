@@ -105,8 +105,11 @@ def delete_pretender(uid):
     LOGGER.info("Performing delete on {0}".format(uid))
     pid = PRETENDERS[uid].pid
     LOGGER.info("attempting to kill pid {0}".format(pid))
-    os.kill(pid, signal.SIGINT)
-    del PRETENDERS[uid]
+    try:
+        os.kill(pid, signal.SIGKILL)
+        del PRETENDERS[uid]
+    except OSError as e:
+        LOGGER.info("OSError while killing:\n{0}".format(dir(e)))
 
 
 @delete('/pretender/http/<uid:int>')

@@ -24,7 +24,7 @@ class HTTPMock(BossClient):
 
     boss_mock_type = 'http'
 
-    def __init__(self, host, port, pretender_timeout=120):
+    def __init__(self, host, port, pretender_timeout=10):
         """
         Create an HTTPMock client for testing purposes.
 
