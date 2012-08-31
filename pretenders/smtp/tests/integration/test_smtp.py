@@ -1,7 +1,6 @@
 import smtplib
 from email.mime.text import MIMEText
 from nose.tools import assert_equals
-from nose.plugins.skip import SkipTest
 
 from pretenders.smtp.client import SMTPMock
 
