@@ -120,7 +120,8 @@ def delete_http_mock(uid):
 
 @delete('/pretender')
 def pretender_delete():
-    """Delete pretenders with filters
+    """
+    Delete pretenders with filters
 
     Currently only supports ``stale`` argument which deletes all those that
     have not had a request made in a period longer than the time out set on

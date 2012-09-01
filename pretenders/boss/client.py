@@ -8,7 +8,7 @@ except ImportError:
 from pretenders.base import ResourceNotFound, UnexpectedResponseStatus
 from pretenders.base import APIHelper
 from pretenders.boss import PretenderModel
-from pretenders.constants import TIMEOUT_PRETENDER
+from pretenders.settings import TIMEOUT_PRETENDER
 from pretenders.exceptions import ConfigurationError
 from pretenders.http import binary_to_ascii, Preset
 
