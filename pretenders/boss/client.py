@@ -8,7 +8,7 @@ except ImportError:
 from pretenders.base import ResourceNotFound, UnexpectedResponseStatus
 from pretenders.base import APIHelper
 from pretenders.boss import PretenderModel
-from pretenders.constants import TIMEOUT_PRETENDER
+from pretenders.settings import TIMEOUT_PRETENDER
 from pretenders.exceptions import ConfigurationError
 from pretenders.http import binary_to_ascii, Preset
 
@@ -50,7 +50,7 @@ class BossClient(object):
         (self.pretend_access_point,
          self.pretend_access_point_id) = self._request_mock_access()
         if self.pretend_access_point:
-            self.pretend_port = self.pretend_access_point.split(':')[1]
+            self.pretend_port = int(self.pretend_access_point.split(':')[1])
 
         self.history = APIHelper(self.connection,
                                  '/history/{0}'.format(

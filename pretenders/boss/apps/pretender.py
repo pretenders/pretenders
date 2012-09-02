@@ -105,8 +105,11 @@ def delete_pretender(uid):
     LOGGER.info("Performing delete on {0}".format(uid))
     pid = PRETENDERS[uid].pid
     LOGGER.info("attempting to kill pid {0}".format(pid))
-    os.kill(pid, signal.SIGINT)
-    del PRETENDERS[uid]
+    try:
+        os.kill(pid, signal.SIGKILL)
+        del PRETENDERS[uid]
+    except OSError as e:
+        LOGGER.info("OSError while killing:\n{0}".format(dir(e)))
 
 
 @delete('/pretender/http/<uid:int>')
@@ -117,7 +120,8 @@ def delete_http_mock(uid):
 
 @delete('/pretender')
 def pretender_delete():
-    """Delete pretenders with filters
+    """
+    Delete pretenders with filters
 
     Currently only supports ``stale`` argument which deletes all those that
     have not had a request made in a period longer than the time out set on
