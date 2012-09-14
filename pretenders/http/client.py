@@ -2,6 +2,7 @@ from copy import copy
 
 from pretenders.boss.client import BossClient
 from pretenders.http import MockHttpRequest
+from pretenders.settings import TIMEOUT_PRETENDER
 
 
 class HTTPMock(BossClient):
@@ -24,7 +25,7 @@ class HTTPMock(BossClient):
 
     boss_mock_type = 'http'
 
-    def __init__(self, host, port, pretender_timeout=120):
+    def __init__(self, host, port, pretender_timeout=TIMEOUT_PRETENDER):
         """
         Create an HTTPMock client for testing purposes.
 

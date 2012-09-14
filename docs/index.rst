@@ -37,15 +37,16 @@ HTTP mock in a test case
     mock = HttpMock('localhost', 8000)
 
     # For GET requests to /hello reply with a body of 'Hello'
-    mock.when('/hello', 'GET').reply('Hello')
+    mock.when('GET /hello').reply('Hello')
 
     # For the next POST  or PUT to /somewhere, simulate a BAD REQUEST status code
-    mock.when('/somewhere', '(POST|PUT)').reply(status=400)
+    mock.when('(POST|PUT) /somewhere').reply(status=400)
 
     # For the next request (any method, any URL) respond with some JSON data
     mock.reply('{"temperature": 23}', headers={'Content-Type': 'application/json'})
 
-    # Your code is exercised here
+    # Your code is exercised here, after setting up the mock URL
+    myapp.settings.FOO_ROOT_URL = mock.pretend_access_point
     ...
 
     # Verify requests your code made
