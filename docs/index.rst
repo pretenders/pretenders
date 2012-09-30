@@ -28,7 +28,7 @@ Start the server to listen on all network interfaces::
 HTTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code::
+Sample HTTP mocking test case::
 
     from pretenders.http.client import HttpMock
 
@@ -57,7 +57,7 @@ HTTP mock in a test case
 SMTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. code::
+Sample SMTP mocking test case::
 
     # Create a mock smtp service
     smtp_mock = SMTPMock('localhost', 8000)
