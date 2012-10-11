@@ -238,11 +238,11 @@ def test_start_http_pretender():
     assert_true(int(new_mock.pretend_access_point.split(':')[1])
                  in PRETEND_PORT_RANGE)
 
+
 def test_etag_handling():
     """
-    Test that when a preset is configured with an ETag, requests will
-    receive a 304 Not Modified response if the include a matching
-    if-None-Match header.
+    Test ETag / If-None-Match headers are handled and 304 Not Modified returned
+    where appropriate.
     """
     etag = 'ab12345'
     http_mock.reset()
@@ -250,14 +250,57 @@ def test_etag_handling():
         body = b'Testing etag headers',
         status = 200,
         headers = {'ETag': etag},
-        times = FOREVER
+        times = 3
     )
-    response = fake_client.get('/test-etag')
    
+    # Initial request
+    response = fake_client.get('/test-etag')
     assert_equals(response.status, 200)
     assert_equals(response.getheader('ETag', ''), etag)
 
+    # Subsequent request including a matching If-None-Match header. 
     response = fake_client.get('/test-etag', headers={'If-None-Match': etag})
     assert_equals(response.status, 304)
 
+    # Subsequent request with a different (ie stale) If-None-Match header
+    response = fake_client.get('/test-etag', headers={'If-None-Match': 'xxxx'})
+    assert_equals(response.status, 200)
+
+
+def test_last_modified_handling():
+    """
+    Test Last-Modified / If-Modified-Since headers are handled and 
+    304 Not Modified returned where appropriate.
+    """
+    last_modified = 'Tue, 15 Nov 2012 12:45:26 GMT'
+    
+    http_mock.reset()
+    http_mock.when('GET /test-last-modified').reply(
+        body = b'Testing etag headers',
+        status = 200,
+        headers = {'Last-Modified': last_modified},
+        times = 3
+    )
+   
+    # Initial request
+    response = fake_client.get('/test-last-modified')
+    assert_equals(response.status, 200)
+    assert_equals(response.getheader('Last-Modified', ''), last_modified)
+
+    # Subsequent request with a later If-Modified-Since header
+    response = fake_client.get(
+        '/test-last-modified', 
+        headers={'If-Modified-Since': last_modified.replace('Nov', 'Dec')}
+    )
+    assert_equals(response.status, 304)
+
+    # Subsequent request with an earlier If-Modified-Since header
+    response = fake_client.get(
+        '/test-last-modified', 
+        headers={'If-Modified-Since': last_modified.replace('Nov', 'Oct')}
+    )
+    assert_equals(response.status, 200)
+
+
+    
 
