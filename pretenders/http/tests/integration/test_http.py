@@ -237,3 +237,27 @@ def test_start_http_pretender():
     assert_true(new_mock.pretend_access_point != "localhost:8000")
     assert_true(int(new_mock.pretend_access_point.split(':')[1])
                  in PRETEND_PORT_RANGE)
+
+def test_etag_handling():
+    """
+    Test that when a preset is configured with an ETag, requests will
+    receive a 304 Not Modified response if the include a matching
+    if-None-Match header.
+    """
+    etag = 'ab12345'
+    http_mock.reset()
+    http_mock.when('GET /test-etag').reply(
+        body = b'Testing etag headers',
+        status = 200,
+        headers = {'ETag': etag},
+        times = FOREVER
+    )
+    response = fake_client.get('/test-etag')
+   
+    assert_equals(response.status, 200)
+    assert_equals(response.getheader('ETag', ''), etag)
+
+    response = fake_client.get('/test-etag', headers={'If-None-Match': etag})
+    assert_equals(response.status, 304)
+
+
