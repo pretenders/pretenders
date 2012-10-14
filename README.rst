@@ -59,7 +59,7 @@ Getting Help
 For discussions about the usage, development, and future of pretenders, please
 join the `pretenders`_ mailing list.
 
-.. _`pretenders`: http://groups.google.com/group/pretenders/
+.. _`pretenders`: http://groups.google.com/group/pretenders-project
 
 Documentation
 -------------
