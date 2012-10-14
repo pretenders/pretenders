@@ -13,7 +13,7 @@ setup(
     long_description=open('README.rst').read(),
     author='Carles Barrobés, Alex Couper',
     author_email='carles@barrobes.com, amcouper@gmail.com',
-    url='https://github.com/txels/pretenders',
+    url='https://github.com/pretenders/pretenders',
     packages=find_packages(),
     install_requires=['bottle'],
     #include_package_data=True,
