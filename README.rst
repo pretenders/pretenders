@@ -10,7 +10,7 @@ They are loosely designed along the pattern of Record/Replay/Verify.
 
 The server side of Pretenders is written in Python3:
 
-* Because I firmly believe all new projects should use Python3, unless 
+* Because I firmly believe all new projects should use Python3, unless
   there are *very* compelling reasons against it.
 * Because since these will be run as standalone servers, compatibility
   is not such an issue
@@ -18,7 +18,7 @@ The server side of Pretenders is written in Python3:
 In the cases we implement a client, we will be making this runnable in
 Python 3.x and Python 2.6/2.7.
 
-The initial service to be mocked by pretenders is HTTP.  
+The initial service to be mocked by pretenders is HTTP.
 Future servers we are considering to support include SMTP and AMQP.
 These they represent the vast majority of the services that the software we
 write interacts with.
@@ -52,3 +52,18 @@ One of our goals will be that the wire protocol is simple enough that you do
 not need any specialised client. That said, we will be providing client
 libraries (at least one in Python) to simplify interacting with the server,
 and to provide a comfortable API to use in tests.
+
+Getting Help
+------------
+
+For discussions about the usage, development, and future of pretenders, please
+join the `pretenders`_ mailing list.
+
+.. _`pretenders`: http://groups.google.com/group/pretenders-project
+
+Documentation
+-------------
+
+Full documentation of the project can be found here:
+
+http://pretenders.readthedocs.org/
