@@ -60,3 +60,10 @@ For discussions about the usage, development, and future of pretenders, please
 join the `pretenders`_ mailing list.
 
 .. _`pretenders`: http://groups.google.com/group/pretenders/
+
+Documentation
+-------------
+
+Full documentation of the project can be found here:
+
+http://pretenders.readthedocs.org/
