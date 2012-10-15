@@ -1,6 +1,6 @@
 import base64
 import json
-
+import re
 
 def to_dict(wsgi_headers, include=lambda _: True):
     """
@@ -54,7 +54,7 @@ class RequestSerialiser(object):
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
-        self.match = "{0} {1}".format(request.method, path)
+        self.match = MatchRule("{0} {1}".format(request.method, path))
 
     def serialize(self):
         data = {
@@ -62,7 +62,7 @@ class RequestSerialiser(object):
             'headers': self.headers,
             'method': self.method,
             'url': self.url,
-            'match': self.match
+            'match': self.match.as_dict()
         }
         return json.dumps(data)
 
@@ -126,6 +126,8 @@ class JsonHelper(object):
 
     def as_json(self):
         """The contained data, as a JSON-serialised string."""
+        if isinstance(self.data['rule'], MatchRule):
+            self.data['rule'] = self.data['rule'].as_dict()
         return json.dumps(self.data)
 
     def __str__(self):
@@ -135,6 +137,55 @@ class JsonHelper(object):
 class Preset(JsonHelper):
     """A preset instance represents a pre-programmed response."""
     pass
+
+
+def match_rule_from_dict(data):
+    if isinstance(data, dict):
+        return MatchRule(
+            data['rule'], 
+            data.get('headers', None)
+        )
+    else:
+        return MatchRule(data)
+
+
+class MatchRule(object):
+    def __init__(self, rule, headers=None):
+        self.rule = rule
+        if headers:
+            self.headers = headers
+        else:
+            self.headers = {}
+
+    def as_dict(self):
+        return {'rule': self.rule, 'headers': self.headers}
+
+    def __key(self):
+        keys = [self.rule,]
+        for k, v in self.headers.items():
+            keys.append('{0}:{1}'.format(k, v))
+        return tuple(keys)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def is_match(self, request):
+        _is_match = True
+        if re.match(self.rule, request['match']['rule']):
+            for k, v in self.headers.items():
+                try:
+                    request_header = request['headers'][k]
+                except KeyError:
+                    _is_match = False
+                    break 
+                else:
+                    if request_header != v:
+                        _is_match = False
+                        break
+        else:
+            _is_match = False
+        
+        return _is_match
 
 
 class MockHttpRequest(JsonHelper):

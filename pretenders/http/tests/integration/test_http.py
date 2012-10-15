@@ -237,3 +237,15 @@ def test_start_http_pretender():
     assert_true(new_mock.pretend_access_point != "localhost:8000")
     assert_true(int(new_mock.pretend_access_point.split(':')[1])
                  in PRETEND_PORT_RANGE)
+
+def test_header_matching():
+    http_mock.reset()
+    http_mock.when(
+        'GET /test-headers', headers={'Etag': 'A12345'}
+    ).reply(b'Test headers', status=200, times=2)
+    
+    response = fake_client.get(url='/test-headers', headers={'Etag': 'A12345'})
+    assert_equals(response.status, 200)
+        
+    response = fake_client.get(url='/test-headers')
+    assert_equals(response.status, 404)

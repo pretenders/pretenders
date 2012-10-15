@@ -13,7 +13,7 @@ from collections import defaultdict
 
 from pretenders.base import get_logger
 from pretenders.constants import FOREVER
-from pretenders.http import Preset
+from pretenders.http import Preset, MatchRule, match_rule_from_dict
 
 
 LOGGER = get_logger('pretenders.boss.apps.preset')
@@ -27,16 +27,17 @@ def preset_count(uid):
     return len(PRESETS[uid])
 
 
-def select_preset(uid, value):
+def select_preset(uid, request):
     """
     Select a preset to respond with.
 
     Look through the presets for a match. If one is found pop off a preset
     response and return it.
 
-    ``values`` is a tuple of values to match against the regexes stored in
-    presets. They are assumed to be in the same sequence as those of the
-    regexes.
+    :param uid: The uid to look up presets for
+    :param request: A dictionary representign the mock request. The 'value' item
+        is used to match against the regexes stored in presets. They are assumed
+        to be in the same sequence as those of the regexes.
 
     Return 404 if no preset found that matches.
     """
@@ -44,8 +45,8 @@ def select_preset(uid, value):
     for key, preset_list in preset_dict.items():
 
         preset = preset_list[0]
-        preset_matches = re.match(preset.rule, value)
-        if preset_matches:
+        rule = match_rule_from_dict(preset.rule)
+        if rule.is_match(request):
             knock_off_preset(preset_dict, key)
             return preset
 
@@ -88,7 +89,8 @@ def add_preset(uid):
                              "zero.".format(preset.times).encode()),
                            status=400)
 
-    rule = preset.rule
+    rule = match_rule_from_dict(preset.rule)
+
     if rule not in PRESETS[uid]:
         PRESETS[uid][rule] = []
     url_presets = PRESETS[uid][rule]
