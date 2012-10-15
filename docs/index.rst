@@ -23,7 +23,7 @@ Example usage
 
 Start the server to listen on all network interfaces::
 
-    $ python -m pretenders.http.server --host 0.0.0.0 --port 8000
+    $ python -m pretenders.boss.server --host 0.0.0.0 --port 8000
 
 HTTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -79,7 +79,7 @@ Sample SMTP mocking test case::
 Source code
 -----------
 
-Sources can be found at https://github.com/txels/pretenders
+Sources can be found at https://github.com/pretenders/pretenders
 
 Contributions are welcome.
 
