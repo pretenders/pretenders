@@ -23,24 +23,25 @@ Example usage
 
 Start the server to listen on all network interfaces::
 
-    $ python -m pretenders.http.server --host 0.0.0.0 --port 8000
+    $ python -m pretenders.boss.server --host 0.0.0.0 --port 8000
 
 HTTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Sample HTTP mocking test case::
 
-    from pretenders.http.client import HttpMock
+    from pretenders.http.client import HTTPMock
+    from pretenders.constants import FOREVER
 
     # Assume a running server
     # Initialise the mock client and clear all responses
-    mock = HttpMock('localhost', 8000)
+    mock = HTTPMock('localhost', 8000)
 
     # For GET requests to /hello reply with a body of 'Hello'
-    mock.when('GET /hello').reply('Hello')
+    mock.when('GET /hello').reply('Hello', times=FOREVER)
 
-    # For the next POST  or PUT to /somewhere, simulate a BAD REQUEST status code
-    mock.when('(POST|PUT) /somewhere').reply(status=400)
+    # For the next three POST or PUT to /somewhere, simulate a BAD REQUEST status code
+    mock.when('(POST|PUT) /somewhere').reply(status=400, times=3)
 
     # For the next request (any method, any URL) respond with some JSON data
     mock.reply('{"temperature": 23}', headers={'Content-Type': 'application/json'})
@@ -79,7 +80,7 @@ Sample SMTP mocking test case::
 Source code
 -----------
 
-Sources can be found at https://github.com/txels/pretenders
+Sources can be found at https://github.com/pretenders/pretenders
 
 Contributions are welcome.
 
