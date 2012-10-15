@@ -46,6 +46,10 @@ class HTTPMock(BossClient):
     def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
+
+        :param rule: String incorporating the method and url to match 
+            eg "GET url/to/match"
+        :param headers: Dictionary of headers to match.
         """
         match_rule = MatchRule(rule, headers)
         mock = copy(self)

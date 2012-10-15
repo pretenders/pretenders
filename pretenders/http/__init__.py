@@ -150,7 +150,16 @@ def match_rule_from_dict(data):
 
 
 class MatchRule(object):
+    """
+    Class encapsulating a matching rule against which incoming requests will 
+    be compared.
+    """
     def __init__(self, rule, headers=None):
+        """
+        :param rule: String incorporating the method and url to be matched
+            eg "GET url/to/match"
+        :param headers: A dictionary of headers to be matched
+        """
         self.rule = rule
         if headers:
             self.headers = headers
@@ -158,9 +167,11 @@ class MatchRule(object):
             self.headers = {}
 
     def as_dict(self):
+        """ Convert a match rule instance to a dictionary """
         return {'rule': self.rule, 'headers': self.headers}
 
     def __key(self):
+        """ A unique key for a match rule which will be hashable. """
         keys = [self.rule,]
         for k, v in self.headers.items():
             keys.append('{0}:{1}'.format(k, v))
@@ -170,22 +181,39 @@ class MatchRule(object):
         return hash(self.__key())
 
     def is_match(self, request):
-        _is_match = True
-        if re.match(self.rule, request['match']['rule']):
-            for k, v in self.headers.items():
-                try:
-                    request_header = request['headers'][k]
-                except KeyError:
-                    _is_match = False
-                    break 
-                else:
-                    if request_header != v:
-                        _is_match = False
-                        break
-        else:
-            _is_match = False
-        
-        return _is_match
+        """
+        Check if a given request matches the MatchRule instance.
+        :param request:  A dictionary representing a mock request.
+        :return: True if the request is a match for rule and False if not.
+        """
+        return  self.is_rule_match(request) and self.is_header_match(request)
+
+    def is_rule_match(self, request):
+        """ 
+        Check if a provided request matches the rule attribute 
+        :param request:  A dictionary representing a mock request.
+        :return: True if the request is a match for rule and False if not.
+        """
+        return re.match(self.rule, request['match']['rule']) != None
+
+    def is_header_match(self, request):
+        """ 
+        Check if a provided request matches the rules headers
+        :param request:  A dictionary representing a mock request.
+        :return: True if the request is a match for rule and False if not.
+        """
+        is_match_ = True
+        for k, v in self.headers.items():
+            try:
+                request_header = request['headers'][k]
+            except KeyError:
+                is_match_ = False
+                break 
+            else:
+                if request_header != v:
+                    is_match_ = False
+                    break
+        return is_match_
 
 
 class MockHttpRequest(JsonHelper):
