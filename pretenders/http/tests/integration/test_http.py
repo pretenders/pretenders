@@ -1,6 +1,6 @@
 from nose.tools import assert_equals, assert_true, assert_raises
 
-from pretenders.constants import PRETEND_PORT_RANGE, FOREVER
+from pretenders.constants import FOREVER
 from pretenders.exceptions import ConfigurationError
 from pretenders.http.client import HTTPMock
 from pretenders.http.tests.integration import get_fake_client
@@ -228,12 +228,33 @@ def test_missing_method_and_url_matches_anything():
 
 def test_start_http_pretender():
     """
-    Test that the http client kicks off an server via a call to the boss.
-
-    TODO: This will need updating when we change the server to return
-    dynamic port configurations for the mock server.
+    Test that the http client continues to use the boss for mock calls.
     """
     new_mock = HTTPMock('localhost', 8000)
-    assert_true(new_mock.pretend_access_point != "localhost:8000")
-    assert_true(int(new_mock.pretend_access_point.split(':')[1])
-                 in PRETEND_PORT_RANGE)
+    assert_true(new_mock.pretend_access_point == "localhost:8000")
+
+
+def test_multiple_http_mocks_independently_served():
+    """
+    Ask for two http mocks and set up different presets.
+    Make calls against each.
+    We should get the correct responses back.
+    """
+    http_mock_1 = HTTPMock('localhost', 8000)
+    http_mock_2 = HTTPMock('localhost', 8000)
+    fake_client_1 = get_fake_client(http_mock_1)
+    fake_client_2 = get_fake_client(http_mock_2)
+    http_mock_1.reset()
+    http_mock_2.reset()
+
+    http_mock_1.when('GET /test_mock1_get').reply(b'You tested a get', 201,
+                                                  times=FOREVER)
+    http_mock_2.when('GET /test_mock2_get').reply(b'You tested a get', 200,
+                                                  times=FOREVER)
+
+    assert_equals(201, fake_client_1.get(url="/test_mock1_get").status)
+    assert_equals(200, fake_client_2.get(url="/test_mock2_get").status)
+
+    # Check that they both 404 if used against the other url.
+    assert_equals(404, fake_client_1.get(url="/test_mock2_get").status)
+    assert_equals(404, fake_client_2.get(url="/test_mock1_get").status)

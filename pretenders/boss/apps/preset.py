@@ -41,10 +41,13 @@ def select_preset(uid, value):
     Return 404 if no preset found that matches.
     """
     preset_dict = PRESETS[uid]
+    print("PRESET DICT", preset_dict, value)
     for key, preset_list in preset_dict.items():
 
         preset = preset_list[0]
+        print(preset, value)
         preset_matches = re.match(preset.rule, value)
+        print(preset_matches)
         if preset_matches:
             knock_off_preset(preset_dict, key)
             return preset

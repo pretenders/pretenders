@@ -20,15 +20,12 @@ def get_datetime_from_string(date_string):
 class PretenderModel(object):
     """Information related to a spawned pretender."""
 
-    def __init__(self, start, port, pid, uid, timeout, last_call, type):
+    def __init__(self, start, uid, timeout, last_call):
         self.data = {
             'start': start,
-            'port': port,
-            'pid': pid,
             'uid': uid,
             'timeout': timeout,
             'last_call': last_call,
-            'type': type,
         }
 
     def __str__(self):
@@ -68,3 +65,19 @@ class PretenderModel(object):
     @property
     def timeout_in_secs(self):
         return self.timeout.seconds
+
+
+class HTTPPretenderModel(PretenderModel):
+    pass
+
+
+class SMTPPretenderModel(PretenderModel):
+
+    def __init__(self, start, uid, timeout, last_call, port, pid):
+        super(SMTPPretenderModel, self).__init__(
+            uid=uid, start=start, timeout=timeout, last_call=last_call
+        )
+        self.data.update({
+            'port': port,
+            'pid': pid,
+        })
