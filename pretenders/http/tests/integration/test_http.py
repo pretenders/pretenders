@@ -253,19 +253,24 @@ def test_header_matching():
 def test_etag_workflow():
     http_mock.reset()
 
-    http_mock.when('GET /test-etag').reply(
+    http_mock.when('GET /test-etag', default_headers_only=True).reply(
         b'Test etag', status=200, headers={'Etag': 'A12345'}, times=FOREVER)
     
     http_mock.when('GET /test-etag', headers={'If-None-Match': 'A12345'}).reply(
         b'', status=304, times=FOREVER)
+    
+    http_mock.when('GET /test-etag').reply(
+        b'Test etag', status=200, headers={'Etag': 'XXXX'}, times=FOREVER)
         
     response = fake_client.get(url='/test-etag')
-    print(response.read())
     assert_equals(response.status, 200)
     assert_equals(response.headers.get('Etag', None), 'A12345')
 
     response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
+    
+    response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
+    assert_equals(response.status, 304)
 
-    response = fake_client.get(url='/test-etag', headers={'Etag': 'XXXX'})
+    response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'XXXX'})
     assert_equals(response.status, 200)

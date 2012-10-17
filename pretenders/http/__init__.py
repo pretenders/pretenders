@@ -145,7 +145,8 @@ def match_rule_from_dict(data):
     if isinstance(data, dict):
         return MatchRule(
             data['rule'], 
-            data.get('headers', None)
+            data.get('headers', None),
+            data.get('default_headers_only', False)
         )
     else:
         return MatchRule(data)
@@ -156,27 +157,39 @@ class MatchRule(object):
     Class encapsulating a matching rule against which incoming requests will 
     be compared.
     """
-    def __init__(self, rule, headers=None, match_all_headers=True):
+
+    DEFAULT_HEADERS = set(
+        ['Content-Length', 'Content-Type', 'Host', 'Accept-Encoding']
+    )
+
+    def __init__(self, rule, headers=None, default_headers_only=False):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
         :param headers: A dictionary of headers to be matched
+        :param default_headers_only: If headers=None and 
+            default_headers_only=False then only requests with the just the 
+            DEFAULT_HEADERS will be matched. 
         """
         self.rule = rule
         if headers:
             self.headers = headers
-            self.match_all_headers = False
+            self.default_headers_only = False
         else:
             self.headers = {}
-            self.match_all_headers = match_all_headers
+            self.default_headers_only = default_headers_only
 
     def as_dict(self):
         """ Convert a match rule instance to a dictionary """
-        return {'rule': self.rule, 'headers': self.headers}
+        return {
+            'rule': self.rule, 
+            'headers': self.headers, 
+            'default_headers_only': self.default_headers_only
+        }
 
     def __key(self):
         """ A unique key for a match rule which will be hashable. """
-        keys = [self.rule,]
+        keys = [self.rule, self.default_headers_only]
         for k, v in self.headers.items():
             keys.append('{0}:{1}'.format(k, v))
         return tuple(keys)
@@ -208,7 +221,6 @@ class MatchRule(object):
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
-        IGNORE = Set('Content-Length', 'Content-Type', 'Host', 'Accept-Encoding')
         is_match_ = True
         if self.headers:
             for k, v in self.headers.items():
@@ -222,9 +234,10 @@ class MatchRule(object):
                         is_match_ = False
                         break
         else:
-            if not self.match_all_headers:
-                if set(request['headers'].values()).difference(IGNORE):
-                    _is_match = False
+            if self.default_headers_only:
+                if set(request['headers'].keys()).difference(
+                                            self.DEFAULT_HEADERS):
+                    is_match_ = False
         
         return is_match_
 

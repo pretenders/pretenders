@@ -42,7 +42,6 @@ def select_preset(uid, request):
     Return 404 if no preset found that matches.
     """
     preset_dict = PRESETS[uid]
-
     
     for key, preset_list in preset_dict.items():
         print("KEY: {0}".format(key.as_dict()))
