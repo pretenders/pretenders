@@ -42,6 +42,16 @@ def test_is_match_headers():
 
     assert_true(match_rule.is_match(mock_request))
 
+def test_is_match_wildcard_headers():
+    """ Test a matching rule with matching headers """
+    match_rule = MatchRule('GET /test-match', match_all_headers=False)
+    mock_request = {
+        'match': {'rule': 'GET /test-match'},
+        'headers': {'Etag': 'A123'},
+    }
+    assert_false(match_rule.is_match(mock_request))
+
+
 def test_is_match_headers_is_false():
     """ Test a matching rule with non-matching headers """
     match_rule = MatchRule(

@@ -260,10 +260,11 @@ def test_etag_workflow():
         b'', status=304, times=FOREVER)
         
     response = fake_client.get(url='/test-etag')
+    print(response.read())
     assert_equals(response.status, 200)
     assert_equals(response.headers.get('Etag', None), 'A12345')
 
-    response = fake_client.get(url='/test-etag', headers={'Etag': 'A12345'})
+    response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
 
     response = fake_client.get(url='/test-etag', headers={'Etag': 'XXXX'})

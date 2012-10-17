@@ -54,7 +54,9 @@ class RequestSerialiser(object):
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
-        self.match = MatchRule("{0} {1}".format(request.method, path))
+        self.match = MatchRule(
+            rule="{0} {1}".format(request.method, path)
+        )
 
     def serialize(self):
         data = {
@@ -154,7 +156,7 @@ class MatchRule(object):
     Class encapsulating a matching rule against which incoming requests will 
     be compared.
     """
-    def __init__(self, rule, headers=None):
+    def __init__(self, rule, headers=None, match_all_headers=True):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
@@ -163,8 +165,10 @@ class MatchRule(object):
         self.rule = rule
         if headers:
             self.headers = headers
+            self.match_all_headers = False
         else:
             self.headers = {}
+            self.match_all_headers = match_all_headers
 
     def as_dict(self):
         """ Convert a match rule instance to a dictionary """
@@ -186,6 +190,8 @@ class MatchRule(object):
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
+        print("REQUEST: {0}".format(request))
+        print("MATCH: {0}".format(self.as_dict()))
         return  self.is_rule_match(request) and self.is_header_match(request)
 
     def is_rule_match(self, request):
@@ -202,17 +208,24 @@ class MatchRule(object):
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
+        IGNORE = Set('Content-Length', 'Content-Type', 'Host', 'Accept-Encoding')
         is_match_ = True
-        for k, v in self.headers.items():
-            try:
-                request_header = request['headers'][k]
-            except KeyError:
-                is_match_ = False
-                break 
-            else:
-                if request_header != v:
+        if self.headers:
+            for k, v in self.headers.items():
+                try:
+                    request_header = request['headers'][k]
+                except KeyError:
                     is_match_ = False
-                    break
+                    break 
+                else:
+                    if request_header != v:
+                        is_match_ = False
+                        break
+        else:
+            if not self.match_all_headers:
+                if set(request['headers'].values()).difference(IGNORE):
+                    _is_match = False
+        
         return is_match_
 
 
