@@ -19,4 +19,5 @@ class FakeClient(APIHelper):
 
 
 def get_fake_client(boss_client):
-    return FakeClient(HTTPConnection(boss_client.pretend_access_point), '')
+    return FakeClient(HTTPConnection(boss_client.pretend_access_point),
+                      boss_client.pretend_access_path)

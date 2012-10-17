@@ -43,6 +43,10 @@ class HTTPMock(BossClient):
         super(HTTPMock, self).__init__(host, port, pretender_timeout)
         self.rule = ''
 
+    @property
+    def pretend_access_path(self):
+        return self.pretender_details['path']
+
     def when(self, rule=''):
         """
         Set the match rule which is the first part of the Preset.
