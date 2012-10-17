@@ -1,4 +1,5 @@
 import re
+import time
 
 import bottle
 from bottle import delete, post, HTTPResponse
@@ -27,29 +28,63 @@ def preset_count(uid):
     return len(PRESETS[uid])
 
 
-def select_preset(uid, value):
+def select_preset(uid, request):
     """
     Select a preset to respond with.
 
     Look through the presets for a match. If one is found pop off a preset
     response and return it.
 
-    ``values`` is a tuple of values to match against the regexes stored in
-    presets. They are assumed to be in the same sequence as those of the
-    regexes.
+    :param uid: The uid to look up presets for
+    :param request: A dictionary representign the mock request. The 'value' item
+        is used to match against the regexes stored in presets. They are assumed 
+        to be in the same sequence as those of the regexes.
 
     Return 404 if no preset found that matches.
+
+    If the preset is configured with an 'ETag' header then we check the request
+    for an 'If-None-Match' header.  If the 'If-None-Match' header exists and 
+    matches the value set in the preset then we return a 304 - Not Modified 
+    otherwise the preset response is returned.
+
+    If the preset is configured with a 'Last-Modified' header then we check the
+    request for an 'If-Modified-Since' header.  If an 'If-Modified-Since' header
+    exists and precedes the preset's 'Last-Modified' value then we return 
+    304 Not Modified.
     """
     preset_dict = PRESETS[uid]
     for key, preset_list in preset_dict.items():
 
         preset = preset_list[0]
-        preset_matches = re.match(preset.rule, value)
+        preset_matches = re.match(preset.rule, request['match'])
         if preset_matches:
+
+            if 'ETag' in preset.headers.keys():
+                if_none_match = request['headers'].get('If-None-Match', None)
+                if if_none_match and if_none_match == preset.headers['ETag']:
+                    raise HTTPResponse(b"", status=304)
+
+            if 'Last-Modified' in preset.headers.keys():
+                if_modified_since = request['headers'].get(
+                    'If-Modified-Since', None)
+                if if_modified_since and is_modified(
+                        preset.headers['Last-Modified'], if_modified_since):
+                    raise HTTPResponse(b"", status=304)
+
             knock_off_preset(preset_dict, key)
             return preset
 
     raise HTTPResponse(b"No matching preset response", status=404)
+
+
+def is_modified(last_modified, if_modified_since):
+    """ 
+    Returns True if a resource has been modified.
+    Both last_modified and if_modified_since parameters are expected to be
+    in standard HTTP date format eg Tue, 15 Nov 1994 12:45:26 GMT.
+    """
+    fmt = "%a, %d %b %Y %H:%M:%S %Z"
+    return time.strptime(if_modified_since, fmt) > time.strptime(last_modified, fmt)
 
 
 def knock_off_preset(preset_dict, key):
