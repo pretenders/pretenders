@@ -144,7 +144,6 @@ def match_rule_from_dict(data):
         return MatchRule(
             data['rule'], 
             data.get('headers', None),
-            exact_headers=data.get('exact_headers', False)
         )
 
     else:
@@ -157,33 +156,16 @@ class MatchRule(object):
     be compared.
     """
 
-    DEFAULT_HEADERS = [
-        'Content-Length', 'Content-Type', 'Host', 'Accept-Encoding'
-    ]
-
-    def __init__(self, rule, headers=None, **kwargs):
+    def __init__(self, rule, headers=None):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
         :param headers: Dictionary of headers to match. 
-            If headers is None then the rule will match on rule only,
-                ignoring headers
-            If headers is an empty dictionary ie {} the rule will match 
-                only if the request has the basic, default headers.
         """
         self.rule = rule
-
-        if 'exact_headers' in kwargs:
-            # We must be hydrating a serialized dictionary 
-            self.exact_headers = kwargs['exact_headers']
-        else:
-            self.exact_headers = True
-
         if headers:
             self.headers = headers
         else:
-            if headers == None:
-                self.exact_headers = False
             self.headers = {}
 
     def as_dict(self):
@@ -191,12 +173,11 @@ class MatchRule(object):
         return {
             'rule': self.rule, 
             'headers': self.headers, 
-            'exact_headers': self.exact_headers
         }
 
     def __key(self):
         """ A unique key for a match rule which will be hashable. """
-        keys = [self.rule, self.exact_headers]
+        keys = [self.rule,]
         for k, v in self.headers.items():
             keys.append('{0}:{1}'.format(k, v))
         return tuple(keys)
@@ -204,54 +185,52 @@ class MatchRule(object):
     def __hash__(self):
         return hash(self.__key())
 
-    def is_match(self, request):
-        """
-        Check if a given request matches the MatchRule instance.
-        
-        :param request:  A dictionary representing a mock request.
-        :return: True if the request is a match for rule and False if not.
-        """
-        return  self.is_rule_match(request) and self.is_header_match(request)
-
     def is_rule_match(self, request):
         """ 
         Check if a provided request matches the regex in the rule attribute 
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
-        return re.match(self.rule, request['rule']) != None
+        try:
+            return re.match(self.rule, request['rule']) != None
+        except KeyError:
+            return False
 
-    def is_header_match(self, request):
-        """ 
-        Check if a provided request matches the configured headers.
-
-        :param request:  A dictionary representing a mock request.
-        :return: True if the request is a match for rule and False if not.
+    def get_match_score(self, request):
         """
-        is_matched = True
+        Returns a score representing the confidence that the provided request 
+        is a match.
+        :param request:  A dictionary representing a mock request.
+        :return: An integer where a higher number represents greater confidence
+            that the request is a match.
+        """
+        RULE_INCREMENT = 1 # Amount score is incremented for a matching rule.
+        score = 0
+        if self.is_rule_match(request):
+            score+=1
+            if not self.headers:
+                score+=RULE_INCREMENT # the rule has greater weight.
+            else:
+                score+=self.get_header_match_score(request)
+        return score
+
+    def get_header_match_score(self, request):
+        """
+        Returns the value of the match score associated with the headers
+        A higher score reflects greater confidence.
+        """
+        HEADER_INCREMENT = 2 # Amount score is incremented for a matching header
+        score = 0
         if self.headers:
             for k, v in self.headers.items():
                 try:
                     request_header = request['headers'][k]
                 except KeyError:
-                    is_matched = False
-                    break
+                    pass
                 else:
-                    if request_header != v:
-                        is_matched = False
-                        break
-
-        if self.exact_headers and is_matched:
-            expected_headers = []
-            expected_headers.extend(self.headers.keys())
-            expected_headers.extend(self.DEFAULT_HEADERS)
-
-            diff = set(expected_headers).symmetric_difference(
-                set(request['headers'].keys()))
-            if diff:
-                is_matched = False
-        
-        return is_matched
+                    if request_header == v:
+                       score+=HEADER_INCREMENT 
+        return score
 
 
 class MockHttpRequest(JsonHelper):
