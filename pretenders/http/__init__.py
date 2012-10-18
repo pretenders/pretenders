@@ -54,9 +54,7 @@ class RequestSerialiser(object):
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
-        self.match = MatchRule(
-            rule="{0} {1}".format(request.method, path)
-        )
+        self.rule = "{0} {1}".format(request.method, path)
 
     def serialize(self):
         data = {
@@ -64,7 +62,7 @@ class RequestSerialiser(object):
             'headers': self.headers,
             'method': self.method,
             'url': self.url,
-            'match': self.match.as_dict()
+            'rule': self.rule,
         }
         return json.dumps(data)
 
@@ -168,12 +166,16 @@ class MatchRule(object):
             eg "GET url/to/match"
         :param headers: A dictionary of headers to be matched
         :param default_headers_only: If headers=None and 
-            default_headers_only=False then only requests with the just the 
+            default_headers_only=False then requests with the only the 
             DEFAULT_HEADERS will be matched. 
         """
         self.rule = rule
         if headers:
             self.headers = headers
+            if default_headers_only:
+                raise ValueError(
+                    'You cannot specify both headers and default_headers_only ' 
+                )
             self.default_headers_only = False
         else:
             self.headers = {}
@@ -200,24 +202,27 @@ class MatchRule(object):
     def is_match(self, request):
         """
         Check if a given request matches the MatchRule instance.
+        
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
-        print("REQUEST: {0}".format(request))
-        print("MATCH: {0}".format(self.as_dict()))
         return  self.is_rule_match(request) and self.is_header_match(request)
 
     def is_rule_match(self, request):
         """ 
-        Check if a provided request matches the rule attribute 
+        Check if a provided request matches the regex in the rule attribute 
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
-        return re.match(self.rule, request['match']['rule']) != None
+        return re.match(self.rule, request['rule']) != None
 
     def is_header_match(self, request):
         """ 
-        Check if a provided request matches the rules headers
+        Check if a provided request matches the configured headers.
+        If default_headers_only is True then the request must have only
+        the DEFAULT_HEADERS (and no more) in order to match - this is only
+        relevant where the match rule has no headers configured.
+
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """

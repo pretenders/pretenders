@@ -259,18 +259,17 @@ def test_etag_workflow():
     http_mock.when('GET /test-etag', headers={'If-None-Match': 'A12345'}).reply(
         b'', status=304, times=FOREVER)
     
-    http_mock.when('GET /test-etag').reply(
-        b'Test etag', status=200, headers={'Etag': 'XXXX'}, times=FOREVER)
-        
+    # Requests without headers return an Etag header.
     response = fake_client.get(url='/test-etag')
     assert_equals(response.status, 200)
     assert_equals(response.headers.get('Etag', None), 'A12345')
 
+    # Requests using the Etag header from above in the If-None-Match header
+    # receive a 304 Not Modified response
     response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
     
+    # ... and will continue to receive 304 responses.
     response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
 
-    response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'XXXX'})
-    assert_equals(response.status, 200)

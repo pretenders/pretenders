@@ -35,21 +35,15 @@ def select_preset(uid, request):
     response and return it.
 
     :param uid: The uid to look up presets for
-    :param request: A dictionary representign the mock request. The 'value' item
-        is used to match against the regexes stored in presets. They are assumed
-        to be in the same sequence as those of the regexes.
+    :param request: A dictionary representing the mock request which is checked
+        to see if it matches the rule regex and headers stored in the preset.
 
     Return 404 if no preset found that matches.
     """
     preset_dict = PRESETS[uid]
     
     for key, preset_list in preset_dict.items():
-        print("KEY: {0}".format(key.as_dict()))
-        print("PRESET_LIST: {0}".format([p.as_dict() for p in preset_list]))
-
-    for key, preset_list in preset_dict.items():
         preset = preset_list[0]
-        print("PRESET {0}".format(preset))
         rule = match_rule_from_dict(preset.rule)
         if rule.is_match(request):
             knock_off_preset(preset_dict, key)

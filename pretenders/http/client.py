@@ -50,6 +50,9 @@ class HTTPMock(BossClient):
         :param rule: String incorporating the method and url to match 
             eg "GET url/to/match"
         :param headers: Dictionary of headers to match.
+        :param default_headers_only: If default_headers_only=False 
+            then requests with only the default headers will be matched. 
+            If headers are provided, default_headers_only must be False.
         """
         match_rule = MatchRule(rule, headers, default_headers_only)
         mock = copy(self)
