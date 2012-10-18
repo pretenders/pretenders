@@ -239,6 +239,9 @@ def test_start_http_pretender():
                  in PRETEND_PORT_RANGE)
 
 def test_header_matching():
+    """
+    Test that rules with headers only match with requests with matching headers.
+    """
     http_mock.reset()
     http_mock.when(
         'GET /test-headers', headers={'Etag': 'A12345'}
@@ -250,10 +253,26 @@ def test_header_matching():
     response = fake_client.get(url='/test-headers')
     assert_equals(response.status, 404)
 
+def test_exact_header_matching():
+    """
+    Test that rules without headers and matching an empty dictionary 
+    will only match requests without headers.
+    """
+    http_mock.reset()
+    http_mock.when('GET /test-headers', headers={}).reply(
+        b'Test headers', status=200, times=2)
+    
+    response = fake_client.get(url='/test-headers')
+    assert_equals(response.status, 200)
+    
+    response = fake_client.get(url='/test-headers', headers={'Etag': 'A12345'})
+    assert_equals(response.status, 404)
+
 def test_etag_workflow():
+    """ Test the mocking of a typical caching workflow using Etags. """
     http_mock.reset()
 
-    http_mock.when('GET /test-etag', default_headers_only=True).reply(
+    http_mock.when('GET /test-etag', headers={}).reply(
         b'Test etag', status=200, headers={'Etag': 'A12345'}, times=FOREVER)
     
     http_mock.when('GET /test-etag', headers={'If-None-Match': 'A12345'}).reply(

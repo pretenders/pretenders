@@ -144,8 +144,9 @@ def match_rule_from_dict(data):
         return MatchRule(
             data['rule'], 
             data.get('headers', None),
-            data.get('default_headers_only', False)
+            exact_headers=data.get('exact_headers', False)
         )
+
     else:
         return MatchRule(data)
 
@@ -156,42 +157,46 @@ class MatchRule(object):
     be compared.
     """
 
-    DEFAULT_HEADERS = set(
-        ['Content-Length', 'Content-Type', 'Host', 'Accept-Encoding']
-    )
+    DEFAULT_HEADERS = [
+        'Content-Length', 'Content-Type', 'Host', 'Accept-Encoding'
+    ]
 
-    def __init__(self, rule, headers=None, default_headers_only=False):
+    def __init__(self, rule, headers=None, **kwargs):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
-        :param headers: A dictionary of headers to be matched
-        :param default_headers_only: If headers=None and 
-            default_headers_only=False then requests with the only the 
-            DEFAULT_HEADERS will be matched. 
+        :param headers: Dictionary of headers to match. 
+            If headers is None then the rule will match on rule only,
+                ignoring headers
+            If headers is an empty dictionary ie {} the rule will match 
+                only if the request has the basic, default headers.
         """
         self.rule = rule
+
+        if 'exact_headers' in kwargs:
+            # We must be hydrating a serialized dictionary 
+            self.exact_headers = kwargs['exact_headers']
+        else:
+            self.exact_headers = True
+
         if headers:
             self.headers = headers
-            if default_headers_only:
-                raise ValueError(
-                    'You cannot specify both headers and default_headers_only ' 
-                )
-            self.default_headers_only = False
         else:
+            if headers == None:
+                self.exact_headers = False
             self.headers = {}
-            self.default_headers_only = default_headers_only
 
     def as_dict(self):
         """ Convert a match rule instance to a dictionary """
         return {
             'rule': self.rule, 
             'headers': self.headers, 
-            'default_headers_only': self.default_headers_only
+            'exact_headers': self.exact_headers
         }
 
     def __key(self):
         """ A unique key for a match rule which will be hashable. """
-        keys = [self.rule, self.default_headers_only]
+        keys = [self.rule, self.exact_headers]
         for k, v in self.headers.items():
             keys.append('{0}:{1}'.format(k, v))
         return tuple(keys)
@@ -219,32 +224,34 @@ class MatchRule(object):
     def is_header_match(self, request):
         """ 
         Check if a provided request matches the configured headers.
-        If default_headers_only is True then the request must have only
-        the DEFAULT_HEADERS (and no more) in order to match - this is only
-        relevant where the match rule has no headers configured.
 
         :param request:  A dictionary representing a mock request.
         :return: True if the request is a match for rule and False if not.
         """
-        is_match_ = True
+        is_matched = True
         if self.headers:
             for k, v in self.headers.items():
                 try:
                     request_header = request['headers'][k]
                 except KeyError:
-                    is_match_ = False
-                    break 
+                    is_matched = False
+                    break
                 else:
                     if request_header != v:
-                        is_match_ = False
+                        is_matched = False
                         break
-        else:
-            if self.default_headers_only:
-                if set(request['headers'].keys()).difference(
-                                            self.DEFAULT_HEADERS):
-                    is_match_ = False
+
+        if self.exact_headers and is_matched:
+            expected_headers = []
+            expected_headers.extend(self.headers.keys())
+            expected_headers.extend(self.DEFAULT_HEADERS)
+
+            diff = set(expected_headers).symmetric_difference(
+                set(request['headers'].keys()))
+            if diff:
+                is_matched = False
         
-        return is_match_
+        return is_matched
 
 
 class MockHttpRequest(JsonHelper):

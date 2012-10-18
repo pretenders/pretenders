@@ -43,18 +43,18 @@ class HTTPMock(BossClient):
         super(HTTPMock, self).__init__(host, port, pretender_timeout)
         self.rule = ''
 
-    def when(self, rule='', headers=None, default_headers_only=False):
+    def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
 
         :param rule: String incorporating the method and url to match 
             eg "GET url/to/match"
-        :param headers: Dictionary of headers to match.
-        :param default_headers_only: If default_headers_only=False 
-            then requests with only the default headers will be matched. 
-            If headers are provided, default_headers_only must be False.
+        :param headers: Dictionary of headers to match. 
+            If headers is None then the rule will match on rule only.
+            If headers is {} the the rule will match only if the request
+                has the basic, default headers.
         """
-        match_rule = MatchRule(rule, headers, default_headers_only)
+        match_rule = MatchRule(rule, headers)
         mock = copy(self)
         mock.rule = match_rule 
         return mock
