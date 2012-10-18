@@ -49,17 +49,15 @@ def select_preset(uid, request):
         if score > 0:
             matches.append((key, preset, score))
 
-    if not matches:
-        raise HTTPResponse(b"No matching preset response", status=404)
-    else:
+    if matches:
         # Find the match with the highest score
         KEY, PRESET, SCORE = 0, 1, 2
         matches.sort(key=lambda x: x[SCORE], reverse=True)
         match = matches[0]
         knock_off_preset(preset_dict, match[KEY])
         return match[PRESET]
-
-    raise HTTPResponse(b"No matching preset response", status=404)
+    else:
+        raise HTTPResponse(b"No matching preset response", status=404)
 
 
 def knock_off_preset(preset_dict, key):

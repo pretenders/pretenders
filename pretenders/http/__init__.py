@@ -201,25 +201,23 @@ class MatchRule(object):
         Returns a score representing the confidence that the provided request 
         is a match.
         :param request:  A dictionary representing a mock request.
-        :return: An integer where a higher number represents greater confidence
-            that the request is a match.
+        :return: An integer where higher implies greater confidence.
         """
-        RULE_INCREMENT = 1 # Amount score is incremented for a matching rule.
+        RULE_WEIGHTING = 1 # Amount score is incremented for a matching rule.
         score = 0
         if self.is_rule_match(request):
             score+=1
             if not self.headers:
-                score+=RULE_INCREMENT # the rule has greater weight.
+                score+=RULE_WEIGHTING # the rule has greater weight.
             else:
                 score+=self.get_header_match_score(request)
         return score
 
     def get_header_match_score(self, request):
         """
-        Returns the value of the match score associated with the headers
-        A higher score reflects greater confidence.
+        Returns the value of the match score associated with the headers.
         """
-        HEADER_INCREMENT = 2 # Amount score is incremented for a matching header
+        HEADER_WEIGHTING = 2 # Amount score is incremented for a matching header
         score = 0
         if self.headers:
             for k, v in self.headers.items():
@@ -229,7 +227,7 @@ class MatchRule(object):
                     pass
                 else:
                     if request_header == v:
-                       score+=HEADER_INCREMENT 
+                       score+=HEADER_WEIGHTING 
         return score
 
 
