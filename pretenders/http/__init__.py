@@ -120,7 +120,7 @@ class JsonHelper(object):
             The ``bottle`` object that represents the response.
         """
         for header, value in self.headers.items():
-            response.set_header(header, value)
+            response.set_header(str(header), str(value))
         response.status = self.status
         return self.body
 
