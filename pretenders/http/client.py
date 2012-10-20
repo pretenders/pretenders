@@ -43,17 +43,21 @@ class HTTPMock(BossClient):
         super(HTTPMock, self).__init__(host, port, pretender_timeout)
         self.rule = ''
 
+    @property
+    def pretend_access_path(self):
+        return self.pretender_details['path']
+
     def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
 
-        :param rule: String incorporating the method and url to match 
+        :param rule: String incorporating the method and url to match
             eg "GET url/to/match"
-        :param headers: An optional dictionary of headers to match. 
+        :param headers: An optional dictionary of headers to match.
         """
         match_rule = MatchRule(rule, headers)
         mock = copy(self)
-        mock.rule = match_rule 
+        mock.rule = match_rule
         return mock
 
     def reply(self, body=b'', status=200, headers={}, times=1):

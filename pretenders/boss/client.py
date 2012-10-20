@@ -47,10 +47,7 @@ class BossClient(object):
         self.connection = HTTPConnection(self.full_host)
         self.boss_access = APIHelper(self.connection, '')
 
-        (self.pretend_access_point,
-         self.pretend_access_point_id) = self._request_mock_access()
-        if self.pretend_access_point:
-            self.pretend_port = int(self.pretend_access_point.split(':')[1])
+        self.pretender_details = self._request_mock_access()
 
         self.history = APIHelper(self.connection,
                                  '/history/{0}'.format(
@@ -69,7 +66,15 @@ class BossClient(object):
 
     @property
     def create_mock_url(self):
-        return "/pretender/{0}".format(self.boss_mock_type)
+        return "/{0}".format(self.boss_mock_type)
+
+    @property
+    def pretend_access_point_id(self):
+        return self.pretender_details.get('id', "")
+
+    @property
+    def pretend_access_point(self):
+        return self.full_host
 
     def _request_mock_access(self):
         """
@@ -78,7 +83,7 @@ class BossClient(object):
         :returns:
             A tuple containing:
 
-                position 0: url to the mock server
+                position 0: hostname[:port] of the mock server
                 position 1: unique id of the pretender (for teardown
                             purposes)
         """
@@ -90,8 +95,9 @@ class BossClient(object):
                                              body=post_body)
             pretender_json = response.read().decode('ascii')
             pretender_details = json.loads(pretender_json)
-            return pretender_details["url"], pretender_details["id"]
-        return "", ""
+
+            return pretender_details
+        return {}
 
     @property
     def delete_mock_url(self):
@@ -102,7 +108,8 @@ class BossClient(object):
         "Get pretenders from the server in dict format"
         response = self.boss_access.http(
             method='GET',
-            url='/pretender/{0}'.format(self.pretend_access_point_id),
+            url='/{0}/{1}'.format(self.boss_mock_type,
+                                  self.pretend_access_point_id),
         )
         if response.status == 200:
             return PretenderModel.from_json_response(response)
