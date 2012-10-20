@@ -256,9 +256,9 @@ def test_header_matching_with_match_headers():
     http_mock.reset()
     http_mock.when('GET /test-headers', headers={'Some-Header': 'A'}).reply(
         b'', status=500)
-    http_mock.when('GET /test-headers').reply(b'', status=400)
     http_mock.when('GET /test-headers', headers={'Another-Header': 'A'}).reply(
         b'', status=200)
+    http_mock.when('GET /test-headers').reply(b'', status=400)
 
     response = fake_client.get(url='/test-headers', headers={'Another-Header': 'A'})
 

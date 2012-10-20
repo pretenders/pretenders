@@ -185,50 +185,46 @@ class MatchRule(object):
     def __hash__(self):
         return hash(self.__key())
 
-    def is_rule_match(self, request):
+    def matches(self, request):
+        """
+        Check if a provided request matches this match rule. 
+        :param request:  A dictionary representing a mock request against which
+            we'll attempt to match.
+        :return: True if the request is a match for rule and False if not.
+        """
+        return (self.rule_matches(request['rule']) and 
+                    self.headers_match(request['headers']))
+
+    def rule_matches(self, rule):
         """ 
         Check if a provided request matches the regex in the rule attribute 
-        :param request:  A dictionary representing a mock request.
+        :param rule:  The regex rule included in the request we're matching 
+            against.
         :return: True if the request is a match for rule and False if not.
         """
         try:
-            return re.match(self.rule, request['rule']) != None
+            return re.match(self.rule, rule) != None
         except KeyError:
             return False
 
-    def get_match_score(self, request):
+    def headers_match(self, headers):
+        """ 
+        Check if a provided request matches the dictionary in the 
+            header attribute 
+        :param headers:  The dictionary of headers included in the request
+            we're matching against.
+        :return: True if the request is a match for headers and False if not.
         """
-        Returns a score representing the confidence that the provided request 
-        is a match.
-        :param request:  A dictionary representing a mock request.
-        :return: An integer where higher implies greater confidence.
-        """
-        RULE_WEIGHTING = 1 # Amount score is incremented for a matching rule.
-        score = 0
-        if self.is_rule_match(request):
-            score+=1
-            if not self.headers:
-                score+=RULE_WEIGHTING # the rule has greater weight.
-            else:
-                score+=self.get_header_match_score(request)
-        return score
-
-    def get_header_match_score(self, request):
-        """
-        Returns the value of the match score associated with the headers.
-        """
-        HEADER_WEIGHTING = 2 # Amount score is incremented for a matching header
-        score = 0
         if self.headers:
             for k, v in self.headers.items():
                 try:
-                    request_header = request['headers'][k]
+                    header = headers[k]
                 except KeyError:
-                    pass
+                    return False
                 else:
-                    if request_header == v:
-                       score+=HEADER_WEIGHTING 
-        return score
+                    if header != v:
+                        return False
+        return True
 
 
 class MockHttpRequest(JsonHelper):

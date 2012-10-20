@@ -45,19 +45,12 @@ def select_preset(uid, request):
     for key, preset_list in preset_dict.items():
         preset = preset_list[0]
         match_rule = match_rule_from_dict(preset.rule)
-        score = match_rule.get_match_score(request)
-        if score > 0:
-            matches.append((key, preset, score))
-
-    if matches:
-        # Find the match with the highest score
-        KEY, PRESET, SCORE = 0, 1, 2
-        matches.sort(key=lambda x: x[SCORE], reverse=True)
-        match = matches[0]
-        knock_off_preset(preset_dict, match[KEY])
-        return match[PRESET]
-    else:
-        raise HTTPResponse(b"No matching preset response", status=404)
+        
+        if match_rule.matches(request):
+            knock_off_preset(preset_dict, key)
+            return preset
+        
+    raise HTTPResponse(b"No matching preset response", status=404)
 
 
 def knock_off_preset(preset_dict, key):
