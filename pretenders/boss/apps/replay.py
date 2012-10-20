@@ -31,6 +31,6 @@ def replay(uid):
     mock_request = json.loads(bottle.request.body.read().decode('ascii'))
     LOGGER.debug('[UID:{0}] Saving history:\n{1}'.format(uid, mock_request))
     save_history(uid, mock_request)
-    selected = select_preset(uid, mock_request['match'])
+    selected = select_preset(uid, mock_request)
     bottle.response.content_type = 'application/json'
     return selected.as_json()

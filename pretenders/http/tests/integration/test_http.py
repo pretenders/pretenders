@@ -237,3 +237,52 @@ def test_start_http_pretender():
     assert_true(new_mock.pretend_access_point != "localhost:8000")
     assert_true(int(new_mock.pretend_access_point.split(':')[1])
                  in PRETEND_PORT_RANGE)
+
+def test_header_matching_with_no_match_headers():
+    """ Test the best match is returned when request has no headers """
+    http_mock.reset()
+    http_mock.when('GET /test-headers', headers={'Some-Header': 'A'}).reply(
+        b'', status=400)
+    http_mock.when('GET /test-headers').reply(b'', status=200)
+    http_mock.when('GET /test-headers', headers={'Another-Header': 'A'}).reply(
+        b'', status=500)
+
+    response = fake_client.get(url='/test-headers')
+
+    assert_equals(response.status, 200)
+
+def test_header_matching_with_match_headers():
+    """ Test the best match is returned when request has a matching header """
+    http_mock.reset()
+    http_mock.when('GET /test-headers', headers={'Some-Header': 'A'}).reply(
+        b'', status=500)
+    http_mock.when('GET /test-headers', headers={'Another-Header': 'A'}).reply(
+        b'', status=200)
+    http_mock.when('GET /test-headers').reply(b'', status=400)
+
+    response = fake_client.get(url='/test-headers', headers={'Another-Header': 'A'})
+
+    assert_equals(response.status, 200)
+
+def test_etag_workflow():
+    """ Test the mocking of a typical caching workflow using Etags. """
+    http_mock.reset()
+    http_mock.when('GET /test-etag', headers={'If-None-Match': 'A12345'}).reply(
+        b'', status=304, times=FOREVER)
+    http_mock.when('GET /test-etag').reply(
+        b'Test etag', status=200, headers={'Etag': 'A12345'}, times=FOREVER)
+    
+    # Requests without headers return an Etag header.
+    response = fake_client.get(url='/test-etag')
+    assert_equals(response.status, 200)
+    assert_equals(response.getheader('Etag', None), 'A12345')
+
+    # Requests using the Etag header from above in the If-None-Match header
+    # receive a 304 Not Modified response
+    response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
+    assert_equals(response.status, 304)
+    
+    # ... and will continue to receive 304 responses.
+    response = fake_client.get(url='/test-etag', headers={'If-None-Match': 'A12345'})
+    assert_equals(response.status, 304)
+
