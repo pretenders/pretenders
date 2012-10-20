@@ -45,6 +45,7 @@ def select_preset(uid, value):
 
         preset = preset_list[0]
         preset_matches = re.match(preset.rule, value)
+
         if preset_matches:
             knock_off_preset(preset_dict, key)
             return preset

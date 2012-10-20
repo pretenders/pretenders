@@ -12,6 +12,14 @@ class SMTPMock(BossClient):
         super(SMTPMock, self).__init__(host, port)
         self.preset.add('', times=FOREVER)
 
+    @property
+    def pretend_port(self):
+        return int(self.pretend_access_point.split(':')[1])
+
+    @property
+    def pretend_access_point(self):
+        return self.pretender_details['full_host']
+
     def get_emails(self):
         history = self.history.list().read()
         converted_history = json.loads(history.decode('ascii'))

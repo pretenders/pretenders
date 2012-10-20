@@ -18,7 +18,8 @@ def run(host, port):
     boss_client = BossClient(host, port)
     while True:
         time.sleep(STALE_DELETE_FREQUENCY)
-        boss_client.boss_access.http('DELETE', url='/pretender?stale=1')
+        boss_client.boss_access.http('DELETE', url='/smtp?stale=1')
+        boss_client.boss_access.http('DELETE', url='/http?stale=1')
 
 
 def launch_maintainer():
