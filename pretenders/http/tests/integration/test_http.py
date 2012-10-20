@@ -275,7 +275,7 @@ def test_etag_workflow():
     # Requests without headers return an Etag header.
     response = fake_client.get(url='/test-etag')
     assert_equals(response.status, 200)
-    assert_equals(response.headers.get('Etag', None), 'A12345')
+    assert_equals(response.getheader('Etag', None), 'A12345')
 
     # Requests using the Etag header from above in the If-None-Match header
     # receive a 304 Not Modified response
