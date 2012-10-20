@@ -2,6 +2,7 @@ import base64
 import json
 import re
 
+
 def to_dict(wsgi_headers, include=lambda _: True):
     """
     Convert WSGIHeaders to a dict so that it can be JSON-encoded
@@ -142,7 +143,7 @@ class Preset(JsonHelper):
 def match_rule_from_dict(data):
     if isinstance(data, dict):
         return MatchRule(
-            data['rule'], 
+            data['rule'],
             data.get('headers', None),
         )
 
@@ -152,15 +153,14 @@ def match_rule_from_dict(data):
 
 class MatchRule(object):
     """
-    Class encapsulating a matching rule against which incoming requests will 
-    be compared.
+    A matching rule against which incoming requests will be compared.
     """
 
     def __init__(self, rule, headers=None):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
-        :param headers: Dictionary of headers to match. 
+        :param headers: Dictionary of headers to match.
         """
         self.rule = rule
         if headers:
@@ -171,13 +171,13 @@ class MatchRule(object):
     def as_dict(self):
         """ Convert a match rule instance to a dictionary """
         return {
-            'rule': self.rule, 
-            'headers': self.headers, 
+            'rule': self.rule,
+            'headers': self.headers,
         }
 
     def __key(self):
         """ A unique key for a match rule which will be hashable. """
-        keys = [self.rule,]
+        keys = [self.rule]
         for k, v in self.headers.items():
             keys.append('{0}:{1}'.format(k, v))
         return tuple(keys)
@@ -187,18 +187,18 @@ class MatchRule(object):
 
     def matches(self, request):
         """
-        Check if a provided request matches this match rule. 
+        Check if a provided request matches this match rule.
         :param request:  A dictionary representing a mock request against which
             we'll attempt to match.
         :return: True if the request is a match for rule and False if not.
         """
-        return (self.rule_matches(request['rule']) and 
+        return (self.rule_matches(request['rule']) and
                     self.headers_match(request['headers']))
 
     def rule_matches(self, rule):
-        """ 
-        Check if a provided request matches the regex in the rule attribute 
-        :param rule:  The regex rule included in the request we're matching 
+        """
+        Check if a provided request matches the regex in the rule attribute
+        :param rule:  The regex rule included in the request we're matching
             against.
         :return: True if the request is a match for rule and False if not.
         """
@@ -208,9 +208,9 @@ class MatchRule(object):
             return False
 
     def headers_match(self, headers):
-        """ 
-        Check if a provided request matches the dictionary in the 
-            header attribute 
+        """
+        Check if a provided request matches the dictionary in the
+            header attribute
         :param headers:  The dictionary of headers included in the request
             we're matching against.
         :return: True if the request is a match for headers and False if not.

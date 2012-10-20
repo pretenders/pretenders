@@ -19,7 +19,7 @@ def replay(uid, body):
     mock_request = json.loads(body)
     LOGGER.debug('[UID:{0}] Saving history:\n{1}'.format(uid, mock_request))
     save_history(uid, mock_request)
-    selected = select_preset(uid, mock_request['match'])
+    selected = select_preset(uid, mock_request)
     LOGGER.debug("SELECTED", selected)
     return selected
 
