@@ -192,8 +192,9 @@ class MatchRule(object):
             we'll attempt to match.
         :return: True if the request is a match for rule and False if not.
         """
-        return (self.rule_matches(request['rule']) and
-                    self.headers_match(request['headers']))
+        return (self.rule_matches(request['rule'])
+                and ('headers' not in request
+                     or self.headers_match(request['headers'])))
 
     def rule_matches(self, rule):
         """
