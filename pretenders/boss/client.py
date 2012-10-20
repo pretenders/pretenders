@@ -15,7 +15,7 @@ from pretenders.http import binary_to_ascii, Preset
 
 class PresetHelper(APIHelper):
 
-    def add(self, match_rule='', response_status=200,
+    def add(self, match_rule=None, response_status=200,
                 response_body=b'', response_headers={}, times=1):
         """
         Add a new preset to the boss server.

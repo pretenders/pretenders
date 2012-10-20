@@ -1,6 +1,6 @@
 import base64
 import json
-
+import re
 
 def to_dict(wsgi_headers, include=lambda _: True):
     """
@@ -54,7 +54,7 @@ class RequestSerialiser(object):
         self.headers = to_dict(request.headers)
         self.method = request.method
         self.url = path
-        self.match = "{0} {1}".format(request.method, path)
+        self.rule = "{0} {1}".format(request.method, path)
 
     def serialize(self):
         data = {
@@ -62,7 +62,7 @@ class RequestSerialiser(object):
             'headers': self.headers,
             'method': self.method,
             'url': self.url,
-            'match': self.match
+            'rule': self.rule,
         }
         return json.dumps(data)
 
@@ -120,12 +120,14 @@ class JsonHelper(object):
             The ``bottle`` object that represents the response.
         """
         for header, value in self.headers.items():
-            response.set_header(header, value)
+            response.set_header(str(header), str(value))
         response.status = self.status
         return self.body
 
     def as_json(self):
         """The contained data, as a JSON-serialised string."""
+        if isinstance(self.data['rule'], MatchRule):
+            self.data['rule'] = self.data['rule'].as_dict()
         return json.dumps(self.data)
 
     def __str__(self):
@@ -135,6 +137,94 @@ class JsonHelper(object):
 class Preset(JsonHelper):
     """A preset instance represents a pre-programmed response."""
     pass
+
+
+def match_rule_from_dict(data):
+    if isinstance(data, dict):
+        return MatchRule(
+            data['rule'], 
+            data.get('headers', None),
+        )
+
+    else:
+        return MatchRule(data)
+
+
+class MatchRule(object):
+    """
+    Class encapsulating a matching rule against which incoming requests will 
+    be compared.
+    """
+
+    def __init__(self, rule, headers=None):
+        """
+        :param rule: String incorporating the method and url to be matched
+            eg "GET url/to/match"
+        :param headers: Dictionary of headers to match. 
+        """
+        self.rule = rule
+        if headers:
+            self.headers = headers
+        else:
+            self.headers = {}
+
+    def as_dict(self):
+        """ Convert a match rule instance to a dictionary """
+        return {
+            'rule': self.rule, 
+            'headers': self.headers, 
+        }
+
+    def __key(self):
+        """ A unique key for a match rule which will be hashable. """
+        keys = [self.rule,]
+        for k, v in self.headers.items():
+            keys.append('{0}:{1}'.format(k, v))
+        return tuple(keys)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def matches(self, request):
+        """
+        Check if a provided request matches this match rule. 
+        :param request:  A dictionary representing a mock request against which
+            we'll attempt to match.
+        :return: True if the request is a match for rule and False if not.
+        """
+        return (self.rule_matches(request['rule']) and 
+                    self.headers_match(request['headers']))
+
+    def rule_matches(self, rule):
+        """ 
+        Check if a provided request matches the regex in the rule attribute 
+        :param rule:  The regex rule included in the request we're matching 
+            against.
+        :return: True if the request is a match for rule and False if not.
+        """
+        try:
+            return re.match(self.rule, rule) != None
+        except KeyError:
+            return False
+
+    def headers_match(self, headers):
+        """ 
+        Check if a provided request matches the dictionary in the 
+            header attribute 
+        :param headers:  The dictionary of headers included in the request
+            we're matching against.
+        :return: True if the request is a match for headers and False if not.
+        """
+        if self.headers:
+            for k, v in self.headers.items():
+                try:
+                    header = headers[k]
+                except KeyError:
+                    return False
+                else:
+                    if header != v:
+                        return False
+        return True
 
 
 class MockHttpRequest(JsonHelper):

@@ -1,7 +1,7 @@
 from copy import copy
 
 from pretenders.boss.client import BossClient
-from pretenders.http import MockHttpRequest
+from pretenders.http import MockHttpRequest, MatchRule
 from pretenders.settings import TIMEOUT_PRETENDER
 
 
@@ -47,12 +47,17 @@ class HTTPMock(BossClient):
     def pretend_access_path(self):
         return self.pretender_details['path']
 
-    def when(self, rule=''):
+    def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
+
+        :param rule: String incorporating the method and url to match
+            eg "GET url/to/match"
+        :param headers: An optional dictionary of headers to match.
         """
+        match_rule = MatchRule(rule, headers)
         mock = copy(self)
-        mock.rule = rule
+        mock.rule = match_rule
         return mock
 
     def reply(self, body=b'', status=200, headers={}, times=1):

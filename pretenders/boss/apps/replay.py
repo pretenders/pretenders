@@ -4,7 +4,7 @@ import bottle
 from bottle import post, HTTPResponse, route
 
 from pretenders.base import get_logger
-from pretenders.boss.apps import pretender_smtp, pretender_http
+from pretenders.boss.apps import pretender_smtp
 from pretenders.boss.apps.history import save_history
 from pretenders.boss.apps.preset import preset_count, select_preset
 from pretenders.http import Preset, RequestSerialiser
