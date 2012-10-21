@@ -4,7 +4,7 @@ import bottle
 from bottle import post, HTTPResponse, route
 
 from pretenders.base import get_logger
-from pretenders.boss.apps import pretender_smtp
+from pretenders.boss.apps import pretender
 from pretenders.boss.apps.history import save_history
 from pretenders.boss.apps.preset import preset_count, select_preset
 from pretenders.http import Preset, RequestSerialiser
@@ -37,12 +37,13 @@ def replay_smtp(uid):
             * Status Code 404 if there are no matching presets.
     """
     # Make a note that this mock server is still in use.
-    pretender_smtp.keep_alive(uid)
+    pretender.keep_alive(uid, 'smtp')
     bottle.response.content_type = 'application/json'
     selected = replay(uid, bottle.request.body.read().decode('ascii'))
     return selected.as_json()
 
 
+@route('/mockhttp/<uid:int><url:path>', method='ANY')
 def replay_http(uid, url):
     """
     Replay a previously recorded preset, and save the request in history
@@ -59,5 +60,3 @@ def replay_http(uid, url):
     # So the above works, but it looks ugly - ideally we'd handle both in
     # Preset constructor.
     return preset.as_http_response(bottle.response)
-
-route('/mockhttp/<uid:int><url:path>', method='ANY', callback=replay_http)
