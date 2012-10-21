@@ -1,8 +1,6 @@
-from nose.tools import assert_equals, assert_true
+from nose.tools import assert_equals
 
 from pretenders.http.client import HTTPMock
-from pretenders.http.tests.integration import FakeClient
-
 from pretenders.http.tests.integration import get_fake_client
 
 
@@ -15,8 +13,8 @@ def assert_response_equal(response, body, status):
 
 
 def test_multiple_mock_servers_only_see_their_presets_and_history():
-    first_mock = HTTPMock('localhost', 8000, pretender_timeout=30)
-    second_mock = HTTPMock('localhost', 8000, pretender_timeout=30)
+    first_mock = HTTPMock('localhost', 8000, timeout=30)
+    second_mock = HTTPMock('localhost', 8000, timeout=30)
 
     first_mock_response_body = b"a 1st mock fake response"
     second_mock_response_body = b"a 2nd mock fake response"
@@ -37,9 +35,8 @@ def test_multiple_mock_servers_only_see_their_presets_and_history():
     # those set up above.
     for i in range(2):
         post_body = "first_mock_{0}".format(i).encode()
-        response = first_fake_client.post(
-                        url='/someplace',
-                        body=post_body)
+        response = first_fake_client.post(url='/someplace',
+                                          body=post_body)
         assert_response_equal(response, first_mock_response_body, 200)
 
         # Check that the historical values match those requested.

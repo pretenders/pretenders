@@ -18,7 +18,7 @@ class MockSMTPServer(smtpd.SMTPServer, Pretender):
     def process_message(self, peer, mailfrom, rcpttos, data):
         smtp_info = SMTPSerialiser(
             peer=peer, mailfrom=mailfrom, rcpttos=rcpttos, data=data,
-            match='')
+            rule='')
         body = smtp_info.serialize()
         LOGGER.info("Storing SMTP message: \n{0}".format(body))
         self.store_history_retrieve_preset(body)

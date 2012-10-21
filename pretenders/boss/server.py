@@ -5,7 +5,7 @@ from pretenders.base import get_logger, in_parent_process, save_pid_file
 from pretenders.boss import data
 from pretenders.boss.maintain import launch_maintainer
 # Import apps so that they get initialised for bottle.
-from pretenders.boss.apps import history, pretender, preset, replay
+from pretenders.boss.apps import history, preset, replay, pretender
 
 
 LOGGER = get_logger('pretenders.boss.server')
@@ -31,8 +31,13 @@ if __name__ == '__main__':
                 help='port number to run the server on (default: 8000)')
     parser.add_argument('-d', '--debug', dest="debug", default=False,
                 action="store_true",
-                help='start a build right after creation')
+                help='set debug mode')
+    parser.add_argument('-t', '--timeout', dest='timeout', type=int,
+                default=120,
+                help='timeout before deleting stale pretenders')
 
     args = parser.parse_args()
     bottle.debug(args.debug)
+    settings.TIMEOUT_PRETENDER = args.timeout
+    LOGGER.debug('Setting pretender timeout: {0}'.format(args.timeout))
     run(args.host, args.port)
