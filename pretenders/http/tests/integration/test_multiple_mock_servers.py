@@ -35,9 +35,8 @@ def test_multiple_mock_servers_only_see_their_presets_and_history():
     # those set up above.
     for i in range(2):
         post_body = "first_mock_{0}".format(i).encode()
-        response = first_fake_client.post(
-                        url='/someplace',
-                        body=post_body)
+        response = first_fake_client.post(url='/someplace',
+                                          body=post_body)
         assert_response_equal(response, first_mock_response_body, 200)
 
         # Check that the historical values match those requested.

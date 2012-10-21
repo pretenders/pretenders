@@ -5,10 +5,9 @@ import json
 
 def get_timedelta_from_string(string):
     data = string.split(":")
-    time = timedelta(
-        hours=int(data[0]),
-        minutes=int(data[1]),
-        seconds=float(data[2]))
+    time = timedelta(hours=int(data[0]),
+                     minutes=int(data[1]),
+                     seconds=float(data[2]))
     return time
 
 
@@ -34,15 +33,14 @@ class PretenderModel(object):
 
     @classmethod
     def from_json_response(cls, response):
-        """Create an instance from the body of a JSON response."""
-        creating_dict = json.loads(response.read().decode('ascii'))
-        creating_dict['start'] = get_datetime_from_string(
-                                    creating_dict['start'])
-        creating_dict['last_call'] = get_datetime_from_string(
-                                        creating_dict['last_call'])
-        creating_dict['timeout'] = get_timedelta_from_string(
-                                        creating_dict['timeout'])
-        return cls(**creating_dict)
+        """
+        Create an instance from the body of a JSON response.
+        """
+        data = json.loads(response.read().decode('ascii'))
+        data['start'] = get_datetime_from_string(data['start'])
+        data['last_call'] = get_datetime_from_string(data['last_call'])
+        data['timeout'] = get_timedelta_from_string(data['timeout'])
+        return cls(**data)
 
     def as_json(self):
         """Convert to JSON."""

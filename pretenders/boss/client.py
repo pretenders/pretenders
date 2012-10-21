@@ -20,7 +20,7 @@ LOGGER = get_logger('pretenders.boss.client')
 class PresetHelper(APIHelper):
 
     def add(self, match_rule=None, response_status=200,
-                response_body=b'', response_headers={}, times=1):
+            response_body=b'', response_headers={}, times=1):
         """
         Add a new preset to the boss server.
         """

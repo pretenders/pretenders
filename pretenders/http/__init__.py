@@ -204,7 +204,7 @@ class MatchRule(object):
         :return: True if the request is a match for rule and False if not.
         """
         try:
-            return re.match(self.rule, rule) != None
+            return re.match(self.rule, rule) is not None
         except KeyError:
             return False
 
