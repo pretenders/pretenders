@@ -26,7 +26,7 @@ def get_pretenders(protocol):
     return HANDLERS[protocol].PRETENDERS
 
 
-def keep_alive(uid, protocol):
+def keep_alive(protocol, uid):
     """
     Notification from a mock server that it must be kept  alive.
     """

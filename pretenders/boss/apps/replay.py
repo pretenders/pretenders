@@ -37,7 +37,7 @@ def replay_smtp(uid):
             * Status Code 404 if there are no matching presets.
     """
     # Make a note that this mock server is still in use.
-    pretender.keep_alive(uid, 'smtp')
+    pretender.keep_alive('smtp', uid)
     bottle.response.content_type = 'application/json'
     selected = replay(uid, bottle.request.body.read().decode('ascii'))
     return selected.as_json()
