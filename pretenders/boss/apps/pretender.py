@@ -131,7 +131,7 @@ def keep_alive(uid, protocol):
     PRETENDERS[protocol][uid].keep_alive()
 
 
-@get('/<protocol>/<uid:int>')
+@get('/<protocol:re:(http|smtp)>/<uid:int>')
 def pretender_get(protocol, uid):
     bottle.response.content_type = 'application/json'
     try:
@@ -141,7 +141,7 @@ def pretender_get(protocol, uid):
                            status=404)
 
 
-@post('/<protocol>')
+@post('/<protocol:re:(http|smtp)>')
 def create_pretender(protocol):
     """
     Client is requesting a mock instance for the given protocol.
@@ -167,7 +167,7 @@ def create_pretender(protocol):
     return HANDLERS[protocol].new_pretender(uid, timeout)
 
 
-@delete('/<protocol>/<uid:int>')
+@delete('/<protocol:re:(http|smtp)>/<uid:int>')
 def delete_http_mock(protocol, uid):
     "Delete http mock servers"
     LOGGER.info("Performing delete on {0} pretender {1}"
@@ -175,7 +175,7 @@ def delete_http_mock(protocol, uid):
     HANDLERS[protocol].delete_pretender(uid)
 
 
-@delete('/<protocol>')
+@delete('/<protocol:re:(http|smtp)>')
 def pretender_delete(protocol):
     """
     Delete pretenders with filters

@@ -5,7 +5,7 @@ from pretenders.base import get_logger, in_parent_process, save_pid_file
 from pretenders.boss import data
 from pretenders.boss.maintain import launch_maintainer
 # Import apps so that they get initialised for bottle.
-from pretenders.boss.apps import history, preset, pretender, replay
+from pretenders.boss.apps import history, preset, replay, pretender
 
 
 LOGGER = get_logger('pretenders.boss.server')
