@@ -71,7 +71,7 @@ class SMTPPretenderModel(PretenderModel):
 
     def __init__(self, start, uid, timeout, last_call, port, pid):
         super(SMTPPretenderModel, self).__init__(
-            uid=uid, start=start, timeout=timeout, last_call=last_call
+            start, uid, timeout, last_call
         )
         self.__dict__.update({
             'port': port,
