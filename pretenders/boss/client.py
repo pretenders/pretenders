@@ -5,12 +5,16 @@ except ImportError:
     # Python2.6/2.7
     from httplib import HTTPConnection
 
-from pretenders.base import ResourceNotFound, UnexpectedResponseStatus
+from pretenders.base import (
+    get_logger, ResourceNotFound, UnexpectedResponseStatus
+)
 from pretenders.base import APIHelper
 from pretenders.boss import PretenderModel
-from pretenders.settings import TIMEOUT_PRETENDER
 from pretenders.exceptions import ConfigurationError
 from pretenders.http import binary_to_ascii, Preset
+
+
+LOGGER = get_logger('pretenders.boss.client')
 
 
 class PresetHelper(APIHelper):
@@ -36,18 +40,23 @@ class PresetHelper(APIHelper):
 
 class BossClient(object):
 
-    boss_mock_type = ''
+    boss_mock_type = None
 
-    def __init__(self, host, port, pretender_timeout=TIMEOUT_PRETENDER):
+    def __init__(self, host, port, timeout=None):
         self.host = host
         self.port = port
-        self.pretender_timeout = pretender_timeout
+        self.timeout = timeout
         self.full_host = "{0}:{1}".format(self.host, self.port)
 
         self.connection = HTTPConnection(self.full_host)
         self.boss_access = APIHelper(self.connection, '')
 
-        self.pretender_details = self._request_mock_access()
+        LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2}'
+                    .format(self.boss_mock_type, self.port, self.timeout))
+        if self.boss_mock_type:
+            self.pretender_details = self._request_mock_access()
+        else:
+            self.pretender_details = {}
 
         self.history = APIHelper(self.connection,
                                  '/history/{0}'.format(
@@ -87,17 +96,17 @@ class BossClient(object):
                 position 1: unique id of the pretender (for teardown
                             purposes)
         """
-        if self.boss_mock_type:
-            post_body = json.dumps(
-                            {'pretender_timeout': self.pretender_timeout})
-            response = self.boss_access.http('POST',
-                                             url=self.create_mock_url,
-                                             body=post_body)
-            pretender_json = response.read().decode('ascii')
-            pretender_details = json.loads(pretender_json)
+        if self.timeout:
+            post_body = json.dumps({'pretender_timeout': self.timeout})
+        else:
+            post_body = '{}'
+        response = self.boss_access.http('POST',
+                                         url=self.create_mock_url,
+                                         body=post_body)
+        pretender_json = response.read().decode('ascii')
+        pretender_details = json.loads(pretender_json)
 
-            return pretender_details
-        return {}
+        return pretender_details
 
     @property
     def delete_mock_url(self):

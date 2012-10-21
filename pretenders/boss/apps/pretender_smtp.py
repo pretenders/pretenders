@@ -9,11 +9,13 @@ import time
 import bottle
 from bottle import delete, get, post, HTTPResponse
 
+from pretenders import settings
 from pretenders.base import get_logger
 from pretenders.boss import SMTPPretenderModel
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
-    PRETEND_PORT_RANGE)
+    PRETEND_PORT_RANGE
+)
 from pretenders.boss import data
 from pretenders.exceptions import NoPortAvailableException
 
@@ -62,11 +64,14 @@ def create_smtp_pretender():
     uid = UID_COUNTER
 
     post_body = bottle.request.body.read().decode('ascii')
-    pretender_timeout = json.loads(post_body)['pretender_timeout']
+    body_data = json.loads(post_body)
+    pretender_timeout = body_data.get('pretender_timeout',
+                                      settings.TIMEOUT_PRETENDER)
 
     for port_number in available_ports():
-        LOGGER.info("Attempt to start smtp pretender on port {0}".format(
-            port_number))
+        LOGGER.info(
+            "Attempt to start smtp pretender on port {0}, timeout {1}"
+            .format(port_number, pretender_timeout))
         process = subprocess.Popen([
             sys.executable,
             "-m",

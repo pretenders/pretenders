@@ -2,7 +2,6 @@ from copy import copy
 
 from pretenders.boss.client import BossClient
 from pretenders.http import MockHttpRequest, MatchRule
-from pretenders.settings import TIMEOUT_PRETENDER
 
 
 class HTTPMock(BossClient):
@@ -25,7 +24,7 @@ class HTTPMock(BossClient):
 
     boss_mock_type = 'http'
 
-    def __init__(self, host, port, pretender_timeout=TIMEOUT_PRETENDER):
+    def __init__(self, host, port, timeout=None):
         """
         Create an HTTPMock client for testing purposes.
 
@@ -35,12 +34,12 @@ class HTTPMock(BossClient):
         :param port:
             The port to connect to of the boss.
 
-        :param pretender_timeout:
+        :param timeout:
             The timeout (in seconds) to be passed to the boss when
             instantiating the mock HTTP server. If a request is not received by
             the mock server in this time, it will be closed down by the boss.
         """
-        super(HTTPMock, self).__init__(host, port, pretender_timeout)
+        super(HTTPMock, self).__init__(host, port, timeout)
         self.rule = ''
 
     @property

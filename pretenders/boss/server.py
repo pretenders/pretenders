@@ -32,8 +32,13 @@ if __name__ == '__main__':
                 help='port number to run the server on (default: 8000)')
     parser.add_argument('-d', '--debug', dest="debug", default=False,
                 action="store_true",
-                help='start a build right after creation')
+                help='set debug mode')
+    parser.add_argument('-t', '--timeout', dest='timeout', type=int,
+                default=120,
+                help='timeout before deleting stale pretenders')
 
     args = parser.parse_args()
     bottle.debug(args.debug)
+    settings.TIMEOUT_PRETENDER = args.timeout
+    LOGGER.debug('Setting pretender timeout: {0}'.format(args.timeout))
     run(args.host, args.port)

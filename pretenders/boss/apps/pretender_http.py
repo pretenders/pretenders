@@ -1,14 +1,10 @@
 import datetime
 import json
-import os
-import signal
-import subprocess
-import sys
-import time
 
 import bottle
 from bottle import delete, get, post, HTTPResponse
 
+from pretenders import settings
 from pretenders.base import get_logger
 from pretenders.boss import HTTPPretenderModel
 
@@ -47,7 +43,9 @@ def create_http_pretender():
     uid = UID_COUNTER
 
     post_body = bottle.request.body.read().decode('ascii')
-    pretender_timeout = json.loads(post_body)['pretender_timeout']
+    body_data = json.loads(post_body)
+    pretender_timeout = body_data.get('pretender_timeout',
+                                      settings.TIMEOUT_PRETENDER)
 
     LOGGER.info("Creating http pretender access point at {0}".format(uid))
 
