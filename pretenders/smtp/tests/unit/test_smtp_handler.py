@@ -3,8 +3,7 @@ from nose.tools import (
 from mock import Mock
 
 from pretenders.constants import PRETEND_PORT_RANGE
-from pretenders.boss.apps.pretender_smtp import (available_ports,
-                                                 SMTP_PRETENDERS)
+from pretenders.smtp.handler import SmtpHandler
 
 
 def test_available_ports():
@@ -12,7 +11,8 @@ def test_available_ports():
     Test ``available_ports`` filters out ports that are in use by
     ``MOCK_SERVERS``.
     """
-    ports = available_ports()
+    handler = SmtpHandler()
+    ports = handler.available_ports()
 
     assert_equals(ports, PRETEND_PORT_RANGE)
 
@@ -22,10 +22,10 @@ def test_available_ports():
 
     pretend_server = Mock()
     pretend_server.port = mock_port
-    SMTP_PRETENDERS[1] = pretend_server
+    handler.PRETENDERS[1] = pretend_server
 
     # Now they should not be equal
-    ports = available_ports()
+    ports = handler.available_ports()
 
     assert_not_equals(ports, PRETEND_PORT_RANGE)
 
