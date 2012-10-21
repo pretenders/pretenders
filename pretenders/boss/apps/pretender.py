@@ -13,7 +13,7 @@ UID_COUNTER = 0
 "Dictionary containing details of currently active pretenders"
 PRETENDERS = {
     'http': {},
-    'stmp': {},
+    'smtp': {},
 }
 
 
@@ -36,7 +36,7 @@ class HttpHandler(object):
             'path': "/mockhttp/{0}".format(uid),
             'id': uid})
 
-    def delete__pretender(uid):
+    def delete_pretender(self, uid):
         "Delete a pretender by ``uid``"
         del PRETENDERS['http'][uid]
 
@@ -106,7 +106,7 @@ class SmtpHandler(object):
                 'id': uid})
         raise NoPortAvailableException("All ports in range in use")
 
-    def delete__pretender(uid):
+    def delete_pretender(self, uid):
         "Delete a pretender by ``uid``"
         LOGGER.info("Performing delete on {0}".format(uid))
         pid = PRETENDERS['smtp'][uid].pid

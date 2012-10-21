@@ -11,7 +11,7 @@ sleep 2
 
 # run tests
 echo "[Pretenders] Running tests"
-nosetests --verbosity=2 -s pretenders/smtp/tests pretenders/http/tests
+nosetests --verbosity=2 -s pretenders/http/tests pretenders/smtp/tests
 
 # sleep to allow for stale servers to be deleted
 echo "[Pretenders] Letting maintainer kill stale servers"

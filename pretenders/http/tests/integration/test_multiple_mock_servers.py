@@ -13,7 +13,7 @@ def assert_response_equal(response, body, status):
 
 
 def test_multiple_mock_servers_only_see_their_presets_and_history():
-    first_mock = HTTPMock('localhost', 7999, timeout=30)
+    first_mock = HTTPMock('localhost', 8000, timeout=30)
     second_mock = HTTPMock('localhost', 8000, timeout=30)
 
     first_mock_response_body = b"a 1st mock fake response"
