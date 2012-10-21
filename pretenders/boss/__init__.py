@@ -61,19 +61,3 @@ class PretenderModel(object):
     @property
     def timeout_in_secs(self):
         return self.timeout.seconds
-
-
-class HTTPPretenderModel(PretenderModel):
-    pass
-
-
-class SMTPPretenderModel(PretenderModel):
-
-    def __init__(self, start, uid, timeout, last_call, port, pid):
-        super(SMTPPretenderModel, self).__init__(
-            start, uid, timeout, last_call
-        )
-        self.__dict__.update({
-            'port': port,
-            'pid': pid,
-        })

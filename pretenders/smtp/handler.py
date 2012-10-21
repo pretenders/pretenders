@@ -6,7 +6,7 @@ import subprocess
 import sys
 import time
 
-from pretenders.boss import SMTPPretenderModel
+from pretenders.boss import PretenderModel
 from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
     PRETEND_PORT_RANGE
@@ -17,6 +17,18 @@ from pretenders.exceptions import NoPortAvailableException
 
 
 LOGGER = get_logger('pretenders.smtp.handler')
+
+
+class SMTPPretenderModel(PretenderModel):
+
+    def __init__(self, start, uid, timeout, last_call, port, pid):
+        super(SMTPPretenderModel, self).__init__(
+            start, uid, timeout, last_call
+        )
+        self.__dict__.update({
+            'port': port,
+            'pid': pid,
+        })
 
 
 class SmtpHandler(object):

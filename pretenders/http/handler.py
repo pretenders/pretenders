@@ -1,7 +1,11 @@
 import datetime
 import json
 
-from pretenders.boss import HTTPPretenderModel
+from pretenders.boss import PretenderModel
+
+
+class HTTPPretenderModel(PretenderModel):
+    pass
 
 
 class HttpHandler(object):
