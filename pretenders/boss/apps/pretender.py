@@ -1,125 +1,87 @@
 import datetime
 import json
-import os
-import signal
-import subprocess
-import sys
-import time
 
 import bottle
 from bottle import delete, get, post, HTTPResponse
 
+from pretenders import settings
 from pretenders.base import get_logger
-from pretenders.boss import PretenderModel
-from pretenders.constants import (
-    RETURN_CODE_PORT_IN_USE,
-    PRETEND_PORT_RANGE)
-from pretenders.boss import data
-from pretenders.exceptions import NoPortAvailableException
+from pretenders.http.handler import HttpHandler
+from pretenders.smtp.handler import SmtpHandler
 
 
 LOGGER = get_logger('pretenders.boss.apps.pretender')
 UID_COUNTER = 0
-PRETENDERS = {}
-"Dictionary containing details of currently active pretenders"
+
+HANDLERS = {
+    'http': HttpHandler(),
+    'smtp': SmtpHandler(),
+}
 
 
-def available_ports():
-    "Get a set of ports available for starting pretenders"
-    ports_in_use = set(map(lambda x: x.port, PRETENDERS.values()))
-    available_set = PRETEND_PORT_RANGE.difference(ports_in_use)
-    return available_set
+def get_pretenders(protocol):
+    """
+    Get a dict mapping UID to pretender data for the given protocol
+    """
+    return HANDLERS[protocol].PRETENDERS
 
 
-def keep_alive(uid):
+def keep_alive(protocol, uid):
     """
     Notification from a mock server that it must be kept  alive.
     """
-    PRETENDERS[uid].keep_alive()
+    get_pretenders(protocol)[uid].keep_alive()
 
 
-@get('/pretender/<uid:int>')
-def pretender_get(uid):
+@get('/<protocol:re:(http|smtp)>/<uid:int>')
+def pretender_get(protocol, uid):
+    """
+    Get details for a given pretender, defined by protocol and UID
+    """
     bottle.response.content_type = 'application/json'
     try:
-        return PRETENDERS[uid].as_json()
+        return get_pretenders(protocol)[uid].as_json()
     except KeyError:
-        raise HTTPResponse(b"No matching http mock", status=404)
+        raise HTTPResponse(b"No matching {0} mock".format(protocol),
+                           status=404)
 
 
-@post('/pretender/<protocol:re:[a-z]+>')
+@post('/<protocol:re:(http|smtp)>')
 def create_pretender(protocol):
     """
-    Client is requesting a mock instance.
+    Client is requesting a mock instance for the given protocol.
 
-    Launch a pretender using protocol ``protocol`` on a random unused port.
-    Keep track of the pid of the pretender
-    Kill the pretender instance after timeout expired.
+    Generate a new UID for the pretender.
     Return the location of the pretender instance.
+
+    Instance creation is protocol-dependent. For HTTP the same boss
+    server will act as pretender in a given sub-URL. For other
+    protocols, new processes may be spawn and listen on different
+    ports.
     """
     global UID_COUNTER
     UID_COUNTER += 1
     uid = UID_COUNTER
 
     post_body = bottle.request.body.read().decode('ascii')
-    pretender_timeout = json.loads(post_body)['pretender_timeout']
+    body_data = json.loads(post_body)
+    timeout = body_data.get('pretender_timeout', settings.TIMEOUT_PRETENDER)
 
-    for port_number in available_ports():
-        LOGGER.info("Attempt to start {0} pretender on port {1}".format(
-            protocol, port_number))
-        process = subprocess.Popen([
-            sys.executable,
-            "-m",
-            "pretenders.{0}.server".format(protocol),
-            "-H", "localhost",
-            "-p", str(port_number),
-            "-b", str(data.BOSS_PORT),
-            "-i", str(uid),
-            ])
-        time.sleep(2)  # Wait this long for failure
-        process.poll()
-        if process.returncode == RETURN_CODE_PORT_IN_USE:
-            LOGGER.info("Return code already set. "
-                        "Assuming failed due to socket error.")
-            continue
-        start = datetime.datetime.now()
-        PRETENDERS[uid] = PretenderModel(
-            start=start,
-            port=port_number,
-            pid=process.pid,
-            timeout=datetime.timedelta(seconds=pretender_timeout),
-            last_call=start,
-            uid=uid,
-            type=protocol
-        )
-        LOGGER.info("Started {0} pretender on port {1}".format(
-            protocol, port_number))
-        return json.dumps({
-            'url': "localhost:{0}".format(port_number),
-            'id': uid})
-    raise NoPortAvailableException("All ports in range in use")
+    LOGGER.info("Creating {0} pretender access point at {1}"
+                .format(protocol, uid))
+    return HANDLERS[protocol].new_pretender(uid, timeout)
 
 
-def delete_pretender(uid):
-    "Delete a pretender by ``uid``"
-    LOGGER.info("Performing delete on {0}".format(uid))
-    pid = PRETENDERS[uid].pid
-    LOGGER.info("attempting to kill pid {0}".format(pid))
-    try:
-        os.kill(pid, signal.SIGKILL)
-        del PRETENDERS[uid]
-    except OSError as e:
-        LOGGER.info("OSError while killing:\n{0}".format(dir(e)))
-
-
-@delete('/pretender/http/<uid:int>')
-def delete_http_mock(uid):
+@delete('/<protocol:re:(http|smtp)>/<uid:int>')
+def delete_http_mock(protocol, uid):
     "Delete http mock servers"
-    delete_pretender(uid)
+    LOGGER.info("Performing delete on {0} pretender {1}"
+                .format(protocol, uid))
+    HANDLERS[protocol].delete_pretender(uid)
 
 
-@delete('/pretender')
-def pretender_delete():
+@delete('/<protocol:re:(http|smtp)>')
+def pretender_delete(protocol):
     """
     Delete pretenders with filters
 
@@ -132,8 +94,8 @@ def pretender_delete():
         LOGGER.debug("Got request to delete stale pretenders")
         # Delete all stale requests
         now = datetime.datetime.now()
-        for uid, server in PRETENDERS.copy().items():
+        for uid, server in get_pretenders(protocol).copy().items():
             LOGGER.debug("Pretender: {0}".format(server))
             if server.last_call + server.timeout < now:
                 LOGGER.info("Deleting pretender with UID: {0}".format(uid))
-                delete_pretender(uid)
+                HANDLERS[protocol].delete_pretender(uid)

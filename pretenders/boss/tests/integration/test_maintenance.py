@@ -1,4 +1,4 @@
-from nose.tools import assert_true, assert_false, assert_equal, assert_raises
+from nose.tools import assert_equal, assert_raises
 import time
 
 try:
@@ -17,7 +17,7 @@ def test_clear_down_of_stale_mock_servers_taking_place():
     #Test that stale mock servers are cleared out
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-    http_mock = HTTPMock('localhost', 8000, pretender_timeout=5)
+    http_mock = HTTPMock('localhost', 8000, timeout=5)
     pretender = http_mock.get_pretender()
 
     assert_equal(http_mock.pretend_access_point_id, pretender.uid)
@@ -35,7 +35,7 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     # recently made a request.
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-    http_mock = HTTPMock('localhost', 8000, pretender_timeout=5)
+    http_mock = HTTPMock('localhost', 8000, timeout=5)
     pretender = http_mock.get_pretender()
 
     timeout_server = pretender.timeout_in_secs
