@@ -67,3 +67,18 @@ Documentation
 Full documentation of the project can be found here:
 
 http://pretenders.readthedocs.org/
+
+Contributing
+============
+
+Pretenders welcomes contributions in any form - be it pull requests, adding an
+issue or feedback via `github`_ or sending a message on the `pretenders`_
+mailing list so don't be shy!
+
+.. _`github`: https://github.com/pretenders/pretenders
+
+Running the tests
+-----------------
+
+``build.sh`` runs the full suite of tests, as well as building the sphinx docs
+and checking for pep8 errors.
