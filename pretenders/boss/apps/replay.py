@@ -10,7 +10,6 @@ from pretenders.boss.apps.preset import preset_count, select_preset
 from pretenders.http import Preset, RequestSerialiser
 from pretenders.http.handler import HttpHandler
 
-
 LOGGER = get_logger('pretenders.boss.apps.replay')
 
 

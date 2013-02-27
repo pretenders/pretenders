@@ -29,9 +29,7 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     # recently made a request.
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-
     http_mock = HTTPMock('localhost', 8000, timeout=5)
-
     pretender = http_mock.get_pretender()
 
     timeout_server = pretender.timeout_in_secs

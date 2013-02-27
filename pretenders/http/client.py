@@ -20,7 +20,6 @@ class HTTPMock(BossClient):
         r = mock.get_request(0)
         assert_equal(r.method, 'GET')
         assert_equal(r.url, '/hello?city=barcelona')
-
     """
 
     boss_mock_type = 'http'
