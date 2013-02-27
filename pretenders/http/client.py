@@ -20,6 +20,7 @@ class HTTPMock(BossClient):
         r = mock.get_request(0)
         assert_equal(r.method, 'GET')
         assert_equal(r.url, '/hello?city=barcelona')
+
     """
 
     boss_mock_type = 'http'
@@ -38,6 +39,11 @@ class HTTPMock(BossClient):
             The timeout (in seconds) to be passed to the boss when
             instantiating the mock HTTP server. If a request is not received by
             the mock server in this time, it will be closed down by the boss.
+
+        :param name:
+            The name of the mock. If an HTTP Mock server exists with this name
+            the client will be hooked into use that server. Otherwise a new one
+            will be created for the client.
         """
         super(HTTPMock, self).__init__(host, port, timeout, name)
         self.rule = ''

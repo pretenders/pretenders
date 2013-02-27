@@ -15,12 +15,13 @@ LOGGER = get_logger('pretenders.boss.apps.replay')
 
 
 def replay(uid, body):
-    if preset_count(uid) == 0:
-        LOGGER.error("Cannot find matching request\n{0}".format(body))
-        raise HTTPResponse(b"No preset response", status=404)
+    "Save the request and replay response"
     mock_request = json.loads(body)
     LOGGER.debug('[UID:{0}] Saving history:\n{1}'.format(uid, mock_request))
     save_history(uid, mock_request)
+    if preset_count(uid) == 0:
+        LOGGER.error("Cannot find matching request\n{0}".format(body))
+        raise HTTPResponse(b"No preset response", status=404)
     selected = select_preset(uid, mock_request)
     LOGGER.debug("SELECTED:\n{0}".format(selected))
     return selected

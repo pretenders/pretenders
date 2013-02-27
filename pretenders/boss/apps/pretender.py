@@ -8,7 +8,6 @@ from pretenders import settings
 from pretenders.base import get_logger
 from pretenders.http.handler import HttpHandler
 from pretenders.smtp.handler import SmtpHandler
-from pretenders.exceptions import DuplicateNameException
 
 
 LOGGER = get_logger('pretenders.boss.apps.pretender')
@@ -70,10 +69,8 @@ def create_pretender(protocol):
     name = body_data.get('name')
     LOGGER.info("Creating {0} pretender access point at {1} (name: {2}) {3}"
                 .format(protocol, uid, name, timeout))
-    try:
-        return HANDLERS[protocol].new_pretender(uid, timeout, name)
-    except DuplicateNameException as e:
-        raise HTTPResponse(str(e), status=409)  # Return Conflict status code
+
+    return HANDLERS[protocol].get_or_create_pretender(uid, timeout, name)
 
 
 @delete('/<protocol:re:(http|smtp)>/<uid:int>')

@@ -3,13 +3,15 @@ import json
 
 from pretenders.base import get_logger
 from pretenders.boss import PretenderModel
-from pretenders.exceptions import DuplicateNameException
 
 LOGGER = get_logger('pretenders.http.handler')
 
 
 class HTTPPretenderModel(PretenderModel):
-    pass
+
+    def __init__(self, path, **kwargs):
+        super(HTTPPretenderModel, self).__init__(**kwargs)
+        self.path = path
 
 
 class HttpHandler(object):
@@ -17,29 +19,30 @@ class HttpHandler(object):
     PRETENDERS = {}
     PRETENDER_NAME_UID = {}
 
-    def new_pretender(self, uid, timeout, name):
+    def get_or_create_pretender(self, uid, timeout, name):
         start = datetime.datetime.now()
         if name in self.PRETENDER_NAME_UID:
-            msg = "Name '{0}' already exists as uid {1}".format(name, uid)
-            LOGGER.debug(msg)
-            raise DuplicateNameException(msg)
-
-        self.PRETENDERS[uid] = HTTPPretenderModel(
-            start=start,
-            timeout=datetime.timedelta(seconds=timeout),
-            last_call=start,
-            uid=uid,
-            name=name
-        )
-        if name:
-            self.PRETENDER_NAME_UID[name] = uid
-            path = "/mockhttp/{0}".format(name)
+            pretender = self.PRETENDERS[self.PRETENDER_NAME_UID[name]]
         else:
-            path = "/mockhttp/{0}".format(uid)
+            if name:
+                self.PRETENDER_NAME_UID[name] = uid
+                path = "/mockhttp/{0}".format(name)
+            else:
+                path = "/mockhttp/{0}".format(uid)
+
+            pretender = HTTPPretenderModel(
+                start=start,
+                timeout=datetime.timedelta(seconds=timeout),
+                last_call=start,
+                uid=uid,
+                name=name,
+                path=path
+            )
+            self.PRETENDERS[uid] = pretender
 
         return json.dumps({
-            'path': path,
-            'id': uid})
+            'path': pretender.path,
+            'id': pretender.uid})
 
     def delete_pretender(self, uid):
         "Delete a pretender by ``uid``"

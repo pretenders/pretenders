@@ -2,7 +2,6 @@ from nose.tools import assert_equals, assert_raises
 
 from pretenders.http.client import HTTPMock
 from pretenders.http.tests.integration import get_fake_client
-from pretenders.exceptions import DuplicateNameException
 
 
 def test_get_mock_server_by_name():
@@ -29,14 +28,25 @@ def test_get_mock_server_by_name():
 
     http_mock.delete_mock()
 
-def test_creating_second_mock_server_by_same_name_fails():
+
+def test_creating_second_mock_server_by_same_name_gives_original_server():
     # Create 1
     h1 = HTTPMock('localhost', 8000, timeout=5, name='duplicate_test')
     # Create another
     h2 = HTTPMock('localhost', 8000, timeout=5, name='duplicate_test_2')
-    # Creation of one with a duplicate name should fail
-    assert_raises(DuplicateNameException,
-                  HTTPMock, 'localhost', 8000, name='duplicate_test')
+    # Creation of one with a duplicate name should succeed.
+    h3 = HTTPMock('localhost', 8000, name='duplicate_test')
+
+    # Requests to h1 should be visible by h3. h2 should only be seen by it.
+
+    get_fake_client(h1).get(url='/h1_get')
+    get_fake_client(h2).get(url='/h2_get')
+    get_fake_client(h3).get(url='/h3_get')
+
+    # assert that the requests h1 and h3 requests can be seen via both mocks.
+    assert_equals(h1.get_request(0).url, h3.get_request(0).url)
+    assert_equals(h1.get_request(1).url, h3.get_request(1).url)
+    assert_equals(h2.get_request(0).url, '/h2_get')
 
     h1.delete_mock()
     h2.delete_mock()

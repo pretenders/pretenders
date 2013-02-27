@@ -10,7 +10,7 @@ from pretenders.base import (
 )
 from pretenders.base import APIHelper
 from pretenders.boss import PretenderModel
-from pretenders.exceptions import ConfigurationError, DuplicateNameException
+from pretenders.exceptions import ConfigurationError
 from pretenders.http import binary_to_ascii, Preset
 
 
@@ -103,13 +103,10 @@ class BossClient(object):
             post_body['pretender_timeout'] = self.timeout
 
         post_body = json.dumps(post_body)
-        print (post_body)
+
         response = self.boss_access.http('POST',
                                          url=self.create_mock_url,
                                          body=post_body)
-        if response.status == 409:
-            raise DuplicateNameException(
-                        'Mock {0} already exists'.format(self.name))
 
         pretender_json = response.read().decode('ascii')
 
