@@ -53,6 +53,8 @@ def replay_http(uid, url):
 
     request_info = RequestSerialiser(url, bottle.request)
     body = request_info.serialize()
+    LOGGER.debug("KEEPING UID {0} ALIVE".format(uid))
+    pretender.keep_alive('http', uid)
 
     boss_response = replay(uid, body)
     preset = Preset(boss_response.as_json().encode('ascii'))

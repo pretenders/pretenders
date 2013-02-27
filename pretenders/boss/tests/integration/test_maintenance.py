@@ -1,14 +1,8 @@
 from nose.tools import assert_equal, assert_raises
 import time
 
-try:
-    from http.client import HTTPConnection
-except ImportError:
-    # Python2.6/2.7
-    from httplib import HTTPConnection
-
+from pretenders.http.tests.integration import get_fake_client
 from pretenders.http.client import HTTPMock
-from pretenders.base import APIHelper
 from pretenders.boss.maintain import STALE_DELETE_FREQUENCY
 from pretenders.base import ResourceNotFound
 
@@ -35,7 +29,9 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     # recently made a request.
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
+
     http_mock = HTTPMock('localhost', 8000, timeout=5)
+
     pretender = http_mock.get_pretender()
 
     timeout_server = pretender.timeout_in_secs
@@ -44,17 +40,13 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     for i in range(3):
         # Sleep for a while, check that the server is still running and then
         # make a call to the mock server.
-
         time.sleep(timeout_server / 2)
 
         # Check that we are still running
         pretender = http_mock.get_pretender()
 
         # Make a call to the mock server.
-        pretender_client = APIHelper(
-                        HTTPConnection(http_mock.pretend_access_point),
-                        '')
-        pretender_client.http(
-            method="GET",
+        pretender_client = get_fake_client(http_mock)
+        pretender_client.get(
             url="/some_url"
         )
