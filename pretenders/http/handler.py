@@ -1,8 +1,11 @@
 import datetime
 import json
 
+from pretenders.base import get_logger
 from pretenders.boss import PretenderModel
 from pretenders.exceptions import DuplicateNameException
+
+LOGGER = get_logger('pretenders.http.handler')
 
 
 class HTTPPretenderModel(PretenderModel):
@@ -17,8 +20,9 @@ class HttpHandler(object):
     def new_pretender(self, uid, timeout, name):
         start = datetime.datetime.now()
         if name in self.PRETENDER_NAME_UID:
-            raise DuplicateNameException("Name '{0}' already exists as uid {1}"
-                                         .format(name, uid))
+            msg = "Name '{0}' already exists as uid {1}".format(name, uid)
+            LOGGER.debug(msg)
+            raise DuplicateNameException(msg)
 
         self.PRETENDERS[uid] = HTTPPretenderModel(
             start=start,
