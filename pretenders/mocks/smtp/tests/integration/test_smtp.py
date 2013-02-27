@@ -56,3 +56,9 @@ def test_history_stores_multiple_emails():
     assert_equals(1, len(smtp_mock.get_emails()))
     send_dummy_email()
     assert_equals(2, len(smtp_mock.get_emails()))
+
+
+def test_check_sent_email_none_sent():
+    smtp_mock.reset()
+    email_message = smtp_mock.get_email(0)
+    assert_equals(email_message, None)

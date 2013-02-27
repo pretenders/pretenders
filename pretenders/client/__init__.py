@@ -67,17 +67,19 @@ class BossClient(object):
 
     boss_mock_type = None
 
-    def __init__(self, host, port, timeout=None):
+    def __init__(self, host, port, timeout=None, name=None):
         self.host = host
         self.port = port
         self.timeout = timeout
+        self.name = name
         self.full_host = "{0}:{1}".format(self.host, self.port)
 
         self.connection = HTTPConnection(self.full_host)
         self.boss_access = APIHelper(self.connection, '')
 
-        LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2}'
-                    .format(self.boss_mock_type, self.port, self.timeout))
+        LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2} ({3})'
+                    .format(self.boss_mock_type, self.port, self.timeout,
+                            self.name))
         if self.boss_mock_type:
             self.pretender_details = self._request_mock_access()
         else:
@@ -121,10 +123,12 @@ class BossClient(object):
                 position 1: unique id of the pretender (for teardown
                             purposes)
         """
+        post_body = {'name': self.name}
         if self.timeout:
-            post_body = json.dumps({'pretender_timeout': self.timeout})
-        else:
-            post_body = '{}'
+            post_body['pretender_timeout'] = self.timeout
+
+        post_body = json.dumps(post_body)
+
         response = self.boss_access.http('POST',
                                          url=self.create_mock_url,
                                          body=post_body)
@@ -138,6 +142,14 @@ class BossClient(object):
     def delete_mock_url(self):
         return "{0}/{1}".format(self.create_mock_url,
                                 self.pretend_access_point_id)
+
+    def delete_mock(self):
+        "Delete the mock server that this points to."
+        response = self.boss_access.http(
+            method="DELETE",
+            url=self.delete_mock_url)
+        if not response.status == 200:
+            raise Exception("Delete failed")
 
     def get_pretender(self):
         "Get pretenders from the server in dict format"
