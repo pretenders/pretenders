@@ -24,7 +24,7 @@ class HTTPMock(BossClient):
 
     boss_mock_type = 'http'
 
-    def __init__(self, host, port, timeout=None):
+    def __init__(self, host, port, timeout=None, name=None):
         """
         Create an HTTPMock client for testing purposes.
 
@@ -38,8 +38,13 @@ class HTTPMock(BossClient):
             The timeout (in seconds) to be passed to the boss when
             instantiating the mock HTTP server. If a request is not received by
             the mock server in this time, it will be closed down by the boss.
+
+        :param name:
+            The name of the mock. If an HTTP Mock server exists with this name
+            the client will be hooked into use that server. Otherwise a new one
+            will be created for the client.
         """
-        super(HTTPMock, self).__init__(host, port, timeout)
+        super(HTTPMock, self).__init__(host, port, timeout, name)
         self.rule = ''
 
     @property

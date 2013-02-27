@@ -66,10 +66,11 @@ def create_pretender(protocol):
     post_body = bottle.request.body.read().decode('ascii')
     body_data = json.loads(post_body)
     timeout = body_data.get('pretender_timeout', settings.TIMEOUT_PRETENDER)
+    name = body_data.get('name')
+    LOGGER.info("Creating {0} pretender access point at {1} (name: {2}) {3}"
+                .format(protocol, uid, name, timeout))
 
-    LOGGER.info("Creating {0} pretender access point at {1}"
-                .format(protocol, uid))
-    return HANDLERS[protocol].new_pretender(uid, timeout)
+    return HANDLERS[protocol].get_or_create_pretender(uid, timeout, name)
 
 
 @delete('/<protocol:re:(http|smtp)>/<uid:int>')
