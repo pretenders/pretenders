@@ -43,7 +43,7 @@ class SmtpHandler(object):
         available_set = PRETEND_PORT_RANGE.difference(ports_in_use)
         return available_set
 
-    def new_pretender(self, uid, timeout):
+    def get_or_create_pretender(self, uid, timeout, name):
         """
         Launch a new SMTP pretender in a separate process.
 
@@ -77,8 +77,8 @@ class SmtpHandler(object):
                 last_call=start,
                 uid=uid,
             )
-            LOGGER.info("Started smtp pretender on port {0}".format(
-                port_number))
+            LOGGER.info("Started smtp pretender on port {0}. uid {1}. pid {2}"
+                        .format(port_number, uid, process.pid))
             return json.dumps({
                 'full_host': "localhost:{0}".format(port_number),
                 'id': uid})
