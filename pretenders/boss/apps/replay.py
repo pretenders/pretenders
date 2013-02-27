@@ -8,6 +8,8 @@ from pretenders.boss.apps import pretender
 from pretenders.boss.apps.history import save_history
 from pretenders.boss.apps.preset import preset_count, select_preset
 from pretenders.http import Preset, RequestSerialiser
+from pretenders.http.handler import HttpHandler
+
 
 LOGGER = get_logger('pretenders.boss.apps.replay')
 
@@ -60,3 +62,14 @@ def replay_http(uid, url):
     # So the above works, but it looks ugly - ideally we'd handle both in
     # Preset constructor.
     return preset.as_http_response(bottle.response)
+
+
+@route('/mockhttp/<name><url:path>', method='ANY')
+def replay_http_by_name(name, url):
+    try:
+        uid = HttpHandler().PRETENDER_NAME_UID[name]
+    except KeyError:
+        raise HTTPResponse("No matching mock by that name '{0}"
+                           .format(name).encode(),
+                           status=404)
+    return replay_http(uid, url)

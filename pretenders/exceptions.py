@@ -4,3 +4,7 @@ class NoPortAvailableException(Exception):
 
 class ConfigurationError(Exception):
     pass
+
+
+class DuplicateNameException(Exception):
+    pass
