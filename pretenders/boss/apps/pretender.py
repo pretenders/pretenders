@@ -42,7 +42,7 @@ def pretender_get(protocol, uid):
     try:
         return get_pretenders(protocol)[uid].as_json()
     except KeyError:
-        raise HTTPResponse(b"No matching {0} mock".format(protocol),
+        raise HTTPResponse("No matching {0} mock".format(protocol),
                            status=404)
 
 

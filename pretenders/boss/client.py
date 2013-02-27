@@ -104,6 +104,7 @@ class BossClient(object):
                                          url=self.create_mock_url,
                                          body=post_body)
         pretender_json = response.read().decode('ascii')
+
         pretender_details = json.loads(pretender_json)
 
         return pretender_details
