@@ -27,7 +27,7 @@ class SMTPMock(BossClient):
 
     def get_email(self, sequence_id):
         history_rep = self.history.get(sequence_id)
-        if history_rep.code == 404:
+        if history_rep.status == 404:
             return None
         history = history_rep.read()
         email = SMTPSerialiser(**json.loads(history.decode('ascii')))
