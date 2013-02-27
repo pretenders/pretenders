@@ -4,6 +4,8 @@
 *.pyo
 *.pid
 *.log
+*.err
+*.out
 .*/
 tags
 dist/
