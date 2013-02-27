@@ -112,6 +112,7 @@ class BossClient(object):
                         'Mock {0} already exists'.format(self.name))
 
         pretender_json = response.read().decode('ascii')
+
         pretender_details = json.loads(pretender_json)
 
         return pretender_details
