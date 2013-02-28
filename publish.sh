@@ -10,7 +10,7 @@ if [ "$1" == "-t" ]
 then
     shopt -s expand_aliases
     alias git='echo $ git'
-    alias python='echo $ git'
+    alias python='echo $ python'
     alias sh='echo $ sh'
     REALFILE="/dev/stdout"
     shift
