@@ -12,11 +12,11 @@ from pretenders.constants import (
 )
 from pretenders.server.base import get_logger
 from pretenders.server import data
-from pretenders.mocks import PretenderModel
+from pretenders.mock_servers import PretenderModel
 from pretenders.exceptions import NoPortAvailableException
 
 
-LOGGER = get_logger('pretenders.mocks.smtp.handler')
+LOGGER = get_logger('pretenders.mock_servers.smtp.handler')
 
 
 class SMTPPretenderModel(PretenderModel):
@@ -56,7 +56,7 @@ class SmtpHandler(object):
             process = subprocess.Popen([
                 sys.executable,
                 "-m",
-                "pretenders.mocks.smtp.server",
+                "pretenders.mock_servers.smtp.server",
                 "-H", "localhost",
                 "-p", str(port_number),
                 "-b", str(data.BOSS_PORT),

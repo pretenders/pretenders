@@ -1,7 +1,7 @@
 from copy import copy
 
 from pretenders.client import BossClient
-from pretenders.mocks.http import MockHttpRequest, MatchRule
+from pretenders.mock_servers.http import MockHttpRequest, MatchRule
 
 
 class HTTPMock(BossClient):

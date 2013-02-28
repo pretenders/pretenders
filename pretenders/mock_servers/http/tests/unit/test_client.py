@@ -1,6 +1,6 @@
 from nose.tools import assert_equals, assert_true
 
-from pretenders.mocks.http import CaseInsensitiveDict
+from pretenders.mock_servers.http import CaseInsensitiveDict
 
 
 def test_caseinsensitivedict_creation():

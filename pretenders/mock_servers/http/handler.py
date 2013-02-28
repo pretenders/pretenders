@@ -2,7 +2,7 @@ import datetime
 import json
 
 from pretenders.server.base import get_logger
-from pretenders.mocks import PretenderModel
+from pretenders.mock_servers import PretenderModel
 
 LOGGER = get_logger('pretenders.http.handler')
 

@@ -11,7 +11,7 @@ from collections import defaultdict
 
 from pretenders.server.base import get_logger
 from pretenders.constants import FOREVER
-from pretenders.mocks.http import Preset, match_rule_from_dict
+from pretenders.mock_servers.http import Preset, match_rule_from_dict
 
 
 LOGGER = get_logger('pretenders.server.apps.preset')

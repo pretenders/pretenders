@@ -10,9 +10,9 @@ import urllib
 from pretenders.server.base import (
     get_logger, ResourceNotFound, UnexpectedResponseStatus
 )
-from pretenders.mocks import PretenderModel
+from pretenders.mock_servers import PretenderModel
 from pretenders.exceptions import ConfigurationError
-from pretenders.mocks.http import binary_to_ascii, Preset
+from pretenders.mock_servers.http import binary_to_ascii, Preset
 
 
 LOGGER = get_logger('pretenders.client')
