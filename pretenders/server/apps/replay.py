@@ -3,7 +3,7 @@ import json
 import bottle
 from bottle import post, HTTPResponse, route
 
-from pretenders.server.base import get_logger
+from pretenders.logging import get_logger
 from pretenders.server.apps import pretender
 from pretenders.server.apps.history import save_history
 from pretenders.server.apps.preset import preset_count, select_preset

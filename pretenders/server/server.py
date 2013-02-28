@@ -1,7 +1,8 @@
 import bottle
 
 from pretenders import settings
-from pretenders.server.base import get_logger, in_parent_process, save_pid_file
+from pretenders.logging import get_logger
+from pretenders.server.base import in_parent_process, save_pid_file
 from pretenders.server import data
 from pretenders.server.maintain import launch_maintainer
 # Import apps so that they get initialised for bottle.

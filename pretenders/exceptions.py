@@ -4,3 +4,11 @@ class NoPortAvailableException(Exception):
 
 class ConfigurationError(Exception):
     pass
+
+
+class ResourceNotFound(Exception):
+    pass
+
+
+class UnexpectedResponseStatus(Exception):
+    pass

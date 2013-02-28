@@ -2,9 +2,9 @@ import argparse
 import socket
 
 from pretenders.server.base import (
-    get_logger,
     in_parent_process,
     save_pid_file)
+from pretenders.logging import get_logger
 from pretenders.client import BossClient
 from pretenders.constants import RETURN_CODE_PORT_IN_USE
 
