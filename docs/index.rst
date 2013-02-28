@@ -30,7 +30,7 @@ HTTP mock in a test case
 
 Sample HTTP mocking test case::
 
-    from pretenders.http.client import HTTPMock
+    from pretenders.client.http import HTTPMock
     from pretenders.constants import FOREVER
 
     # Assume a running server

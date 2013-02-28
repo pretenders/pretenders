@@ -13,7 +13,7 @@ class HTTPMock(BossClient):
 
     Example usage::
 
-        from pretenders.http.client import HTTPMock
+        from pretenders.client.http import HTTPMock
         mock = HTTPMock('localhost', 8000)
         mock.when('/hello', 'GET').reply('Hello')
         # run tests... then read received responses:
