@@ -55,6 +55,57 @@ Sample HTTP mocking test case::
     assert_equal(r.method, 'GET')
     assert_equal(r.url, '/weather?city=barcelona')
 
+HTTP mocking for remote application
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes it is not possible to alter the settings of a running remote
+application on the fly. In such circumstances you need to have a predetermined
+url to reach the http mock on so that you can configure correctly ahead of
+time.
+
+Let's pretend we have a web app that on a page refresh gets data from an
+external site. We might write some tests like::
+
+    from pretenders.client.http import HTTPMock
+    from pretenders.constants import FOREVER
+
+    mock = HTTPMock('my.local.server', 9000, timeout=20, name="third_party")
+
+    def setup_normal():
+        mock.reset()
+        mock.when("GET /important_data").reply(
+            '{"account": "10000", "outstanding": "10.00"}',
+            status=200,
+            times=FOREVER)
+
+    def setup_error():
+        mock.reset()
+        mock.when("GET /important_data").reply('ERROR', status=500, times=FOREVER)
+
+
+    @with_setup(setup_normal)
+    def test_shows_account_information_correctly():
+        # Get the webpage
+        ...
+        # Check that the page shows things correctly as we expect.
+        ...
+
+    @with_setup(setup_error)
+    def test_application_handles_error_from_service():
+        # Get the webpage
+        ...
+        # Check that the page gracefully handles the error that has happened
+        # in the background.
+        ...
+
+If you have a test set like the one above you know in advance that your app
+needs to be configured to point to::
+
+    http://my.local.server:9000/mockhttp/third_party
+
+instead of the actual third party's website.
+
+
 SMTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

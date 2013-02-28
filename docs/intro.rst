@@ -8,6 +8,10 @@ execution.
 
 They are loosely designed along the pattern of Record/Replay/Verify.
 
+
+Python Compatibility
+--------------------
+
 The server side of Pretenders is written in Python3:
 
 * Because I firmly believe all new projects should use Python3, unless
@@ -18,26 +22,34 @@ The server side of Pretenders is written in Python3:
 In the cases we implement a client, we will be making this runnable in
 Python 3.x and Python 2.6/2.7.
 
-The initial service to be mocked by pretenders is HTTP.
-Future servers we are considering to support include SMTP and AMQP.
-These they represent the vast majority of the services that the software we
+
+Mocked Servers Available
+------------------------
+
+Pretenders currently supports the mocking of HTTP and SMTP servers.
+
+Future services we are considering to support include AMQP and ssh.
+
+These represent the vast majority of the services that the software we
 write interacts with.
 
 Some example use cases include:
 
-* Mocking external HTTP-based APIs at the wire level in module integration tests
+* Mocking external HTTP-based APIs at the wire level in module integration
+  tests
 * Facilitating the manual testing and debugging of front-end Ajax code
   where the back-end has not been developed yet
 * Writing fully automated tests for any system that sends email, and
   where we want to easily verify outgoing mails
 
-Pretenders will provide a unified RESTful API to verify the interactions of
+Pretenders provides a unified RESTful API to verify the interactions of
 our code with external services, regardless of the service protocol.
 
-pretenders.http - HTTP server
------------------------------
+pretenders.client.http - HTTP server
+------------------------------------
 
 Typical usage is to mock RESTful/SOAP APIs of external services.
+
 This will normally require pre-programming the service with responses,
 and enquiring the service later about received requests. This can be done
 with specialised assertions / matchers, or by setting expectations and
@@ -45,6 +57,10 @@ verifying fulfilment of such expectations.
 
 The pre-programming step may be done by using specific proprietary HTTP
 headers, or by using an alternative HTTP port to the one used for mocking.
+
+For example usage see the `documentation`_.
+
+.. _`documentation`: http://pretenders.readthedocs.org/
 
 Implementation is based on the ``bottle`` web microframework.
 

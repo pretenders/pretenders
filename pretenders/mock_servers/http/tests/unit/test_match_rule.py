@@ -1,4 +1,4 @@
-from nose.tools import assert_equals, assert_true, assert_raises, assert_false
+from nose.tools import assert_true, assert_false
 
 from pretenders.mock_servers.http import MatchRule
 
@@ -9,6 +9,7 @@ DEFAULT_HEADERS = {
     'Accept-Encoding': 'identity',
 }
 
+
 def create_request(rule, headers=None):
     request = {'rule': rule}
     if not headers:
@@ -18,6 +19,7 @@ def create_request(rule, headers=None):
     request['headers'] = headers
     return request
 
+
 def test_is_match_basic():
     """ Test a basic matching method / url"""
     match_rule = MatchRule('GET /test-match')
@@ -25,6 +27,7 @@ def test_is_match_basic():
 
     assert_true(match_rule.matches(mock_request))
     assert_true(match_rule.rule_matches(mock_request['rule']))
+
 
 def test_is_match_basic_is_false():
     """ Test a basic non-matching method \ url """
@@ -34,6 +37,7 @@ def test_is_match_basic_is_false():
     assert_false(match_rule.matches(mock_request))
     assert_false(match_rule.rule_matches(mock_request['rule']))
 
+
 def test_is_match_regex():
     """ Test a matching regex """
     match_rule = MatchRule('GET /test-match/[0-9]{5}')
@@ -42,6 +46,7 @@ def test_is_match_regex():
     assert_true(match_rule.matches(mock_request))
     assert_true(match_rule.rule_matches(mock_request['rule']))
 
+
 def test_is_match_regex_is_false():
     """ Test a non-matching regex """
     match_rule = MatchRule('GET /test-match/[0-9]{5}')
@@ -49,6 +54,7 @@ def test_is_match_regex_is_false():
 
     assert_false(match_rule.matches(mock_request))
     assert_false(match_rule.rule_matches(mock_request['rule']))
+
 
 def test_is_match_headers():
     """ Test a matching rule with matching headers """
@@ -59,16 +65,18 @@ def test_is_match_headers():
     assert_true(match_rule.rule_matches(mock_request['rule']))
     assert_true(match_rule.headers_match(mock_request['headers']))
 
+
 def test_is_match_headers_is_false():
     """ Test a matching rule with non-matching headers """
     match_rule = MatchRule(
         'GET /test-match', headers={'ETag': 'A123'}
     )
-    mock_request = create_request('GET /test-match',{'ETag': 'XXXX'})
+    mock_request = create_request('GET /test-match', {'ETag': 'XXXX'})
 
     assert_false(match_rule.matches(mock_request))
     assert_true(match_rule.rule_matches(mock_request['rule']))
     assert_false(match_rule.headers_match(mock_request['headers']))
+
 
 def test_is_match_headers_with_extra_headers():
     """ Test a matching rule with an unmatched extra header """
@@ -82,6 +90,7 @@ def test_is_match_headers_with_extra_headers():
     assert_true(match_rule.rule_matches(mock_request['rule']))
     assert_false(match_rule.headers_match(mock_request['headers']))
 
+
 def test_is_match_with_no_headers():
     """ Test a matching rule with no headers """
     match_rule = MatchRule('GET /test-match')
@@ -91,6 +100,7 @@ def test_is_match_with_no_headers():
     assert_true(match_rule.rule_matches(mock_request['rule']))
     assert_true(match_rule.headers_match(mock_request['headers']))
 
+
 def test_is_match_with_headers_and_no_request_headers():
     """ Test a matching rule with headers not in request """
     match_rule = MatchRule('GET /test-match', headers={'Etag': 'A123'})
@@ -99,4 +109,3 @@ def test_is_match_with_headers_and_no_request_headers():
     assert_false(match_rule.matches(mock_request))
     assert_true(match_rule.rule_matches(mock_request['rule']))
     assert_false(match_rule.headers_match(mock_request['headers']))
-
