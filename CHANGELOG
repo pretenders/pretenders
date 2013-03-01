@@ -5,7 +5,7 @@ Restructure project into client, mock_servers and server packages.
 0.1.4
 -----
 
-Fix bug with insaller by adding argparse as dependency.
+Fix bug with installer by adding argparse as dependency.
 Add ability to use named servers in HTTP.
 Change HTTP mocks to run from same instance as boss.
 Alter way that urls are matched.
