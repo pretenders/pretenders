@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m pretenders.boss.server --host localhost --port 8000
+python -m pretenders.server.server --host localhost --port 8000
