@@ -14,7 +14,7 @@ Python Compatibility
 
 The server side of Pretenders is written in Python3:
 
-* Because I firmly believe all new projects should use Python3, unless
+* Because we firmly believe all new projects should use Python3, unless
   there are *very* compelling reasons against it.
 * Because since these will be run as standalone servers, compatibility
   is not such an issue
