@@ -12,3 +12,7 @@ class ResourceNotFound(Exception):
 
 class UnexpectedResponseStatus(Exception):
     pass
+
+
+class NoRequestFound(Exception):
+    pass

@@ -8,7 +8,7 @@ from pretenders import settings
 from pretenders.logging import get_logger
 from pretenders.mock_servers.http.handler import HttpHandler
 from pretenders.mock_servers.smtp.handler import SmtpHandler
-
+from pretenders.server.apps import history
 
 LOGGER = get_logger('pretenders.server.apps.pretender')
 UID_COUNTER = 0
@@ -74,11 +74,12 @@ def create_pretender(protocol):
 
 
 @delete('/<protocol:re:(http|smtp)>/<uid:int>')
-def delete_http_mock(protocol, uid):
+def delete_mock(protocol, uid):
     "Delete http mock servers"
     LOGGER.info("Performing delete on {0} pretender {1}"
                 .format(protocol, uid))
     HANDLERS[protocol].delete_pretender(uid)
+    history.clear_history(uid)
 
 
 @delete('/<protocol:re:(http|smtp)>')
@@ -99,4 +100,4 @@ def pretender_delete(protocol):
             LOGGER.debug("Pretender: {0}".format(server))
             if server.last_call + server.timeout < now:
                 LOGGER.info("Deleting pretender with UID: {0}".format(uid))
-                HANDLERS[protocol].delete_pretender(uid)
+                delete_mock(protocol, uid)

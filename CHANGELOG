@@ -1,5 +1,6 @@
 
-
+Reset history for a UID on the server when a pretender is deleted.
+Add listing of all historical requests to http client.
 Restructure project into client, mock_servers and server packages.
 
 0.1.4

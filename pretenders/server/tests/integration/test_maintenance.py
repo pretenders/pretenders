@@ -48,3 +48,20 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
         pretender_client.get(
             url="/some_url"
         )
+
+
+def test_clear_down_removes_history():
+    # Test that when we clear down a pretender, the history is removed.
+    # Otherwise we end up slowly creeping up the memory usage!
+    http_mock = HTTPMock('localhost', 8000, timeout=5)
+    pretender = http_mock.get_pretender()
+    pretender_client = get_fake_client(http_mock)
+    pretender_client.get(
+            url="/some_url"
+        )
+    assert_equal(http_mock.get_request(0).url, '/some_url')
+    time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout_in_secs + 1)
+    assert_raises(ResourceNotFound, http_mock.get_pretender)
+    # Check that there is no history now!
+    req = http_mock.get_request(0)
+    assert_equal(req, None)
