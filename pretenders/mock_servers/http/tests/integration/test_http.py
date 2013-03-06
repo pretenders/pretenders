@@ -318,6 +318,8 @@ def test_etag_workflow():
 def test_list_history():
     http_mock.reset()
     add_test_preset()
+    assert_equals([], http_mock.get_request())
+
     fake_client.get(url='/call_one')
     fake_client.get(url='/call_two')
     fake_client.get(url='/call_three')
