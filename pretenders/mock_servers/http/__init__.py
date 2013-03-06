@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+from pretenders.exceptions import NoRequestFound
 
 
 def to_dict(wsgi_headers, include=lambda _: True):
@@ -90,16 +91,24 @@ class JsonHelper(object):
         Additional keyword arguments will complement or override the
         values in ``json_data``. Normally you will use one or the other.
     """
-    def __init__(self, json_data=None, **kwargs):
+    def __init__(self, json_data=None, data=None, **kwargs):
         self.data = {}
         if json_data is not None:
             content = json_data.decode('ascii')
             self.data = json.loads(content)
+        if data is not None:
+            self.data.update(data)
         self.data.update(kwargs)
 
     def __getattr__(self, attribute):
         """Access attributes from JSON-dict as if they were class attibutes"""
         return self.data[attribute]
+
+    @classmethod
+    def from_http_request(cls, pretend_response):
+        if pretend_response.status != 200:
+            raise NoRequestFound('No saved request')
+        return JsonHelper(pretend_response.read())
 
     @property
     def body(self):
@@ -226,12 +235,3 @@ class MatchRule(object):
                     if header != v:
                         return False
         return True
-
-
-class MockHttpRequest(JsonHelper):
-    """A stored HTTP request as issued to our pretend server"""
-    def __init__(self, pretend_response):
-        if pretend_response.status != 200:
-            # TODO use custom exception
-            raise Exception('No saved request')
-        super(MockHttpRequest, self).__init__(pretend_response.read())

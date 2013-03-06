@@ -1,7 +1,9 @@
 from copy import copy
+import json
 
 from pretenders.client import BossClient
-from pretenders.mock_servers.http import MockHttpRequest, MatchRule
+from pretenders.mock_servers.http import MatchRule, JsonHelper
+from pretenders.exceptions import NoRequestFound
 
 
 class HTTPMock(BossClient):
@@ -74,5 +76,21 @@ class HTTPMock(BossClient):
     def get_request(self, sequence_id=None):
         """
         Get a stored request issued to the mock server, by sequence order.
+
+        If sequence_id is not given return the whole history of requests to
+        this mock.
         """
-        return MockHttpRequest(self.history.get(sequence_id))
+        try:
+            if sequence_id is not None:
+                return JsonHelper.from_http_request(
+                                        self.history.get(sequence_id))
+            else:
+                json_data = self.history.list().read()
+                content = json_data.decode('ascii')
+                data = json.loads(content)
+                historical = []
+                for response in data:
+                    historical.append(JsonHelper(data=response))
+                return historical
+        except NoRequestFound:
+            return None

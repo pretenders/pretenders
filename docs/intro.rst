@@ -91,6 +91,15 @@ Pretenders welcomes contributions in any form - be it pull requests, adding an
 issue or feedback via `github`_ or sending a message on the `pretenders`_
 mailing list so don't be shy!
 
+We have the following branching convention:
+
+    - master: This should look exactly like the latest release.
+    - develop: This is where ongoing work lands, only being merged into master
+      at release point.
+
+In order to contribute, fork the repo in `github`_ and branch from the develop
+branch. Create your PRs into develop in the main repo.
+
 .. _`github`: https://github.com/pretenders/pretenders
 
 Running the tests
