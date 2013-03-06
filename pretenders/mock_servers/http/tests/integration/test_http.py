@@ -313,3 +313,18 @@ def test_etag_workflow():
     response = fake_client.get(url='/test-etag',
                                headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
+
+
+def test_list_history():
+    http_mock.reset()
+    add_test_preset()
+    fake_client.get(url='/call_one')
+    fake_client.get(url='/call_two')
+    fake_client.get(url='/call_three')
+
+    historical_calls = http_mock.get_request()
+
+    assert_equals(len(historical_calls), 3)
+    assert_equals(historical_calls[0].url, '/call_one')
+    assert_equals(historical_calls[1].url, '/call_two')
+    assert_equals(historical_calls[2].url, '/call_three')
