@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+from pretenders.exceptions import NoRequestFound
 
 
 def to_dict(wsgi_headers, include=lambda _: True):
@@ -232,6 +233,5 @@ class MockHttpRequest(JsonHelper):
     """A stored HTTP request as issued to our pretend server"""
     def __init__(self, pretend_response):
         if pretend_response.status != 200:
-            # TODO use custom exception
-            raise Exception('No saved request')
+            raise NoRequestFound('No saved request')
         super(MockHttpRequest, self).__init__(pretend_response.read())

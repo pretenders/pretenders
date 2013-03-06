@@ -2,6 +2,7 @@ from copy import copy
 
 from pretenders.client import BossClient
 from pretenders.mock_servers.http import MockHttpRequest, MatchRule
+from pretenders.exceptions import NoRequestFound
 
 
 class HTTPMock(BossClient):
@@ -75,4 +76,7 @@ class HTTPMock(BossClient):
         """
         Get a stored request issued to the mock server, by sequence order.
         """
-        return MockHttpRequest(self.history.get(sequence_id))
+        try:
+            return MockHttpRequest(self.history.get(sequence_id))
+        except NoRequestFound:
+            return None
