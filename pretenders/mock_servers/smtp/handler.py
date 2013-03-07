@@ -10,7 +10,7 @@ from pretenders.constants import (
     RETURN_CODE_PORT_IN_USE,
     PRETEND_PORT_RANGE
 )
-from pretenders.logging import get_logger
+from pretenders.log import get_logger
 from pretenders.server import data
 from pretenders.mock_servers import PretenderModel
 from pretenders.exceptions import NoPortAvailableException

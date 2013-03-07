@@ -24,7 +24,6 @@ def send_dummy_email(from_email='test@test.com',
 
 
 def test_check_sent_email_content():
-    #raise SkipTest()
     smtp_mock.reset()
     from_email = 'pretenders_from@test.com'
     to_email = 'pretenders_to@test.com'

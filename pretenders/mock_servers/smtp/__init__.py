@@ -10,7 +10,14 @@ class SMTPSerialiser(object):
     """
     def __init__(self, **kwargs):
         self.data = kwargs
-        self.message = Parser().parsestr(self.data['data'])
+        email = self.data['data']
+        if not isinstance(email, str):
+            # Python2.6's version of the email parser doesn't like when these
+            # come in as unicode. In Python 3 strings ARE sequences of unicode
+            # characters, so I can only assume that the email parser has been
+            # updated to handle them.
+            email = str(email)
+        self.message = Parser().parsestr(email)
 
     def serialize(self):
         return json.dumps(self.data)
