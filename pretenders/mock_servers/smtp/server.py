@@ -1,7 +1,7 @@
 import smtpd
 import asyncore
 
-from pretenders.logging import get_logger
+from pretenders.log import get_logger
 from pretenders.server.pretender import Pretender
 from pretenders.mock_servers.smtp import SMTPSerialiser
 

@@ -5,7 +5,7 @@ import bottle
 from bottle import delete, get, post, HTTPResponse
 
 from pretenders import settings
-from pretenders.logging import get_logger
+from pretenders.log import get_logger
 from pretenders.mock_servers.http.handler import HttpHandler
 from pretenders.mock_servers.smtp.handler import SmtpHandler
 from pretenders.server.apps import history

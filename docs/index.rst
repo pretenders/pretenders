@@ -23,7 +23,7 @@ Example usage
 
 Start the server to listen on all network interfaces::
 
-    $ python -m pretenders.boss.server --host 0.0.0.0 --port 8000
+    $ python -m pretenders.server.server --host 0.0.0.0 --port 8000
 
 HTTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~

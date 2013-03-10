@@ -6,7 +6,7 @@ except ImportError:
     #2.6 compatibility
     from pretenders.compat.ordered_dict import OrderedDict
 
-from pretenders.logging import get_logger
+from pretenders.log import get_logger
 from pretenders.constants import REQUEST_ONLY_HEADERS
 
 LOGGER = get_logger('pretenders.server.utils')

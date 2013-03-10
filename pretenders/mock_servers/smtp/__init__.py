@@ -1,5 +1,8 @@
-import json
+import email as email_lib
 from email.parser import Parser
+import json
+
+from pretenders.compat import ensure_is_python_string
 
 
 class SMTPSerialiser(object):
@@ -10,7 +13,8 @@ class SMTPSerialiser(object):
     """
     def __init__(self, **kwargs):
         self.data = kwargs
-        self.message = Parser().parsestr(self.data['data'])
+        email = ensure_is_python_string(self.data['data'])
+        self.message = Parser().parsestr(email)
 
     def serialize(self):
         return json.dumps(self.data)
@@ -20,4 +24,10 @@ class SMTPSerialiser(object):
 
     @property
     def content(self):
-        return self.message.get_payload()
+        payload = self.message.get_payload(decode=True)
+        return ensure_is_python_string(payload)
+
+    @property
+    def subject(self):
+        subj = email_lib.header.decode_header(self.message['Subject'])[0][0]
+        return ensure_is_python_string(subj)
