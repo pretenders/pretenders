@@ -1,5 +1,8 @@
-import json
+import email as email_lib
 from email.parser import Parser
+import json
+
+from pretenders.compat import ensure_is_python_string
 
 
 class SMTPSerialiser(object):
@@ -10,13 +13,7 @@ class SMTPSerialiser(object):
     """
     def __init__(self, **kwargs):
         self.data = kwargs
-        email = self.data['data']
-        if not isinstance(email, str):
-            # Python2.6's version of the email parser doesn't like when these
-            # come in as unicode. In Python 3 strings ARE sequences of unicode
-            # characters, so I can only assume that the email parser has been
-            # updated to handle them.
-            email = str(email)
+        email = ensure_is_python_string(self.data['data'])
         self.message = Parser().parsestr(email)
 
     def serialize(self):
@@ -27,4 +24,10 @@ class SMTPSerialiser(object):
 
     @property
     def content(self):
-        return self.message.get_payload()
+        payload = self.message.get_payload(decode=True)
+        return ensure_is_python_string(payload)
+
+    @property
+    def subject(self):
+        subj = email_lib.header.decode_header(self.message['Subject'])[0][0]
+        return ensure_is_python_string(subj)
