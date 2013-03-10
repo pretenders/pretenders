@@ -7,7 +7,7 @@ except ImportError:
 
 import urllib
 
-from pretenders.logging import get_logger
+from pretenders.log import get_logger
 from pretenders.mock_servers import PretenderModel
 from pretenders.exceptions import (ConfigurationError, ResourceNotFound,
                                    UnexpectedResponseStatus)
