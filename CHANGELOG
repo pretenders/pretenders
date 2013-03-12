@@ -1,4 +1,12 @@
 
+1.0.1
+-----
+
+Bug fix on setup.py
+
+1.0
+---
+
 Reset history for a UID on the server when a pretender is deleted.
 Add listing of all historical requests to http client.
 Restructure project into client, mock_servers and server packages.
