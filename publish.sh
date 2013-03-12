@@ -41,7 +41,7 @@ git commit -m "Bumped version number to $VERSION"
 
 echo -e "\nTagging and pushing to Github..."
 git tag $VERSION
-git push
+git push origin master
 git push --tags
 
 echo -e "\nUploading to PyPI..."
