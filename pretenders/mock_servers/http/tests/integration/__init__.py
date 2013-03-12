@@ -18,6 +18,7 @@ class FakeClient(APIHelper):
         return self.http('POST', url=url, *args, **kwargs)
 
 
-def get_fake_client(boss_client):
-    return FakeClient(HTTPConnection(boss_client.pretend_access_point),
-                      boss_client.pretend_access_path)
+def get_fake_client(boss_client, **kwargs):
+    return FakeClient(
+            HTTPConnection(boss_client.pretend_access_point, **kwargs),
+            boss_client.pretend_access_path)

@@ -44,7 +44,7 @@ class APIHelper(object):
 class PresetHelper(APIHelper):
 
     def add(self, match_rule=None, response_status=200,
-            response_body=b'', response_headers={}, times=1):
+            response_body=b'', response_headers={}, times=1, after=0):
         """
         Add a new preset to the boss server.
         """
@@ -54,6 +54,7 @@ class PresetHelper(APIHelper):
             status=response_status,
             rule=match_rule,
             times=times,
+            after=after
         )
 
         response = self.http('POST', url=self.path, body=new_preset.as_json())
