@@ -66,11 +66,16 @@ class HTTPMock(BossClient):
         mock.rule = match_rule
         return mock
 
-    def reply(self, body=b'', status=200, headers={}, times=1):
+    def reply(self, body=b'', status=200, headers={}, times=1, after=0):
         """
         Set the pre-canned reply for the preset.
+
+        :param after:
+            The http mock server will delay for ``after`` seconds before
+            replying. Defaults to 0.
+
         """
-        self.preset.add(self.rule, status, body, headers, times)
+        self.preset.add(self.rule, status, body, headers, times, after)
         return self
 
     def get_request(self, sequence_id=None):
