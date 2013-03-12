@@ -5,12 +5,19 @@ from setuptools import setup, find_packages
 
 from pretenders import __version__
 
+# We're using the long description for PyPI purposes. In github the README is
+# a symlink to one documentation page. The docs don't get included so this
+# fails when run following a download from PyPI.
+try:
+    long_description = open('README.rst').read()
+except IOError:
+    long_description = ""
 
 setup(
     name='pretenders',
     version=__version__,
     description='Fake servers for testing',
-    long_description=open('README.rst').read(),
+    long_description=long_description,
     author='Carles Barrobés, Alex Couper',
     author_email='carles@barrobes.com, amcouper@gmail.com',
     url='https://github.com/pretenders/pretenders',
