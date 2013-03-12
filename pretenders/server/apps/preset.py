@@ -1,3 +1,5 @@
+import time
+
 import bottle
 from bottle import delete, post, HTTPResponse
 
@@ -45,6 +47,7 @@ def select_preset(uid, request):
 
         if match_rule.matches(request):
             knock_off_preset(preset_dict, key)
+            time.sleep(preset.after)
             return preset
 
     raise HTTPResponse(b"No matching preset response", status=404)

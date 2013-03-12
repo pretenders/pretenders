@@ -1,3 +1,5 @@
+import socket
+
 from nose.tools import assert_equals, assert_true, assert_raises
 
 from pretenders.constants import FOREVER
@@ -330,3 +332,15 @@ def test_list_history():
     assert_equals(historical_calls[0].url, '/call_one')
     assert_equals(historical_calls[1].url, '/call_two')
     assert_equals(historical_calls[2].url, '/call_three')
+
+
+def test_mock_timeout_behaviour():
+    timeout_fake_client = get_fake_client(http_mock, timeout=10)
+
+    http_mock.reset()
+    http_mock.when(
+        'GET /test-long-process').reply(b'', status=200, times=FOREVER,
+                                        after=20)
+    assert_raises(socket.timeout,
+                  timeout_fake_client.get,
+                  url='/test-long-process')

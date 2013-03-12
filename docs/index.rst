@@ -46,6 +46,9 @@ Sample HTTP mocking test case::
     # For the next request (any method, any URL) respond with some JSON data
     mock.reply('{"temperature": 23}', headers={'Content-Type': 'application/json'})
 
+    # For the next GET request to /long take 100 seconds to respond.
+    mock.when('GET /long').reply('', after=100)
+
     # Your code is exercised here, after setting up the mock URL
     myapp.settings.FOO_ROOT_URL = mock.pretend_access_point
     ...
