@@ -1,7 +1,8 @@
+import json
 import time
 
 import bottle
-from bottle import delete, post, HTTPResponse
+from bottle import delete, post, get, HTTPResponse
 
 try:
     from collections import OrderedDict
@@ -103,3 +104,11 @@ def clear_presets(uid):
     Delete all recorded presets
     """
     PRESETS[uid].clear()
+
+
+@get('/preset/<uid:int>')
+def list_presets(uid):
+    presets = []
+    for _, preset_list in PRESETS[uid].items():
+        presets.extend([preset.as_dict() for preset in preset_list])
+    return json.dumps(presets)
