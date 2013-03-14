@@ -5,7 +5,7 @@ from nose.tools import assert_equals, assert_true, assert_raises
 from pretenders.constants import FOREVER
 from pretenders.exceptions import ConfigurationError
 from pretenders.client.http import HTTPMock
-from pretenders.mock_servers.http.tests.integration import get_fake_client
+from . import get_fake_client
 
 
 http_mock = HTTPMock('localhost', 8000)
