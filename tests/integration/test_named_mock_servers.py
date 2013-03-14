@@ -1,7 +1,7 @@
 from nose.tools import assert_equals
 
 from pretenders.client.http import HTTPMock
-from pretenders.mock_servers.http.tests.integration import get_fake_client
+from . import get_fake_client
 
 
 def test_get_mock_server_by_name():

@@ -4,7 +4,7 @@ import time
 from pretenders.client.http import HTTPMock
 from pretenders.exceptions import ResourceNotFound
 from pretenders.server.maintain import STALE_DELETE_FREQUENCY
-from pretenders.mock_servers.http.tests.integration import get_fake_client
+from . import get_fake_client
 
 
 def test_clear_down_of_stale_mock_servers_taking_place():

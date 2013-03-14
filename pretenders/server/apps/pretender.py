@@ -33,6 +33,12 @@ def keep_alive(protocol, uid):
     get_pretenders(protocol)[uid].keep_alive()
 
 
+@get('/<protocol:re:(http|smtp)>')
+def list_pretenders(protocol):
+    return [pretender.as_json()
+             for pretender in get_pretenders(protocol).values()]
+
+
 @get('/<protocol:re:(http|smtp)>/<uid:int>')
 def pretender_get(protocol, uid):
     """
