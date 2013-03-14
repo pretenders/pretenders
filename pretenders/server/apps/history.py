@@ -4,6 +4,7 @@ from collections import defaultdict
 from bottle import delete, get, HTTPResponse
 
 from pretenders.log import get_logger
+from pretenders.server import app
 
 LOGGER = get_logger('pretenders.server.apps.history')
 HISTORY = defaultdict(list)
@@ -16,7 +17,7 @@ def save_history(uid, request):
     HISTORY[uid].append(request)
 
 
-@get('/history/<uid:int>/<ordinal:int>')
+@app.get('/history/<uid:int>/<ordinal:int>')
 def get_history(uid, ordinal):
     """
     Access requests issued to the mock server
@@ -29,7 +30,7 @@ def get_history(uid, ordinal):
         LOGGER.exception('Unexpected exception')
 
 
-@get('/history/<uid:int>')
+@app.get('/history/<uid:int>')
 def get_all_history(uid):
     """
     Access all requests issued to the mock server
@@ -40,7 +41,7 @@ def get_all_history(uid):
         LOGGER.exception('Unexpected exception')
 
 
-@delete('/history/<uid:int>')
+@app.delete('/history/<uid:int>')
 def clear_history(uid):
     """
     Delete all recorded requests
