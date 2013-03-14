@@ -1,6 +1,7 @@
 import socket
 
 from nose.tools import assert_equals, assert_true, assert_raises
+import requests
 
 from pretenders.constants import FOREVER
 from pretenders.exceptions import ConfigurationError
@@ -109,6 +110,28 @@ def test_configure_multiple_rules_url_match():
                                  ('/test_410', 410)]:
         response = fake_client.get(url=url)
         assert_equals(response.status, expected_status)
+
+
+def test_get_presets():
+    """Test we can get the presets back from the boss directly."""
+    http_mock.reset()
+    http_mock.when('.* /test_500').reply(status=500)
+    http_mock.when('.* /test_410').reply(status=410)
+    http_mock.when('.* /test_200').reply(status=200)
+
+    response = requests.get('http://localhost:8000/preset/{0}'.format(
+                            http_mock.pretend_access_point_id))
+    presets = response.json()
+    assert_equals(len(presets), 3)
+
+    assert_equals(presets[0]['status'], 500)
+    assert_equals(presets[0]['rule']['rule'], '.* /test_500')
+
+    assert_equals(presets[1]['status'], 410)
+    assert_equals(presets[1]['rule']['rule'], '.* /test_410')
+
+    assert_equals(presets[2]['status'], 200)
+    assert_equals(presets[2]['rule']['rule'], '.* /test_200')
 
 
 def test_method_matching():
@@ -318,6 +341,10 @@ def test_etag_workflow():
 
 
 def test_list_history():
+    """
+    Test that we can get the history out of a mock with one call.
+    Test that we get the same history out from the bottle view at the boss.
+    """
     http_mock.reset()
     add_test_preset()
     assert_equals([], http_mock.get_request())
@@ -332,6 +359,15 @@ def test_list_history():
     assert_equals(historical_calls[0].url, '/call_one')
     assert_equals(historical_calls[1].url, '/call_two')
     assert_equals(historical_calls[2].url, '/call_three')
+
+    response = requests.get('http://localhost:8000/history/{0}'.format(
+                            http_mock.pretend_access_point_id))
+
+    historical_calls = response.json()
+    assert_equals(len(historical_calls), 3)
+    assert_equals(historical_calls[0]['url'], '/call_one')
+    assert_equals(historical_calls[1]['url'], '/call_two')
+    assert_equals(historical_calls[2]['url'], '/call_three')
 
 
 def test_mock_timeout_behaviour():
