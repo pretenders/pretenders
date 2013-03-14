@@ -3,11 +3,8 @@ import bottle
 from pretenders import settings
 from pretenders.log import get_logger
 from pretenders.server.base import in_parent_process, save_pid_file
-from pretenders.server import data
+from pretenders.server import data, app as pretender_app
 from pretenders.server.maintain import launch_maintainer
-# Import apps so that they get initialised for bottle.
-from pretenders.server.apps import history, preset, replay, pretender
-
 
 LOGGER = get_logger('pretenders.server.server')
 
@@ -20,7 +17,7 @@ def run(host='localhost', port=8000):
             LOGGER.debug('Starting maintainer process')
             launch_maintainer()
         save_pid_file('pretenders-boss.pid')
-    bottle.run(host=host, port=port, reloader=True)
+    bottle.run(app=pretender_app, host=host, port=port, reloader=True)
 
 
 if __name__ == '__main__':

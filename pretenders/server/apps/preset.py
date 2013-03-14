@@ -14,7 +14,7 @@ from collections import defaultdict
 from pretenders.log import get_logger
 from pretenders.constants import FOREVER
 from pretenders.mock_servers.http import Preset, match_rule_from_dict
-
+from pretenders.server import app
 
 LOGGER = get_logger('pretenders.server.apps.preset')
 PRESETS = defaultdict(OrderedDict)
@@ -78,7 +78,7 @@ def knock_off_preset(preset_dict, key):
             del preset_dict[key]
 
 
-@post('/preset/<uid:int>')
+@app.post('/preset/<uid:int>')
 def add_preset(uid):
     """
     Save the incoming request body as a preset response
@@ -97,7 +97,7 @@ def add_preset(uid):
     url_presets.append(preset)
 
 
-@delete('/preset/<uid:int>')
+@app.delete('/preset/<uid:int>')
 def clear_presets(uid):
     """
     Delete all recorded presets

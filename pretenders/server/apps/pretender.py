@@ -8,7 +8,9 @@ from pretenders import settings
 from pretenders.log import get_logger
 from pretenders.mock_servers.http.handler import HttpHandler
 from pretenders.mock_servers.smtp.handler import SmtpHandler
+from pretenders.server import app
 from pretenders.server.apps import history
+
 
 LOGGER = get_logger('pretenders.server.apps.pretender')
 UID_COUNTER = 0
@@ -33,7 +35,7 @@ def keep_alive(protocol, uid):
     get_pretenders(protocol)[uid].keep_alive()
 
 
-@get('/<protocol:re:(http|smtp)>/<uid:int>')
+@app.get('/<protocol:re:(http|smtp)>/<uid:int>')
 def pretender_get(protocol, uid):
     """
     Get details for a given pretender, defined by protocol and UID
@@ -46,7 +48,7 @@ def pretender_get(protocol, uid):
                            status=404)
 
 
-@post('/<protocol:re:(http|smtp)>')
+@app.post('/<protocol:re:(http|smtp)>')
 def create_pretender(protocol):
     """
     Client is requesting a mock instance for the given protocol.
@@ -73,7 +75,7 @@ def create_pretender(protocol):
     return HANDLERS[protocol].get_or_create_pretender(uid, timeout, name)
 
 
-@delete('/<protocol:re:(http|smtp)>/<uid:int>')
+@app.delete('/<protocol:re:(http|smtp)>/<uid:int>')
 def delete_mock(protocol, uid):
     "Delete http mock servers"
     LOGGER.info("Performing delete on {0} pretender {1}"
@@ -82,7 +84,7 @@ def delete_mock(protocol, uid):
     history.clear_history(uid)
 
 
-@delete('/<protocol:re:(http|smtp)>')
+@app.delete('/<protocol:re:(http|smtp)>')
 def pretender_delete(protocol):
     """
     Delete pretenders with filters
