@@ -3,7 +3,7 @@ import bottle
 from pretenders import settings
 from pretenders.log import get_logger
 from pretenders.server.base import in_parent_process, save_pid_file
-from pretenders.server import data, myapp as pretender_app
+from pretenders.server import data, pretender_app
 from pretenders.server.maintain import launch_maintainer
 
 LOGGER = get_logger('pretenders.server.server')
