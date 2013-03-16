@@ -2,7 +2,7 @@ import json
 import time
 
 import bottle
-from bottle import delete, post, get, HTTPResponse
+from bottle import HTTPResponse
 
 try:
     from collections import OrderedDict
@@ -106,7 +106,7 @@ def clear_presets(uid):
     PRESETS[uid].clear()
 
 
-@get('/preset/<uid:int>')
+@app.get('/preset/<uid:int>')
 def list_presets(uid):
     presets = []
     for _, preset_list in PRESETS[uid].items():
