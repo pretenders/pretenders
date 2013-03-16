@@ -7,6 +7,7 @@ from nose.tools import assert_equals
 
 from pretenders.client.smtp import SMTPMock
 
+
 smtp_mock = SMTPMock('localhost', 8000)
 
 
@@ -21,7 +22,18 @@ def send_dummy_email(from_email='test@test.com',
     msg['From'] = from_email
     msg['To'] = to_email
 
-    s = smtplib.SMTP(smtp_mock.host, smtp_mock.pretend_port)
+    try:
+        s = smtplib.SMTP(smtp_mock.host, smtp_mock.pretend_port, timeout=10)
+    except smtplib.SMTPServerDisconnected:
+        # NOTE:
+        # If this happens, make sure that your VM can actually ping things out
+        # in the real world. I got this issue when I changed from wifi to
+        # eth and the VM wasn't able to see anything. I think in such cases the
+        # SMTP server cocks up.
+        print("Server disconnected. There may be a bug in running the "
+              "SMTP Mock server. Are you sure the boss managed to start "
+              "it?")
+        raise
     message = msg.as_string()
     s.sendmail(from_email, [to_email], message)
     s.quit()
@@ -43,7 +55,6 @@ def test_check_sent_email_content():
 
 
 def test_reset_works():
-    #raise SkipTest()
     smtp_mock.reset()
     send_dummy_email()
     assert_equals(1, len(smtp_mock.get_emails()))
@@ -53,7 +64,6 @@ def test_reset_works():
 
 
 def test_history_stores_multiple_emails():
-    #raise SkipTest()
     smtp_mock.reset()
     send_dummy_email()
     assert_equals(1, len(smtp_mock.get_emails()))

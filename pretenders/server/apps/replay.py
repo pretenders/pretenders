@@ -4,6 +4,7 @@ import bottle
 from bottle import post, HTTPResponse, route
 
 from pretenders.log import get_logger
+from pretenders.server import app
 from pretenders.server.apps import pretender
 from pretenders.server.apps.history import save_history
 from pretenders.server.apps.preset import preset_count, select_preset
@@ -27,7 +28,7 @@ def replay(uid, body):
     return selected
 
 
-@post('/replay/<uid:int>')
+@app.post('/replay/<uid:int>')
 def replay_smtp(uid):
     """
     Replay a previously recorded preset, and save the request in history.
@@ -46,7 +47,7 @@ def replay_smtp(uid):
     return selected.as_json()
 
 
-@route('/mockhttp/<uid:int><url:path>', method='ANY')
+@app.route('/mockhttp/<uid:int><url:path>', method='ANY')
 def replay_http(uid, url):
     """
     Replay a previously recorded preset, and save the request in history
@@ -67,7 +68,7 @@ def replay_http(uid, url):
     return preset.as_http_response(bottle.response)
 
 
-@route('/mockhttp/<name><url:path>', method='ANY')
+@app.route('/mockhttp/<name><url:path>', method='ANY')
 def replay_http_by_name(name, url):
     try:
         uid = HttpHandler().PRETENDER_NAME_UID[name]
