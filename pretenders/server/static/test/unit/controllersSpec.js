@@ -4,30 +4,28 @@
 
 /* jasmine specs for controllers go here */
 
-describe('Feature list controller', function () {
+describe('Http Mock list controller', function () {
     var scope, ctrl, $httpBackend;
 
-    beforeEach(module('deploystream.services'));
+    beforeEach(module('pretenders.services'));
 
     beforeEach(inject(function (_$httpBackend_, $rootScope, $controller) {
         $httpBackend = _$httpBackend_;
         $httpBackend
-            .expectGET('/features')
+            .expectGET('/http')
             .respond([
                 {
-                    project: 'deploystream',
-                    id: '1',
-                    title: 'First Feature'
+                    uid: '1',
+                    name: 'first_mock'
                 },
                 {
-                    project: 'deploystream',
-                    id: '2',
-                    title: 'Second Feature'
+                    uid: '2',
+                    name: 'second_mock'
                 }
             ]);
 
         scope = $rootScope.$new();
-        ctrl = $controller(FeatureListCtrl, {$scope: scope});
+        ctrl = $controller(HttpMockListCtrl, {$scope: scope});
     }));
 
 

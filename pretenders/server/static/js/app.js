@@ -13,8 +13,12 @@ angular.module('pretenders', [
             templateUrl: '/static/partials/home.html'
         });
         $routeProvider.when('/http', {
-            templateUrl: '/static/partials/http.html',
+            templateUrl: '/static/partials/mocks.html',
             controller: HttpMockListCtrl
+        });
+        $routeProvider.when('/smtp', {
+            templateUrl: '/static/partials/mocks.html',
+            controller: SmtpMockListCtrl
         });
     }]
 );

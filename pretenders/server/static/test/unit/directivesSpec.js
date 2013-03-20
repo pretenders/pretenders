@@ -4,7 +4,7 @@
 /* jasmine specs for directives go here */
 
 describe('directives', function () {
-    beforeEach(module('deploystream.directives'));
+    beforeEach(module('pretenders.directives'));
 
     describe('app-version', function () {
         it('should print current version', function () {

@@ -4,7 +4,7 @@
 /* jasmine specs for services go here */
 
 describe('service', function () {
-    beforeEach(module('deploystream.services'));
+    beforeEach(module('pretenders.services'));
 
 
     describe('version', function () {

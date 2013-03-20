@@ -4,7 +4,7 @@
 /* jasmine specs for filters go here */
 
 describe('filter', function () {
-    beforeEach(module('deploystream.filters'));
+    beforeEach(module('pretenders.filters'));
 
 
     describe('interpolate', function () {
