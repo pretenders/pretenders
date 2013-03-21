@@ -1,17 +1,9 @@
-// global HttpMock
 'use strict';
 
 /* Controllers */
 
 
-function HttpMockListCtrl($scope, Mock) {
-    $scope.mocks = Mock.query({mocktype:"http"});
-    $scope.name = 'HTTP';
+function MockListCtrl($scope, $routeParams, Mock) {
+    $scope.mocks = Mock.query({mocktype:$routeParams['type']});
+    $scope.name = $routeParams['type'];
 }
-
-function SmtpMockListCtrl($scope, Mock) {
-    $scope.mocks = Mock.query({mocktype:"smtp"});
-    $scope.name = 'SMTP';
-}
-
-//HttpMockListCtrl.$inject = [];

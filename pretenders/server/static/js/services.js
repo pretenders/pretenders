@@ -1,4 +1,3 @@
-// global angular
 'use strict';
 
 /* Services */
@@ -15,7 +14,7 @@ angular.module('pretenders.services', ['ngResource'])
             {
                 query: {
                     method: 'GET',
-                    params: {mockId: '',
+                    params: {mockId: '@uid',
                              mocktype: 'http'},
                     isArray: true
                 }

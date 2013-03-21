@@ -40,7 +40,6 @@ def list_pretenders(protocol):
     response = json.dumps(
             [pretender.as_dict()
              for pretender in get_pretenders(protocol).values()])
-    #response = json.dumps([{"start": "2013-03-21 18:11:06.716463", "last_call": "2013-03-21 18:11:09.189252", "uid": 1, "timeout": "0:02:00", "name": protocol}, {"start": "2013-03-21 18:11:06.748470", "last_call": "2013-03-21 18:11:06.748470", "uid": 2, "timeout": "0:02:00", "name": "None"}, {"start": "2013-03-21 18:11:09.104860", "last_call": "2013-03-21 18:11:09.104860", "uid": 4, "timeout": "0:02:00", "name": "None"}, {"start": "2013-03-21 18:11:09.107500", "last_call": "2013-03-21 18:11:09.125973", "uid": 5, "timeout": "0:02:00", "name": "None"}, {"start": "2013-03-21 18:11:09.110048", "last_call": "2013-03-21 18:11:09.128202", "uid": 6, "timeout": "0:02:00", "name": "None"}])
     return response
 
 
