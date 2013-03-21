@@ -19,13 +19,14 @@ def get_datetime_from_string(date_string):
 class PretenderModel(object):
     """Information related to a spawned pretender."""
 
-    def __init__(self, start, uid, timeout, last_call, name=None):
+    def __init__(self, start, uid, timeout, last_call, protocol, name=None):
         self.__dict__.update({
             'start': start,
             'uid': uid,
             'timeout': timeout,
             'last_call': last_call,
             'name': name,
+            'protocol': protocol,
         })
 
     def __str__(self):
@@ -49,7 +50,8 @@ class PretenderModel(object):
             'uid': self.uid,
             'timeout': str(self.timeout),
             'last_call': str(self.last_call),
-            'name': str(self.name)
+            'name': str(self.name),
+            'protocol': self.protocol
         }
 
     def as_json(self):
