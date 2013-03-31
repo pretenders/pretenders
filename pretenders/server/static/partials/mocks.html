@@ -1,22 +1,30 @@
 <h1>{{name | uppercase}} Mocks</h1>
-<table class="table table-hover" ng-cloak>
-    <thead>
-        <tr>
-            <th>id</th>
-            <th>name</th>
-            <th>start</th>
-            <th>last call</th>
-            <th>timeout</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr ng-repeat="mock in mocks">
-            <td>{{mock.uid}}</td>
-            <td>{{mock.name}}</td>
-            <td>{{mock.start}}</td>
-            <td>{{mock.last_call}}</td>
-            <td>{{mock.timeout}}</td>
-        </tr>
-    </tbody>
-</table>
-
+<div class="mocklist">
+    <table class="table table-hover" ng-cloak>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>start</th>
+                <th>last call</th>
+                <th>timeout</th>
+                <th>protocol</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="m in mocks">
+                <td><a href="" ng-click="selectMock(m)">{{m.uid}}</a></td>
+                <td>{{m.name}}</td>
+                <td>{{m.start}}</td>
+                <td>{{m.last_call}}</td>
+                <td>{{m.timeout}}</td>
+                <td>{{m.protocol}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="details" ng-show="mock">
+    MOCK HISTORY AND PRESETS: {{mock.uid}}
+    <h2>History</h2>
+    <h2>Presets</h2>
+</div>

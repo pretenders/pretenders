@@ -9,17 +9,19 @@ angular.module('pretenders.services', ['ngResource'])
     .value('version', '0.1')
     .factory('Mock', function ($resource) {
         var Mock = $resource(
-            '/:mocktype/:mockId',
+            '/:protocol/:mock_id',
             {},
             {
-                query: {
-                    method: 'GET',
-                    params: {mockId: '@uid',
-                             mocktype: 'http'},
-                    isArray: true
-                }
+                // all: {
+                //     method: 'GET',
+                //     params: {protocol: '@protocol'},
+                //     isArray: true
+                // },
+                // get: { method: 'GET' }
+                //     params: {mock_id: '@uid',
+                //              protocol: '@protocol'}
+                // }
             });
-
 
         Mock.prototype.get_history = function() {
 
