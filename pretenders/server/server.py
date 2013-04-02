@@ -15,7 +15,7 @@ def run(host='localhost', port=8000):
     if in_parent_process():
         if settings.RUN_MAINTAINER:
             LOGGER.debug('Starting maintainer process')
-            #launch_maintainer()
+            launch_maintainer()
         save_pid_file('pretenders-boss.pid')
 
     bottle.run(app=pretender_app, host=host, port=port, reloader=True)

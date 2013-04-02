@@ -6,7 +6,9 @@
 angular.module('pretenders', [
         'pretenders.filters',
         'pretenders.services',
-        'pretenders.directives'
+        'pretenders.directives',
+        'history',
+        'preset'
     ])
 .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.

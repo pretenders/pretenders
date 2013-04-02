@@ -24,7 +24,47 @@
     </table>
 </div>
 <div class="details" ng-show="mock">
-    MOCK HISTORY AND PRESETS: {{mock.uid}}
-    <h2>History</h2>
-    <h2>Presets</h2>
+    <h2>{{mock.protocol | uppercase}} Mock {{mock.uid}}</h2>
+    <h3>History</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>URL</th>
+                <th>Headers</th>
+                <th>Body</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="h in mock.get_history()">
+                <td>{{h.method}}</td>
+                <td>{{h.url}}</td>
+                <td>{{h.headers}}</td>
+                <td>{{h.body}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Presets</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Headers</th>
+                <th>Rule</th>
+                <th>Body</th>
+                <th>Status</th>
+                <th>After</th>
+                <th>Times</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="h in mock.get_presets()">
+                <td>{{h.headers}}</td>
+                <td>{{h.rule.rule}}</td>
+                <td>{{h.body}}</td>
+                <td>{{h.status}}</td>
+                <td>{{h.after}}</td>
+                <td>{{h.times}}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>
