@@ -1,0 +1,7 @@
+-r runtime.txt
+
+nose
+pep8
+Sphinx
+mock
+requests

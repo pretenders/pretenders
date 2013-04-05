@@ -19,13 +19,14 @@ def get_datetime_from_string(date_string):
 class PretenderModel(object):
     """Information related to a spawned pretender."""
 
-    def __init__(self, start, uid, timeout, last_call, name=None):
+    def __init__(self, start, uid, timeout, last_call, protocol, name=None):
         self.__dict__.update({
             'start': start,
             'uid': uid,
             'timeout': timeout,
             'last_call': last_call,
             'name': name,
+            'protocol': protocol,
         })
 
     def __str__(self):
@@ -43,16 +44,19 @@ class PretenderModel(object):
         data['timeout'] = get_timedelta_from_string(data['timeout'])
         return cls(**data)
 
-    def as_json(self):
-        """Convert to JSON."""
-        json_data = {
+    def as_dict(self):
+        return {
             'start': str(self.start),
             'uid': self.uid,
             'timeout': str(self.timeout),
             'last_call': str(self.last_call),
-            'name': str(self.name)
+            'name': str(self.name),
+            'protocol': self.protocol
         }
-        return json.dumps(json_data)
+
+    def as_json(self):
+        """Convert to JSON."""
+        return json.dumps(self.as_dict())
 
     def keep_alive(self):
         "Refresh the last_call date to keep this server up"
