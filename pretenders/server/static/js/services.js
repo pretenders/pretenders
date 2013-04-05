@@ -3,7 +3,7 @@
 /* Services */
 
 
-angular.module('history', ['ngResource']).factory('History', function($resource){
+angular.module('pretenders.history', ['ngResource']).factory('History', function($resource){
         var History = $resource(
             '/history/:uid',
             {},
@@ -13,7 +13,7 @@ angular.module('history', ['ngResource']).factory('History', function($resource)
         return History;
 });
 
-angular.module('preset', ['ngResource']).factory('Preset', function($resource){
+angular.module('pretenders.preset', ['ngResource']).factory('Preset', function($resource){
         var Preset = $resource(
             '/preset/:uid',
             {},
@@ -32,29 +32,20 @@ angular.module('pretenders.services', ['ngResource'])
         var Mock = $resource(
             '/:protocol/:mock_id',
             {},
-            {
-                // all: {
-                //     method: 'GET',
-                //     params: {protocol: '@protocol'},
-                //     isArray: true
-                // },
-                // get: { method: 'GET' }
-                //     params: {mock_id: '@uid',
-                //              protocol: '@protocol'}
-                // }
-            });
+            {}
+        );
         var _history = null;
         var _presets = null;
 
         Mock.prototype.get_history = function() {
-            if (!this._history){
+            if (!this._history && this.uid){
                 this._history = History.query({'uid': this.uid});
             }
             return this._history;
         };
 
         Mock.prototype.get_presets = function() {
-            if (!this._presets){
+            if (!this._presets && this.uid){
                 this._presets = Preset.query({'uid': this.uid});
             }
             return this._presets;
