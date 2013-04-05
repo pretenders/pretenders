@@ -2,3 +2,4 @@ nose
 pep8
 Sphinx
 mock
+requests
