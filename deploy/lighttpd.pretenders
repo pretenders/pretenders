@@ -1,0 +1,22 @@
+# Serve bottle app via fast cgi
+
+$HTTP["host"] =~ "^pretenders\.txels\.com$" {
+    fastcgi.server = ("/pretenders.fcgi" =>
+        ((
+            "socket" => env.HOME + "/srv/pretenders/pretenders.sock",
+            "bin-path" => env.HOME + "/srv/pretenders/deploy/pretenders.fcgi",
+            "check-local" => "disable",
+            "max-procs" => 1
+        ))
+    )
+
+    alias.url = (
+        "/static" => env.HOME + "/srv/pretenders/pretenders/server/static",
+    )
+
+    url.rewrite-once = (
+        "^(/static($|/.*))$" => "$1",
+        # "^/favicon\.ico$" => "/media/favicon.ico",
+        "^(/.*)$" => "/pretenders.fcgi$1",
+    )
+}
