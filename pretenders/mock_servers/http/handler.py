@@ -10,7 +10,7 @@ LOGGER = get_logger('pretenders.http.handler')
 class HTTPPretenderModel(PretenderModel):
 
     def __init__(self, path, **kwargs):
-        super(HTTPPretenderModel, self).__init__(**kwargs)
+        super(HTTPPretenderModel, self).__init__(protocol='http', **kwargs)
         self.path = path
 
 
