@@ -15,11 +15,11 @@ def test_get_mock_server_by_name():
 
     # Perform a post from a pretend application
     fake_client = get_fake_client(http_mock)
-    response = fake_client.post(url='/someplace', body="anything".encode())
+    response, data = fake_client.post(url='/someplace', body="anything".encode())
 
     # check the app would receive back the response from the rule we set up.
     assert_equals(response.status, 200)
-    assert_equals(response.read(), b'something interesting')
+    assert_equals(data, b'something interesting')
 
     # finally, check that we can look at the history via the http_mock.
     req = http_mock.get_request(0)

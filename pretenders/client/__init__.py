@@ -25,7 +25,8 @@ class APIHelper(object):
 
     def http(self, method, *args, **kwargs):
         self.connection.request(method=method, *args, **kwargs)
-        return self.connection.getresponse()
+        response = self.connection.getresponse()
+        return response, response.read()
 
     def get(self, id):
         return self.http('GET', url='{0}/{1}'.format(self.path, id))
@@ -57,9 +58,10 @@ class PresetHelper(APIHelper):
             after=after
         )
 
-        response = self.http('POST', url=self.path, body=new_preset.as_json())
+        response, data = self.http('POST', url=self.path,
+                                   body=new_preset.as_json())
         if response.status != 200:
-            raise ConfigurationError(response.read().decode())
+            raise ConfigurationError(data.decode())
         return response
 
 
@@ -85,12 +87,14 @@ class BossClient(object):
         else:
             self.pretender_details = {}
 
-        self.history = APIHelper(self.connection,
-                                 '/history/{0}'.format(
-                                            self.pretend_access_point_id))
-        self.preset = PresetHelper(self.connection,
-                                   '/preset/{0}'.format(
-                                            self.pretend_access_point_id))
+        self.history = APIHelper(
+            self.connection,
+            '/history/{0}'.format(self.pretend_access_point_id)
+        )
+        self.preset = PresetHelper(
+            self.connection,
+            '/preset/{0}'.format(self.pretend_access_point_id)
+        )
 
     def reset(self):
         """
@@ -129,13 +133,11 @@ class BossClient(object):
 
         post_body = json.dumps(post_body)
 
-        response = self.boss_access.http('POST',
-                                         url=self.create_mock_url,
-                                         body=post_body)
-        pretender_json = response.read().decode('ascii')
-
+        response, data = self.boss_access.http('POST',
+                                               url=self.create_mock_url,
+                                               body=post_body)
+        pretender_json = data.decode('ascii')
         pretender_details = json.loads(pretender_json)
-
         return pretender_details
 
     @property
@@ -145,7 +147,7 @@ class BossClient(object):
 
     def delete_mock(self):
         "Delete the mock server that this points to."
-        response = self.boss_access.http(
+        response, data = self.boss_access.http(
             method="DELETE",
             url=self.delete_mock_url)
         if not response.status == 200:
@@ -153,13 +155,13 @@ class BossClient(object):
 
     def get_pretender(self):
         "Get pretenders from the server in dict format"
-        response = self.boss_access.http(
+        response, data = self.boss_access.http(
             method='GET',
             url='/{0}/{1}'.format(self.boss_mock_type,
                                   self.pretend_access_point_id),
         )
         if response.status == 200:
-            return PretenderModel.from_json_response(response)
+            return PretenderModel.from_json_response(data)
         elif response.status == 404:
             raise ResourceNotFound(
                     'The mock server for this client was shutdown.')

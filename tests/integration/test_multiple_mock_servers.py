@@ -7,9 +7,10 @@ from . import get_fake_client
 http_mock = HTTPMock('localhost', 8000)
 
 
-def assert_response_equal(response, body, status):
+def assert_response_equal(http_response, body, status):
+    response, data = http_response
     assert_equals(response.status, status)
-    assert_equals(response.read(), body)
+    assert_equals(data, body)
 
 
 def test_multiple_mock_servers_only_see_their_presets_and_history():
