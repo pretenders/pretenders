@@ -161,7 +161,7 @@ class BossClient(object):
                                   self.pretend_access_point_id),
         )
         if response.status == 200:
-            return PretenderModel.from_json_response(response)
+            return PretenderModel.from_json_response(data)
         elif response.status == 404:
             raise ResourceNotFound(
                     'The mock server for this client was shutdown.')

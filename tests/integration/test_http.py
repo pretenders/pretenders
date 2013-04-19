@@ -23,9 +23,9 @@ def test_configure_request_and_check_values():
     "Requires a running pretender.http.server instance"
     http_mock.reset()
     add_test_preset()
-    response = fake_client.post(url='/fred/test/one')
+    response, data = fake_client.post(url='/fred/test/one')
     assert_equals(response.status, 200)
-    assert_equals(response.read(), b'You tested fred well')
+    assert_equals(data, b'You tested fred well')
 
     request = http_mock.get_request(0)
 
@@ -39,7 +39,7 @@ def test_perform_wrong_method_on_configured_url():
     http_mock.reset()
     add_test_preset()
 
-    response = fake_client.get(url='/fred/test/another')
+    response, data = fake_client.get(url='/fred/test/another')
     assert_equals(response.status, 404)
 
     historical_call = http_mock.get_request(0)
@@ -52,7 +52,7 @@ def test_perform_wrong_method_on_configured_url():
 def test_url_query_string():
     http_mock.reset()
     add_test_preset()
-    response = fake_client.get(url='/test/two?a=1&b=2')
+    response, data = fake_client.get(url='/test/two?a=1&b=2')
     assert_equals(response.status, 404)
 
     historical_call = http_mock.get_request(0)
@@ -64,7 +64,7 @@ def test_url_query_string():
 def test_reset_results_in_subsequent_404():
     "Expect a 404 after resetting the client"
     http_mock.reset()
-    response = fake_client.post(url='/fred/test/one', )
+    response, data = fake_client.post(url='/fred/test/one', )
     assert_equals(response.status, 404)
 
 
@@ -85,11 +85,11 @@ def test_configure_multiple_rules_independent():
                                  ('/test_400', 400),
                                  ('/test_500', 500),
                                  ('/test_410', 410)]:
-        response = fake_client.get(url=url)
+        response, data = fake_client.get(url=url)
         assert_equals(response.status, expected_status)
 
     # Do one more to show that it'll always be 404 from here on in:
-    response = fake_client.post(url='/test_200')
+    response, data = fake_client.post(url='/test_200')
     assert_equals(response.status, 404)
 
 
@@ -108,7 +108,7 @@ def test_configure_multiple_rules_url_match():
                                  ('/test_500', 500),
                                  ('/test_500', 404),
                                  ('/test_410', 410)]:
-        response = fake_client.get(url=url)
+        response, data = fake_client.get(url=url)
         assert_equals(response.status, expected_status)
 
 
@@ -145,24 +145,24 @@ def test_method_matching():
         b'You tested a PUT or a POST',  203)
 
     # Only GET works when GET matched
-    assert_equals(404, fake_client.post(url="/test_get").status)
-    assert_equals(200, fake_client.get(url="/test_get").status)
-    assert_equals(404, fake_client.get(url="/test_get").status)
+    assert_equals(404, fake_client.post(url="/test_get")[0].status)
+    assert_equals(200, fake_client.get(url="/test_get")[0].status)
+    assert_equals(404, fake_client.get(url="/test_get")[0].status)
 
     # Only POST works when POST matched
-    assert_equals(404, fake_client.get(url="/test_post").status)
-    assert_equals(201, fake_client.post(url="/test_post").status)
-    assert_equals(404, fake_client.post(url="/test_post").status)
+    assert_equals(404, fake_client.get(url="/test_post")[0].status)
+    assert_equals(201, fake_client.post(url="/test_post")[0].status)
+    assert_equals(404, fake_client.post(url="/test_post")[0].status)
 
     # Any method works with .* as the method matched
-    assert_equals(202, fake_client.get(url="/test_star").status)
-    assert_equals(202, fake_client.post(url="/test_star").status)
-    assert_equals(404, fake_client.post(url="/test_star").status)
+    assert_equals(202, fake_client.get(url="/test_star")[0].status)
+    assert_equals(202, fake_client.post(url="/test_star")[0].status)
+    assert_equals(404, fake_client.post(url="/test_star")[0].status)
 
     # PUT or POST work with (PUT|POST) as the method matched
-    assert_equals(404, fake_client.get(url="/test_put_or_post").status)
-    assert_equals(203, fake_client.post(url="/test_put_or_post").status)
-    assert_equals(404, fake_client.post(url="/test_put_or_post").status)
+    assert_equals(404, fake_client.get(url="/test_put_or_post")[0].status)
+    assert_equals(203, fake_client.post(url="/test_put_or_post")[0].status)
+    assert_equals(404, fake_client.post(url="/test_put_or_post")[0].status)
 
 
 def test_multiple_responses_for_a_url():
@@ -179,7 +179,7 @@ def test_multiple_responses_for_a_url():
                                  ('/test_url_pattern_2', 201),
                                  ('/test_url_pattern', 404),
                                  ('/test_url_pattern_2', 404)]:
-        response = fake_client.get(url=url)
+        response, data = fake_client.get(url=url)
         assert_equals(response.status, expected_status)
 
 
@@ -196,7 +196,7 @@ def test_regular_expression_matching():
                                  ('/something/13Fdr', 200),
                                  ('/something/1', 200),
                                  ('/something/Aaaa', 404)]:
-        response = fake_client.get(url=url)
+        response, data = fake_client.get(url=url)
         assert_equals(response.status, expected_status)
 
 
@@ -204,10 +204,10 @@ def test_blank_url_matches_anything():
     "A blank url matcher header matches any url"
     http_mock.reset()
     http_mock.when('POST').reply(status=200)
-    response = fake_client.post(url='/some/strange/12121/string')
+    response, data = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 200)
     # Check subsequent call 404s
-    response = fake_client.post(url='/some/strange/12121/string')
+    response, data = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 404)
 
 
@@ -216,7 +216,7 @@ def test_setup_reply_multiple_times():
     http_mock.reset()
     http_mock.when('POST').reply(status=202, times=3)
     for expected_status in [202, 202, 202, 404]:
-        response = fake_client.post(url='/some/strange/12121/string')
+        response, data = fake_client.post(url='/some/strange/12121/string')
         assert_equals(response.status, expected_status)
 
 
@@ -229,7 +229,7 @@ def test_setup_reply_forever():
     http_mock.reset()
     http_mock.when('POST').reply(status=202, times=FOREVER)
     for _ in range(10):
-        response = fake_client.post(url='/some/strange/12121/string')
+        response, data = fake_client.post(url='/some/strange/12121/string')
         assert_equals(response.status, 202)
 
 
@@ -247,7 +247,7 @@ def test_missing_method_and_url_matches_anything():
     "Missing matcher headers match anything"
     http_mock.reset()
     http_mock.reply(b'Hello', 323)
-    response = fake_client.post(url='/some/strange/12121/string')
+    response, data = fake_client.post(url='/some/strange/12121/string')
     assert_equals(response.status, 323)
 
 
@@ -277,12 +277,12 @@ def test_multiple_http_mocks_independently_served():
     http_mock_2.when('GET /test_mock2_get').reply(b'You tested a get', 200,
                                                   times=FOREVER)
 
-    assert_equals(201, fake_client_1.get(url="/test_mock1_get").status)
-    assert_equals(200, fake_client_2.get(url="/test_mock2_get").status)
+    assert_equals(201, fake_client_1.get(url="/test_mock1_get")[0].status)
+    assert_equals(200, fake_client_2.get(url="/test_mock2_get")[0].status)
 
     # Check that they both 404 if used against the other url.
-    assert_equals(404, fake_client_1.get(url="/test_mock2_get").status)
-    assert_equals(404, fake_client_2.get(url="/test_mock1_get").status)
+    assert_equals(404, fake_client_1.get(url="/test_mock2_get")[0].status)
+    assert_equals(404, fake_client_2.get(url="/test_mock1_get")[0].status)
 
 
 def test_header_matching_with_no_match_headers():
@@ -294,7 +294,7 @@ def test_header_matching_with_no_match_headers():
     http_mock.when('GET /test-headers',
                    headers={'Another-Header': 'A'}).reply(b'', status=500)
 
-    response = fake_client.get(url='/test-headers')
+    response, data = fake_client.get(url='/test-headers')
 
     assert_equals(response.status, 200)
 
@@ -308,7 +308,7 @@ def test_header_matching_with_match_headers():
                    headers={'Another-Header': 'A'}).reply(b'', status=200)
     http_mock.when('GET /test-headers').reply(b'', status=400)
 
-    response = fake_client.get(url='/test-headers',
+    response, data = fake_client.get(url='/test-headers',
                                headers={'Another-Header': 'A'})
 
     assert_equals(response.status, 200)
@@ -324,18 +324,18 @@ def test_etag_workflow():
         b'Test etag', status=200, headers={'Etag': 'A12345'}, times=FOREVER)
 
     # Requests without headers return an Etag header.
-    response = fake_client.get(url='/test-etag')
+    response, data = fake_client.get(url='/test-etag')
     assert_equals(response.status, 200)
     assert_equals(response.getheader('Etag', None), 'A12345')
 
     # Requests using the Etag header from above in the If-None-Match header
     # receive a 304 Not Modified response
-    response = fake_client.get(url='/test-etag',
+    response, data = fake_client.get(url='/test-etag',
                                headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
 
     # ... and will continue to receive 304 responses.
-    response = fake_client.get(url='/test-etag',
+    response, data = fake_client.get(url='/test-etag',
                                headers={'If-None-Match': 'A12345'})
     assert_equals(response.status, 304)
 
