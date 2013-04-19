@@ -34,11 +34,11 @@ class PretenderModel(object):
                 self.uid, self.last_call, self.timeout, self.name)
 
     @classmethod
-    def from_json_response(cls, response):
+    def from_json_response(cls, response_data):
         """
         Create an instance from the body of a JSON response.
         """
-        data = json.loads(response.read().decode('ascii'))
+        data = json.loads(response_data.decode('ascii'))
         data['start'] = get_datetime_from_string(data['start'])
         data['last_call'] = get_datetime_from_string(data['last_call'])
         data['timeout'] = get_timedelta_from_string(data['timeout'])
