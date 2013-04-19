@@ -90,7 +90,7 @@ class HTTPMock(BossClient):
                 return JsonHelper.from_http_request(
                                         self.history.get(sequence_id))
             else:
-                json_data = self.history.list().read()
+                response, json_data = self.history.list()
                 content = json_data.decode('ascii')
                 data = json.loads(content)
                 historical = []

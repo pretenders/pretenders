@@ -21,15 +21,14 @@ class SMTPMock(BossClient):
         return self.pretender_details['full_host']
 
     def get_emails(self):
-        history = self.history.list().read()
+        history_resp, history = self.history.list()
         converted_history = json.loads(history.decode('ascii'))
         return [SMTPSerialiser(**dict_info) for dict_info in converted_history]
 
     def get_email(self, sequence_id):
-        history_rep = self.history.get(sequence_id)
-        if history_rep.status == 404:
+        history_resp, history = self.history.get(sequence_id)
+        if history_resp.status == 404:
             return None
-        history = history_rep.read()
         email = SMTPSerialiser(**json.loads(history.decode('ascii')))
         return email
 
