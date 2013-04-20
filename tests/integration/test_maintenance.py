@@ -14,7 +14,7 @@ def test_clear_down_of_stale_mock_servers_taking_place():
     http_mock = HTTPMock('localhost', 8000, timeout=5)
     pretender = http_mock.get_pretender()
 
-    assert_equal(http_mock.pretend_access_point_id, pretender.uid)
+    assert_equal(http_mock.pretend_access_point_id, pretender.name)
 
     # Sleep for enough time for the maintainer to have run and killed the
     # process. which means the total of STALE_DELETE_FREQUENCY + timeout
@@ -45,9 +45,7 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
 
         # Make a call to the mock server.
         pretender_client = get_fake_client(http_mock)
-        pretender_client.get(
-            url="/some_url"
-        )
+        pretender_client.get(url="/some_url")
 
 
 def test_clear_down_removes_history():
@@ -56,10 +54,11 @@ def test_clear_down_removes_history():
     http_mock = HTTPMock('localhost', 8000, timeout=5)
     pretender = http_mock.get_pretender()
     pretender_client = get_fake_client(http_mock)
-    pretender_client.get(
-            url="/some_url"
-        )
+
+    pretender_client.get(url="/some_url")
+
     assert_equal(http_mock.get_request(0).url, '/some_url')
+
     time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout_in_secs + 1)
     assert_raises(ResourceNotFound, http_mock.get_pretender)
     # Check that there is no history now!

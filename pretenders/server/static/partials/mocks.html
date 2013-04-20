@@ -3,7 +3,6 @@
     <table class="table table-hover" ng-cloak>
         <thead>
             <tr>
-                <th>id</th>
                 <th>name</th>
                 <th>start</th>
                 <th>last call</th>
@@ -13,8 +12,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="m in mocks">
-                <td><a href="/#/{{m.protocol}}/{{m.uid}}">{{m.uid}}</a></td>
-                <td>{{m.name}}</td>
+                <td><a href="/#/{{m.protocol}}/{{m.name}}">{{m.name}}</a></td>
                 <td>{{m.start}}</td>
                 <td>{{m.last_call}}</td>
                 <td>{{m.timeout}}</td>
@@ -24,7 +22,7 @@
     </table>
 </div>
 <div class="details" ng-show="mock">
-    <h2>{{mock.protocol | uppercase}} Mock {{mock.uid}}</h2>
+    <h2>{{mock.protocol | uppercase}} Mock {{mock.name}}</h2>
     <h3>History</h3>
     <table class="table">
         <thead>
