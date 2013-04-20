@@ -79,7 +79,7 @@ def knock_off_preset(preset_dict, key):
             del preset_dict[key]
 
 
-@app.post('/preset/<uid:int>')
+@app.post('/preset/<uid>')
 def add_preset(uid):
     """
     Save the incoming request body as a preset response
@@ -98,7 +98,7 @@ def add_preset(uid):
     url_presets.append(preset)
 
 
-@app.delete('/preset/<uid:int>')
+@app.delete('/preset/<uid>')
 def clear_presets(uid):
     """
     Delete all recorded presets
@@ -106,7 +106,7 @@ def clear_presets(uid):
     PRESETS[uid].clear()
 
 
-@app.get('/preset/<uid:int>')
+@app.get('/preset/<uid>')
 def list_presets(uid):
     presets = []
     for _, preset_list in PRESETS[uid].items():

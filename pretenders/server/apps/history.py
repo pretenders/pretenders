@@ -17,7 +17,7 @@ def save_history(uid, request):
     HISTORY[uid].append(request)
 
 
-@app.get('/history/<uid:int>/<ordinal:int>')
+@app.get('/history/<uid>/<ordinal:int>')
 def get_history(uid, ordinal):
     """
     Access requests issued to the mock server
@@ -30,7 +30,7 @@ def get_history(uid, ordinal):
         LOGGER.exception('Unexpected exception')
 
 
-@app.get('/history/<uid:int>')
+@app.get('/history/<uid>')
 def get_all_history(uid):
     """
     Access all requests issued to the mock server
@@ -41,7 +41,7 @@ def get_all_history(uid):
         LOGGER.exception('Unexpected exception')
 
 
-@app.delete('/history/<uid:int>')
+@app.delete('/history/<uid>')
 def clear_history(uid):
     """
     Delete all recorded requests

@@ -1,5 +1,6 @@
 import datetime
 import json
+from uuid import uuid4
 
 import bottle
 from bottle import HTTPResponse
@@ -13,7 +14,6 @@ from pretenders.server.apps import history
 
 
 LOGGER = get_logger('pretenders.server.apps.pretender')
-UID_COUNTER = 0
 
 HANDLERS = {
     'http': HttpHandler(),
@@ -37,13 +37,13 @@ def keep_alive(protocol, uid):
 
 @app.get('/<protocol:re:(http|smtp)>')
 def list_pretenders(protocol):
-    response = json.dumps(
-            [pretender.as_dict()
-             for pretender in get_pretenders(protocol).values()])
+    response = json.dumps([
+        pretender.as_dict() for pretender in get_pretenders(protocol).values()
+    ])
     return response
 
 
-@app.get('/<protocol:re:(http|smtp)>/<uid:int>')
+@app.get('/<protocol:re:(http|smtp)>/<uid>')
 def pretender_get(protocol, uid):
     """
     Get details for a given pretender, defined by protocol and UID
@@ -61,7 +61,7 @@ def create_pretender(protocol):
     """
     Client is requesting a mock instance for the given protocol.
 
-    Generate a new UID for the pretender.
+    Use the provided name, or else generate a random UUID for the pretender.
     Return the location of the pretender instance.
 
     Instance creation is protocol-dependent. For HTTP the same boss
@@ -69,21 +69,18 @@ def create_pretender(protocol):
     protocols, new processes may be spawn and listen on different
     ports.
     """
-    global UID_COUNTER
-    UID_COUNTER += 1
-    uid = UID_COUNTER
-
     post_body = bottle.request.body.read().decode('ascii')
     body_data = json.loads(post_body)
+    name = body_data.get('name') or str(uuid4())
+
     timeout = body_data.get('pretender_timeout', settings.TIMEOUT_PRETENDER)
-    name = body_data.get('name')
-    LOGGER.info("Creating {0} pretender access point at {1} (name: {2}) {3}"
-                .format(protocol, uid, name, timeout))
+    LOGGER.info("Creating {0} pretender access point at {1} {2}"
+                .format(protocol, name, timeout))
 
-    return HANDLERS[protocol].get_or_create_pretender(uid, timeout, name)
+    return HANDLERS[protocol].get_or_create_pretender(name, timeout)
 
 
-@app.delete('/<protocol:re:(http|smtp)>/<uid:int>')
+@app.delete('/<protocol:re:(http|smtp)>/<uid>')
 def delete_mock(protocol, uid):
     "Delete http mock servers"
     LOGGER.info("Performing delete on {0} pretender {1}"
