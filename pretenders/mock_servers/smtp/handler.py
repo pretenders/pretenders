@@ -21,9 +21,9 @@ LOGGER = get_logger('pretenders.mock_servers.smtp.handler')
 
 class SMTPPretenderModel(PretenderModel):
 
-    def __init__(self, start, uid, timeout, last_call, port, pid):
+    def __init__(self, start, name, timeout, last_call, port, pid):
         super(SMTPPretenderModel, self).__init__(
-            start, uid, timeout, last_call, protocol='smtp'
+            start, name, timeout, last_call, protocol='smtp'
         )
         self.__dict__.update({
             'port': port,
@@ -43,7 +43,7 @@ class SmtpHandler(object):
         available_set = PRETEND_PORT_RANGE.difference(ports_in_use)
         return available_set
 
-    def get_or_create_pretender(self, uid, timeout, name):
+    def get_or_create_pretender(self, name, timeout):
         """
         Launch a new SMTP pretender in a separate process.
 
@@ -60,8 +60,8 @@ class SmtpHandler(object):
                 "-H", "localhost",
                 "-p", str(port_number),
                 "-b", str(data.BOSS_PORT),
-                "-i", str(uid),
-                ])
+                "-i", str(name),
+            ])
             time.sleep(2)  # Wait this long for failure
             process.poll()
             if process.returncode == RETURN_CODE_PORT_IN_USE:
@@ -69,28 +69,28 @@ class SmtpHandler(object):
                             "Assuming failed due to socket error.")
                 continue
             start = datetime.datetime.now()
-            self.PRETENDERS[uid] = SMTPPretenderModel(
+            self.PRETENDERS[name] = SMTPPretenderModel(
+                name=name,
                 start=start,
                 port=port_number,
                 pid=process.pid,
                 timeout=datetime.timedelta(seconds=timeout),
                 last_call=start,
-                uid=uid,
             )
-            LOGGER.info("Started smtp pretender on port {0}. uid {1}. pid {2}"
-                        .format(port_number, uid, process.pid))
+            LOGGER.info("Started smtp pretender on port {0}. name {1}. pid {2}"
+                        .format(port_number, name, process.pid))
             return json.dumps({
                 'full_host': "localhost:{0}".format(port_number),
-                'id': uid})
+                'id': name})
         raise NoPortAvailableException("All ports in range in use")
 
-    def delete_pretender(self, uid):
-        "Delete a pretender by ``uid``"
-        LOGGER.info("Performing delete on {0}".format(uid))
-        pid = self.PRETENDERS[uid].pid
+    def delete_pretender(self, name):
+        "Delete a pretender by ``name``"
+        LOGGER.info("Performing delete on {0}".format(name))
+        pid = self.PRETENDERS[name].pid
         LOGGER.info("attempting to kill pid {0}".format(pid))
         try:
             os.kill(pid, signal.SIGKILL)
-            del self.PRETENDERS[uid]
+            del self.PRETENDERS[name]
         except OSError as e:
             LOGGER.info("OSError while killing:\n{0}".format(dir(e)))

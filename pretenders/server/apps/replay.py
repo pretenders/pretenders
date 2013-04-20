@@ -1,7 +1,7 @@
 import json
 
 import bottle
-from bottle import post, HTTPResponse, route
+from bottle import HTTPResponse
 
 from pretenders.log import get_logger
 from pretenders.server import app
@@ -9,7 +9,6 @@ from pretenders.server.apps import pretender
 from pretenders.server.apps.history import save_history
 from pretenders.server.apps.preset import preset_count, select_preset
 from pretenders.mock_servers.http import Preset, RequestSerialiser
-from pretenders.mock_servers.http.handler import HttpHandler
 
 
 LOGGER = get_logger('pretenders.server.apps.replay')
@@ -28,7 +27,7 @@ def replay(uid, body):
     return selected
 
 
-@app.post('/replay/<uid:int>')
+@app.post('/replay/<uid>')
 def replay_smtp(uid):
     """
     Replay a previously recorded preset, and save the request in history.
@@ -47,7 +46,7 @@ def replay_smtp(uid):
     return selected.as_json()
 
 
-@app.route('/mockhttp/<uid:int><url:path>', method='ANY')
+@app.route('/mockhttp/<uid><url:path>', method='ANY')
 def replay_http(uid, url):
     """
     Replay a previously recorded preset, and save the request in history
@@ -66,14 +65,3 @@ def replay_http(uid, url):
     # So the above works, but it looks ugly - ideally we'd handle both in
     # Preset constructor.
     return preset.as_http_response(bottle.response)
-
-
-@app.route('/mockhttp/<name><url:path>', method='ANY')
-def replay_http_by_name(name, url):
-    try:
-        uid = HttpHandler().PRETENDER_NAME_UID[name]
-    except KeyError:
-        raise HTTPResponse("No matching mock by that name '{0}"
-                           .format(name).encode(),
-                           status=404)
-    return replay_http(uid, url)

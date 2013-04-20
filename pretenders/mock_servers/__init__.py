@@ -19,10 +19,9 @@ def get_datetime_from_string(date_string):
 class PretenderModel(object):
     """Information related to a spawned pretender."""
 
-    def __init__(self, start, uid, timeout, last_call, protocol, name=None):
+    def __init__(self, start, name, timeout, last_call, protocol):
         self.__dict__.update({
             'start': start,
-            'uid': uid,
             'timeout': timeout,
             'last_call': last_call,
             'name': name,
@@ -30,8 +29,10 @@ class PretenderModel(object):
         })
 
     def __str__(self):
-        return "UID: {0}, last_call: {1}, timeout: {2}, name: {3}".format(
-                self.uid, self.last_call, self.timeout, self.name)
+        return (
+            "Name: {name}, last_call: {last_call}, timeout: {timeout}".format(
+                **self.__dict__)
+        )
 
     @classmethod
     def from_json_response(cls, response_data):
@@ -47,7 +48,6 @@ class PretenderModel(object):
     def as_dict(self):
         return {
             'start': str(self.start),
-            'uid': self.uid,
             'timeout': str(self.timeout),
             'last_call': str(self.last_call),
             'name': str(self.name),
