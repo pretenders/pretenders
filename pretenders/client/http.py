@@ -53,6 +53,19 @@ class HTTPMock(BossClient):
     def pretend_access_path(self):
         return self.pretender_details['path']
 
+    @property
+    def pretend_url(self):
+        """
+        The full URL of the pretend server.
+        """
+        if self.port == 80:
+            full_host = self.host
+        else:
+            full_host == "{0}:{1}".format(self.host, self.port)
+        return "http://{0}{1}".format(
+            full_host, self.pretend_access_path
+        )
+
     def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
@@ -87,8 +100,8 @@ class HTTPMock(BossClient):
         """
         try:
             if sequence_id is not None:
-                return JsonHelper.from_http_request(
-                                        self.history.get(sequence_id))
+                historical = self.history.get(sequence_id)
+                return JsonHelper.from_http_request(historical)
             else:
                 response, json_data = self.history.list()
                 content = json_data.decode('ascii')
