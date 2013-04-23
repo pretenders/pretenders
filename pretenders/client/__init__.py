@@ -1,9 +1,9 @@
 import json
 try:
-    from http.client import HTTPConnection
+    from http import client as httplib
 except ImportError:
-    # Python2.6/2.7
-    from httplib import HTTPConnection
+    # Python 2.6/2.7
+    import httplib
 
 import urllib
 
@@ -23,9 +23,25 @@ class APIHelper(object):
         self.connection = connection
         self.path = path
 
-    def http(self, method, *args, **kwargs):
+    def _get_response(self, method, *args, **kwargs):
         self.connection.request(method=method, *args, **kwargs)
-        response = self.connection.getresponse()
+        return self.connection.getresponse()
+
+    def http(self, method, *args, **kwargs):
+        """
+        Issue an HTTP request.
+
+        The HTTP connection is reused between requests. We try to detect
+        dropped connections, and in those cases try to reconnect to the remote
+        server.
+        """
+        try:
+            response = self._get_response(method, *args, **kwargs)
+        except (httplib.CannotSendRequest, httplib.BadStatusLine):
+            self.connection.close()
+            self.connection.connect()
+            response = self._get_response(method, *args, **kwargs)
+
         return response, response.read()
 
     def get(self, id):
@@ -76,7 +92,7 @@ class BossClient(object):
         self.name = name
         self.full_host = "{0}:{1}".format(self.host, self.port)
 
-        self.connection = HTTPConnection(self.full_host)
+        self.connection = httplib.HTTPConnection(self.full_host, strict=0)
         self.boss_access = APIHelper(self.connection, '')
 
         LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2} ({3})'
@@ -164,6 +180,6 @@ class BossClient(object):
             return PretenderModel.from_json_response(data)
         elif response.status == 404:
             raise ResourceNotFound(
-                    'The mock server for this client was shutdown.')
+                'The mock server for this client was shutdown.')
         else:
             raise UnexpectedResponseStatus(response.status)
