@@ -9,7 +9,7 @@ from pretenders.exceptions import NoRequestFound
 class HTTPMock(BossClient):
     """
     A mock HTTP server as seen from the test writer.
-
+    
     The test will first preset responses on the server, and after execution
     it will enquire the received requests.
 
@@ -23,24 +23,24 @@ class HTTPMock(BossClient):
         assert_equal(r.method, 'GET')
         assert_equal(r.url, '/hello?city=barcelona')
     """
-
+    
     boss_mock_type = 'http'
-
+    
     def __init__(self, host, port, timeout=None, name=None):
         """
         Create an HTTPMock client for testing purposes.
-
+        
         :param host:
             The host of the boss server.
-
+        
         :param port:
             The port to connect to of the boss.
-
+        
         :param timeout:
             The timeout (in seconds) to be passed to the boss when
             instantiating the mock HTTP server. If a request is not received by
             the mock server in this time, it will be closed down by the boss.
-
+        
         :param name:
             The name of the mock. If an HTTP Mock server exists with this name
             the client will be hooked into use that server. Otherwise a new one
@@ -48,11 +48,11 @@ class HTTPMock(BossClient):
         """
         super(HTTPMock, self).__init__(host, port, timeout, name)
         self.rule = ''
-
+        
     @property
     def pretend_access_path(self):
         return self.pretender_details['path']
-
+    
     @property
     def pretend_url(self):
         """
@@ -65,7 +65,7 @@ class HTTPMock(BossClient):
         return "http://{0}{1}".format(
             full_host, self.pretend_access_path
         )
-
+    
     def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
@@ -78,8 +78,15 @@ class HTTPMock(BossClient):
         mock = copy(self)
         mock.rule = match_rule
         return mock
-
-    def reply(self, body=b'', status=200, headers={}, times=1, after=0):
+    
+    def reply(self, body=b'', status=200, headers={}, times=1, after=0, bodyfile=''):
+        """
+        If there's a file to be sent as the body then load it and assign it to then
+        body.
+        """
+        if bodyfile != '':
+            with open (bodyfile, "r") as bodysource:
+                body = bodysource.read()
         """
         Set the pre-canned reply for the preset.
 
@@ -90,7 +97,7 @@ class HTTPMock(BossClient):
         """
         self.preset.add(self.rule, status, body, headers, times, after)
         return self
-
+    
     def get_request(self, sequence_id=None):
         """
         Get a stored request issued to the mock server, by sequence order.
