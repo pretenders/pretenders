@@ -40,7 +40,7 @@ pre-canned response. The mapping is as follows:
 
 * response body = preset request body
 * response status = preset header ``X-Pretend-Response-Status``
-* response headers = all request headers, excluding those beginning with 
+* response headers = all request headers, excluding those beginning with
   ``X-Pretend-``
 
 It also contains optional matching information to determine which pre-canned
@@ -72,4 +72,13 @@ includes:
  * Relative URL (``/city/association?n=12``)
  * HTTP Headers of the request
  * Body
+
+
+The Python client
+~~~~~~~~~~~~~~~~~
+
+Pretenders comes with a python client which can be used to configure HTTP mocks
+
+.. automodule:: pretenders.client.http
+    :members:
 
