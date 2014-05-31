@@ -1,7 +1,8 @@
+import json
 import time
 
 import bottle
-from bottle import delete, post, HTTPResponse
+from bottle import HTTPResponse
 
 try:
     from collections import OrderedDict
@@ -14,7 +15,7 @@ from collections import defaultdict
 from pretenders.log import get_logger
 from pretenders.constants import FOREVER
 from pretenders.mock_servers.http import Preset, match_rule_from_dict
-
+from pretenders.server import app
 
 LOGGER = get_logger('pretenders.server.apps.preset')
 PRESETS = defaultdict(OrderedDict)
@@ -78,7 +79,7 @@ def knock_off_preset(preset_dict, key):
             del preset_dict[key]
 
 
-@post('/preset/<uid:int>')
+@app.post('/preset/<uid>')
 def add_preset(uid):
     """
     Save the incoming request body as a preset response
@@ -97,9 +98,17 @@ def add_preset(uid):
     url_presets.append(preset)
 
 
-@delete('/preset/<uid:int>')
+@app.delete('/preset/<uid>')
 def clear_presets(uid):
     """
     Delete all recorded presets
     """
     PRESETS[uid].clear()
+
+
+@app.get('/preset/<uid>')
+def list_presets(uid):
+    presets = []
+    for _, preset_list in PRESETS[uid].items():
+        presets.extend([preset.as_dict() for preset in preset_list])
+    return json.dumps(presets)

@@ -17,7 +17,7 @@ class HTTPMock(BossClient):
 
         from pretenders.client.http import HTTPMock
         mock = HTTPMock('localhost', 8000)
-        mock.when('/hello', 'GET').reply('Hello')
+        mock.when('GET /hello').reply('Hello')
         # run tests... then read received responses:
         r = mock.get_request(0)
         assert_equal(r.method, 'GET')
@@ -53,6 +53,19 @@ class HTTPMock(BossClient):
     def pretend_access_path(self):
         return self.pretender_details['path']
 
+    @property
+    def pretend_url(self):
+        """
+        The full URL of the pretend server.
+        """
+        if self.port == 80:
+            full_host = self.host
+        else:
+            full_host == "{0}:{1}".format(self.host, self.port)
+        return "http://{0}{1}".format(
+            full_host, self.pretend_access_path
+        )
+
     def when(self, rule='', headers=None):
         """
         Set the match rule which is the first part of the Preset.
@@ -60,6 +73,18 @@ class HTTPMock(BossClient):
         :param rule: String incorporating the method and url to match
             eg "GET url/to/match"
         :param headers: An optional dictionary of headers to match.
+
+        .. note::
+
+            ``rule`` is matched as a regular expression and can therefore be
+            set to match more than one request.
+            eg. ``r'^GET /something/([a-zA-Z0-9\-_]*)/?'``
+
+            Also note that it is always seen as a regex and therefore to match
+            ``"GET /foo?bar=1"`` you would need to use something like::
+
+            'GET /foo\?bar=1'
+
         """
         match_rule = MatchRule(rule, headers)
         mock = copy(self)
@@ -87,10 +112,10 @@ class HTTPMock(BossClient):
         """
         try:
             if sequence_id is not None:
-                return JsonHelper.from_http_request(
-                                        self.history.get(sequence_id))
+                historical = self.history.get(sequence_id)
+                return JsonHelper.from_http_request(historical)
             else:
-                json_data = self.history.list().read()
+                response, json_data = self.history.list()
                 content = json_data.decode('ascii')
                 data = json.loads(content)
                 historical = []

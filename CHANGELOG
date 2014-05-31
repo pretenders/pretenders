@@ -1,3 +1,7 @@
+
+Fix 500 error when mock doesn't exist.
+Expose ``GET`` functions of each resource.
+
 1.0.2
 -----
 

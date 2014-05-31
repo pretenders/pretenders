@@ -106,9 +106,10 @@ class JsonHelper(object):
 
     @classmethod
     def from_http_request(cls, pretend_response):
-        if pretend_response.status != 200:
+        response, data = pretend_response
+        if response.status != 200:
             raise NoRequestFound('No saved request')
-        return JsonHelper(pretend_response.read())
+        return JsonHelper(data)
 
     @property
     def body(self):

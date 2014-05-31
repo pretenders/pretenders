@@ -1,0 +1,68 @@
+<h1>{{name | uppercase}} Mocks</h1>
+<div class="mocklist">
+    <table class="table table-hover" ng-cloak>
+        <thead>
+            <tr>
+                <th>name</th>
+                <th>start</th>
+                <th>last call</th>
+                <th>timeout</th>
+                <th>protocol</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="m in mocks">
+                <td><a href="/#/{{m.protocol}}/{{m.name}}">{{m.name}}</a></td>
+                <td>{{m.start}}</td>
+                <td>{{m.last_call}}</td>
+                <td>{{m.timeout}}</td>
+                <td>{{m.protocol}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="details" ng-show="mock">
+    <h2>{{mock.protocol | uppercase}} Mock {{mock.name}}</h2>
+    <h3>History</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>URL</th>
+                <th>Headers</th>
+                <th>Body</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="h in mock.get_history()">
+                <td>{{h.method}}</td>
+                <td>{{h.url}}</td>
+                <td>{{h.headers}}</td>
+                <td>{{h.body}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <h3>Presets</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Headers</th>
+                <th>Rule</th>
+                <th>Body</th>
+                <th>Status</th>
+                <th>After</th>
+                <th>Times</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="h in mock.get_presets()">
+                <td>{{h.headers}}</td>
+                <td>{{h.rule.rule}}</td>
+                <td>{{h.body}}</td>
+                <td>{{h.status}}</td>
+                <td>{{h.after}}</td>
+                <td>{{h.times}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

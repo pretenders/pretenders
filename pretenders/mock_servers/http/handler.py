@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from pretenders.constants import FOREVER
 from pretenders.log import get_logger
 from pretenders.mock_servers import PretenderModel
 
@@ -10,44 +11,37 @@ LOGGER = get_logger('pretenders.http.handler')
 class HTTPPretenderModel(PretenderModel):
 
     def __init__(self, path, **kwargs):
-        super(HTTPPretenderModel, self).__init__(**kwargs)
+        super(HTTPPretenderModel, self).__init__(protocol='http', **kwargs)
         self.path = path
 
 
 class HttpHandler(object):
 
     PRETENDERS = {}
-    PRETENDER_NAME_UID = {}
 
-    def get_or_create_pretender(self, uid, timeout, name):
+    def get_or_create_pretender(self, name, timeout):
         start = datetime.datetime.now()
-        if name in self.PRETENDER_NAME_UID:
-            pretender = self.PRETENDERS[self.PRETENDER_NAME_UID[name]]
+        if name in self.PRETENDERS:
+            pretender = self.PRETENDERS[name]
         else:
-            if name:
-                self.PRETENDER_NAME_UID[name] = uid
-                path = "/mockhttp/{0}".format(name)
-            else:
-                path = "/mockhttp/{0}".format(uid)
+            path = "/mockhttp/{0}".format(name)
+
+            if timeout != FOREVER:
+                timeout = datetime.timedelta(seconds=timeout)
 
             pretender = HTTPPretenderModel(
                 start=start,
-                timeout=datetime.timedelta(seconds=timeout),
+                timeout=timeout,
                 last_call=start,
-                uid=uid,
                 name=name,
                 path=path
             )
-            self.PRETENDERS[uid] = pretender
+            self.PRETENDERS[name] = pretender
 
         return json.dumps({
             'path': pretender.path,
-            'id': pretender.uid})
+            'id': pretender.name})
 
-    def delete_pretender(self, uid):
-        "Delete a pretender by ``uid``"
-        try:
-            del self.PRETENDER_NAME_UID[self.PRETENDERS[uid].name]
-        except KeyError:
-            pass
-        del self.PRETENDERS[uid]
+    def delete_pretender(self, name):
+        "Delete a pretender by ``name``"
+        del self.PRETENDERS[name]

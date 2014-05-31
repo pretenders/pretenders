@@ -1,9 +1,9 @@
 import json
 try:
-    from http.client import HTTPConnection
+    from http import client as httplib
 except ImportError:
-    # Python2.6/2.7
-    from httplib import HTTPConnection
+    # Python 2.6/2.7
+    import httplib
 
 import urllib
 
@@ -23,9 +23,26 @@ class APIHelper(object):
         self.connection = connection
         self.path = path
 
-    def http(self, method, *args, **kwargs):
+    def _get_response(self, method, *args, **kwargs):
         self.connection.request(method=method, *args, **kwargs)
         return self.connection.getresponse()
+
+    def http(self, method, *args, **kwargs):
+        """
+        Issue an HTTP request.
+
+        The HTTP connection is reused between requests. We try to detect
+        dropped connections, and in those cases try to reconnect to the remote
+        server.
+        """
+        try:
+            response = self._get_response(method, *args, **kwargs)
+        except (httplib.CannotSendRequest, httplib.BadStatusLine):
+            self.connection.close()
+            self.connection.connect()
+            response = self._get_response(method, *args, **kwargs)
+
+        return response, response.read()
 
     def get(self, id):
         return self.http('GET', url='{0}/{1}'.format(self.path, id))
@@ -57,9 +74,10 @@ class PresetHelper(APIHelper):
             after=after
         )
 
-        response = self.http('POST', url=self.path, body=new_preset.as_json())
+        response, data = self.http('POST', url=self.path,
+                                   body=new_preset.as_json())
         if response.status != 200:
-            raise ConfigurationError(response.read().decode())
+            raise ConfigurationError(data.decode())
         return response
 
 
@@ -74,7 +92,7 @@ class BossClient(object):
         self.name = name
         self.full_host = "{0}:{1}".format(self.host, self.port)
 
-        self.connection = HTTPConnection(self.full_host)
+        self.connection = httplib.HTTPConnection(self.full_host, strict=0)
         self.boss_access = APIHelper(self.connection, '')
 
         LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2} ({3})'
@@ -85,12 +103,14 @@ class BossClient(object):
         else:
             self.pretender_details = {}
 
-        self.history = APIHelper(self.connection,
-                                 '/history/{0}'.format(
-                                            self.pretend_access_point_id))
-        self.preset = PresetHelper(self.connection,
-                                   '/preset/{0}'.format(
-                                            self.pretend_access_point_id))
+        self.history = APIHelper(
+            self.connection,
+            '/history/{0}'.format(self.pretend_access_point_id)
+        )
+        self.preset = PresetHelper(
+            self.connection,
+            '/preset/{0}'.format(self.pretend_access_point_id)
+        )
 
     def reset(self):
         """
@@ -129,13 +149,11 @@ class BossClient(object):
 
         post_body = json.dumps(post_body)
 
-        response = self.boss_access.http('POST',
-                                         url=self.create_mock_url,
-                                         body=post_body)
-        pretender_json = response.read().decode('ascii')
-
+        response, data = self.boss_access.http('POST',
+                                               url=self.create_mock_url,
+                                               body=post_body)
+        pretender_json = data.decode('ascii')
         pretender_details = json.loads(pretender_json)
-
         return pretender_details
 
     @property
@@ -145,7 +163,7 @@ class BossClient(object):
 
     def delete_mock(self):
         "Delete the mock server that this points to."
-        response = self.boss_access.http(
+        response, data = self.boss_access.http(
             method="DELETE",
             url=self.delete_mock_url)
         if not response.status == 200:
@@ -153,15 +171,15 @@ class BossClient(object):
 
     def get_pretender(self):
         "Get pretenders from the server in dict format"
-        response = self.boss_access.http(
+        response, data = self.boss_access.http(
             method='GET',
             url='/{0}/{1}'.format(self.boss_mock_type,
                                   self.pretend_access_point_id),
         )
         if response.status == 200:
-            return PretenderModel.from_json_response(response)
+            return PretenderModel.from_json_response(data)
         elif response.status == 404:
             raise ResourceNotFound(
-                    'The mock server for this client was shutdown.')
+                'The mock server for this client was shutdown.')
         else:
             raise UnexpectedResponseStatus(response.status)

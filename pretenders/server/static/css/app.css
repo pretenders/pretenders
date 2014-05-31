@@ -1,0 +1,52 @@
+/* app css stylesheet */
+
+/* sticky footer ----------------------------------------------------- */
+
+html,
+body {
+    height: 100%;
+    /* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    /* Negative indent footer by it's height */
+    margin: 0 auto -80px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+    height: 80px;
+}
+#footer {
+    background-color: #222;
+    color: white;
+    padding-top: 30px;
+    border-top: 4px solid #666;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+    #footer {
+        margin-left: -20px;
+        margin-right: -20px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+}
+
+.marketing {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.hero-unit {
+    padding: 32px;
+    background-image: url('../img/story.jpg')
+}
+
+/* end sticky footer */
