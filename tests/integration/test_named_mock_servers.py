@@ -1,3 +1,4 @@
+import requests
 from nose.tools import assert_equals
 
 from pretenders.client.http import HTTPMock
@@ -50,3 +51,19 @@ def test_creating_second_mock_server_by_same_name_gives_original_server():
 
     h1.delete_mock()
     h2.delete_mock()
+
+
+def test_get_response_when_none_queued():
+    h1 = HTTPMock('localhost', 8000, timeout=5, name='existent')
+
+    THIRD_PARTY_ADDRESS = 'http://localhost:8000/mockhttp/existent'
+    resp = requests.get(THIRD_PARTY_ADDRESS + '/hello')
+    assert_equals(resp.status_code, 404)
+
+
+def test_get_response_from_non_existent_mock_server():
+    THIRD_PARTY_ADDRESS = 'http://localhost:8000/mockhttp/non-existent'
+
+    resp = requests.get(THIRD_PARTY_ADDRESS + '/hello')
+
+    assert_equals(resp.status_code, 404)

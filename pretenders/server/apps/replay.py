@@ -51,7 +51,7 @@ def replay_http(uid, url):
     """
     Replay a previously recorded preset, and save the request in history
     """
-
+    pretender.exists_or_404('http', uid)
     request_info = RequestSerialiser(url, bottle.request)
     body = request_info.serialize()
     LOGGER.debug("KEEPING UID {0} ALIVE".format(uid))
