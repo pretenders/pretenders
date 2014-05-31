@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
-
 import json
 
+from pretenders.constants import FOREVER
 
 def get_timedelta_from_string(string):
     data = string.split(":")
@@ -42,7 +42,8 @@ class PretenderModel(object):
         data = json.loads(response_data.decode('ascii'))
         data['start'] = get_datetime_from_string(data['start'])
         data['last_call'] = get_datetime_from_string(data['last_call'])
-        data['timeout'] = get_timedelta_from_string(data['timeout'])
+        if data['timeout'] != FOREVER:
+            data['timeout'] = get_timedelta_from_string(data['timeout'])
         return cls(**data)
 
     def as_dict(self):
@@ -61,7 +62,3 @@ class PretenderModel(object):
     def keep_alive(self):
         "Refresh the last_call date to keep this server up"
         self.last_call = datetime.now()
-
-    @property
-    def timeout_in_secs(self):
-        return self.timeout.seconds

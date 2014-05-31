@@ -1,6 +1,7 @@
 import datetime
 import json
 
+from pretenders.constants import FOREVER
 from pretenders.log import get_logger
 from pretenders.mock_servers import PretenderModel
 
@@ -25,9 +26,12 @@ class HttpHandler(object):
         else:
             path = "/mockhttp/{0}".format(name)
 
+            if timeout != FOREVER:
+                timeout = datetime.timedelta(seconds=timeout)
+
             pretender = HTTPPretenderModel(
                 start=start,
-                timeout=datetime.timedelta(seconds=timeout),
+                timeout=timeout,
                 last_call=start,
                 name=name,
                 path=path

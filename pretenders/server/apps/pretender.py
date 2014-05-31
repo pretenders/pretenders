@@ -6,6 +6,7 @@ import bottle
 from bottle import HTTPResponse
 
 from pretenders import settings
+from pretenders.constants import FOREVER
 from pretenders.log import get_logger
 from pretenders.mock_servers.http.handler import HttpHandler
 from pretenders.mock_servers.smtp.handler import SmtpHandler
@@ -74,6 +75,7 @@ def create_pretender(protocol):
     name = body_data.get('name') or str(uuid4())
 
     timeout = body_data.get('pretender_timeout', settings.TIMEOUT_PRETENDER)
+
     LOGGER.info("Creating {0} pretender access point at {1} {2}"
                 .format(protocol, name, timeout))
 
@@ -104,7 +106,10 @@ def pretender_delete(protocol):
         # Delete all stale requests
         now = datetime.datetime.now()
         for uid, server in get_pretenders(protocol).copy().items():
+
             LOGGER.debug("Pretender: {0}".format(server))
+            if server.timeout == FOREVER:
+                continue
             if server.last_call + server.timeout < now:
                 LOGGER.info("Deleting pretender with UID: {0}".format(uid))
                 delete_mock(protocol, uid)

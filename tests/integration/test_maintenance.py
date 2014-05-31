@@ -2,6 +2,7 @@ from nose.tools import assert_equal, assert_raises
 import time
 
 from pretenders.client.http import HTTPMock
+from pretenders.constants import FOREVER
 from pretenders.exceptions import ResourceNotFound
 from pretenders.server.maintain import STALE_DELETE_FREQUENCY
 from . import get_fake_client
@@ -19,7 +20,7 @@ def test_clear_down_of_stale_mock_servers_taking_place():
     # Sleep for enough time for the maintainer to have run and killed the
     # process. which means the total of STALE_DELETE_FREQUENCY + timeout
     #
-    time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout_in_secs)
+    time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout.seconds)
 
     assert_raises(ResourceNotFound, http_mock.get_pretender)
 
@@ -32,7 +33,7 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     http_mock = HTTPMock('localhost', 8000, timeout=5)
     pretender = http_mock.get_pretender()
 
-    timeout_server = pretender.timeout_in_secs
+    timeout_server = pretender.timeout.seconds
     assert_equal(pretender.last_call, pretender.start)
 
     for i in range(3):
@@ -59,8 +60,16 @@ def test_clear_down_removes_history():
 
     assert_equal(http_mock.get_request(0).url, '/some_url')
 
-    time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout_in_secs + 1)
+    time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout.seconds + 1)
     assert_raises(ResourceNotFound, http_mock.get_pretender)
     # Check that there is no history now!
     req = http_mock.get_request(0)
     assert_equal(req, None)
+
+
+def test_can_create_a_forever_mock():
+    # Just test that we can actually create one of these chaps.
+    # We won't actually check if it is still around in an eternity.
+    mock = HTTPMock('localhost', 8000, timeout=FOREVER)
+    assert_equal(FOREVER, mock.get_pretender().timeout)
+

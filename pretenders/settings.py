@@ -31,7 +31,6 @@ LOGGING_CONFIG = {
 RUN_MAINTAINER = True
 TIMEOUT_PRETENDER = 120
 
-
 try:
     from local_settings import *
 except ImportError:
