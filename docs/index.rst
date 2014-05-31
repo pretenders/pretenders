@@ -50,7 +50,7 @@ Sample HTTP mocking test case::
     mock.when('GET /long').reply('', after=100)
 
     # Your code is exercised here, after setting up the mock URL
-    myapp.settings.FOO_ROOT_URL = mock.pretend_access_point + mock.pretend_access_path
+    myapp.settings.FOO_ROOT_URL = mock.pretend_url
     ...
 
     # Verify requests your code made
