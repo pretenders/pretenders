@@ -36,6 +36,17 @@ def keep_alive(protocol, uid):
     get_pretenders(protocol)[uid].keep_alive()
 
 
+def exists_or_404(protocol, uid):
+    """
+    If the uid doesn't exist, 404.
+    """
+    try:
+        get_pretenders(protocol)[uid]
+    except KeyError:
+        raise HTTPResponse("No matching {0} mock: {1}".format(protocol, uid),
+                            status=404)
+
+
 @app.get('/<protocol:re:(http|smtp)>')
 def list_pretenders(protocol):
     response = json.dumps([
