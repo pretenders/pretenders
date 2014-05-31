@@ -61,7 +61,7 @@ class HTTPMock(BossClient):
         if self.port == 80:
             full_host = self.host
         else:
-            full_host == "{0}:{1}".format(self.host, self.port)
+            full_host = "{0}:{1}".format(self.host, self.port)
         return "http://{0}{1}".format(
             full_host, self.pretend_access_path
         )

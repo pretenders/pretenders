@@ -53,6 +53,12 @@ def test_creating_second_mock_server_by_same_name_gives_original_server():
     h2.delete_mock()
 
 
+def test_pretend_url():
+    "Test that pretend url works"
+    h1 = HTTPMock('localhost', 8000, timeout=5, name='some_mock')
+    assert_equals(h1.pretend_url, 'http://localhost:8000/mockhttp/some_mock')
+
+
 def test_get_response_when_none_queued():
     h1 = HTTPMock('localhost', 8000, timeout=5, name='existent')
 
