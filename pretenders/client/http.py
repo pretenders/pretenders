@@ -2,8 +2,8 @@ from copy import copy
 import json
 
 from pretenders.client import BossClient
-from pretenders.mock_servers.http import MatchRule, JsonHelper
-from pretenders.exceptions import NoRequestFound
+from pretenders.common.http import MatchRule, JsonHelper
+from pretenders.common.exceptions import NoRequestFound
 
 
 class HTTPMock(BossClient):

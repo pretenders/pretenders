@@ -3,9 +3,9 @@ try:
     from logging.config import dictConfig
 except ImportError:
     # Backwards compatible with py < 2.7
-    from pretenders.compat.dictconfig import dictConfig
+    from pretenders.common.compat.dictconfig import dictConfig
 
-from pretenders import settings
+from pretenders.server import settings
 
 
 def setup_logging():

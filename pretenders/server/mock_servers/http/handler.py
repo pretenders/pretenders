@@ -1,9 +1,9 @@
 import datetime
 import json
 
-from pretenders.constants import FOREVER
-from pretenders.log import get_logger
-from pretenders.mock_servers import PretenderModel
+from pretenders.common.constants import FOREVER
+from pretenders.server.log import get_logger
+from pretenders.server.mock_servers import PretenderModel
 
 LOGGER = get_logger('pretenders.http.handler')
 

@@ -1,6 +1,6 @@
 from nose.tools import assert_true, assert_false
 
-from pretenders.mock_servers.http import MatchRule
+from pretenders.common.http import MatchRule
 
 DEFAULT_HEADERS = {
     'Content-Length': '10',

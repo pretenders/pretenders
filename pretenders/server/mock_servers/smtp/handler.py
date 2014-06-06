@@ -6,17 +6,19 @@ import subprocess
 import sys
 import time
 
-from pretenders.constants import (
+from pretenders.common.constants import (
     RETURN_CODE_PORT_IN_USE,
     PRETEND_PORT_RANGE
 )
-from pretenders.log import get_logger
+from pretenders.common.exceptions import NoPortAvailableException
+from pretenders.server.log import get_logger
+
 from pretenders.server import data
-from pretenders.mock_servers import PretenderModel
-from pretenders.exceptions import NoPortAvailableException
+from pretenders.server.mock_servers import PretenderModel
 
 
-LOGGER = get_logger('pretenders.mock_servers.smtp.handler')
+
+LOGGER = get_logger('pretenders.server.mock_servers.smtp.handler')
 
 
 class SMTPPretenderModel(PretenderModel):
@@ -56,7 +58,7 @@ class SmtpHandler(object):
             process = subprocess.Popen([
                 sys.executable,
                 "-m",
-                "pretenders.mock_servers.smtp.server",
+                "pretenders.server.mock_servers.smtp.server",
                 "-H", "localhost",
                 "-p", str(port_number),
                 "-b", str(data.BOSS_PORT),

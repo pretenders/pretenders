@@ -5,12 +5,12 @@ from uuid import uuid4
 import bottle
 from bottle import HTTPResponse
 
-from pretenders import settings
-from pretenders.constants import FOREVER
-from pretenders.log import get_logger
-from pretenders.mock_servers.http.handler import HttpHandler
-from pretenders.mock_servers.smtp.handler import SmtpHandler
-from pretenders.server import app
+
+from pretenders.common.constants import FOREVER
+from pretenders.server.log import get_logger
+from pretenders.server.mock_servers.http.handler import HttpHandler
+from pretenders.server.mock_servers.smtp.handler import SmtpHandler
+from pretenders.server import app, settings
 from pretenders.server.apps import history
 
 

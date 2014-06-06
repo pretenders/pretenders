@@ -1,7 +1,7 @@
 import json
 from pretenders.client import BossClient
-from pretenders.constants import FOREVER
-from pretenders.mock_servers.smtp import SMTPSerialiser
+from pretenders.common.constants import FOREVER
+from pretenders.common.smtp import SMTPSerialiser
 
 
 class SMTPMock(BossClient):

@@ -8,13 +8,13 @@ try:
     from collections import OrderedDict
 except ImportError:
     #2.6 compatibility
-    from pretenders.compat.ordered_dict import OrderedDict
+    from pretenders.common.compat.ordered_dict import OrderedDict
 
 from collections import defaultdict
 
-from pretenders.log import get_logger
-from pretenders.constants import FOREVER
-from pretenders.mock_servers.http import Preset, match_rule_from_dict
+from pretenders.server.log import get_logger
+from pretenders.common.constants import FOREVER
+from pretenders.common.http import Preset, match_rule_from_dict
 from pretenders.server import app
 
 LOGGER = get_logger('pretenders.server.apps.preset')

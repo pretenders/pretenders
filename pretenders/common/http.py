@@ -1,7 +1,7 @@
 import base64
 import json
 import re
-from pretenders.exceptions import NoRequestFound
+from pretenders.common.exceptions import NoRequestFound
 
 
 def to_dict(wsgi_headers, include=lambda _: True):
@@ -13,33 +13,6 @@ def to_dict(wsgi_headers, include=lambda _: True):
         if include(k):
             ret[k] = v
     return ret
-
-
-class CaseInsensitiveDict(dict):
-    "A dictionary that is case insensitive for keys."
-
-    def __init__(self, *args, **kwargs):
-        super(CaseInsensitiveDict, self).__init__(*args, **kwargs)
-        for key, value in self.items():
-            super(CaseInsensitiveDict, self).__delitem__(key)
-            self[key.lower()] = value
-
-    def __delitem__(self, key):
-        return super(CaseInsensitiveDict, self).__delitem__(key.lower())
-
-    def __setitem__(self, key, value):
-        super(CaseInsensitiveDict, self).__setitem__(key.lower(), value)
-
-    def __getitem__(self, key):
-        return super(CaseInsensitiveDict, self).__getitem__(key.lower())
-
-
-def binary_to_ascii(data):
-    return base64.b64encode(data).decode('ascii')
-
-
-def ascii_to_binary(data):
-    return base64.b64decode(data.encode('ascii'))
 
 
 class RequestSerialiser(object):
@@ -67,6 +40,14 @@ class RequestSerialiser(object):
             'rule': self.rule,
         }
         return json.dumps(data)
+
+
+def binary_to_ascii(data):
+    return base64.b64encode(data).decode('ascii')
+
+
+def ascii_to_binary(data):
+    return base64.b64decode(data.encode('ascii'))
 
 
 class JsonHelper(object):

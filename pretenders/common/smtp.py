@@ -2,7 +2,7 @@ import email as email_lib
 from email.parser import Parser
 import json
 
-from pretenders.compat import ensure_is_python_string
+from pretenders.common.compat import ensure_is_python_string
 
 
 class SMTPSerialiser(object):

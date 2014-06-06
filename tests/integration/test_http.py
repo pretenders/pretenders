@@ -3,8 +3,8 @@ import socket
 from nose.tools import assert_equals, assert_true, assert_raises
 import requests
 
-from pretenders.constants import FOREVER
-from pretenders.exceptions import ConfigurationError
+from pretenders.common.constants import FOREVER
+from pretenders.common.exceptions import ConfigurationError
 from pretenders.client.http import HTTPMock
 from . import get_fake_client
 
