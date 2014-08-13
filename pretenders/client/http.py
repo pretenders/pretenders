@@ -66,7 +66,7 @@ class HTTPMock(BossClient):
             full_host, self.pretend_access_path
         )
 
-    def when(self, rule='', headers=None):
+    def when(self, rule='', headers=None, body=None):
         """
         Set the match rule which is the first part of the Preset.
 
@@ -86,7 +86,7 @@ class HTTPMock(BossClient):
             'GET /foo\?bar=1'
 
         """
-        match_rule = MatchRule(rule, headers)
+        match_rule = MatchRule(rule, headers, body)
         mock = copy(self)
         mock.rule = match_rule
         return mock

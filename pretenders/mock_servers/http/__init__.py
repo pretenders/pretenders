@@ -155,6 +155,7 @@ def match_rule_from_dict(data):
         return MatchRule(
             data['rule'],
             data.get('headers', None),
+            data.get('body', None),
         )
 
     else:
@@ -166,7 +167,7 @@ class MatchRule(object):
     A matching rule against which incoming requests will be compared.
     """
 
-    def __init__(self, rule, headers=None):
+    def __init__(self, rule, headers=None, body=None):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
@@ -177,12 +178,14 @@ class MatchRule(object):
             self.headers = headers
         else:
             self.headers = {}
+        self.body = body
 
     def as_dict(self):
         """ Convert a match rule instance to a dictionary """
         return {
             'rule': self.rule,
             'headers': self.headers,
+            'body': self.body,
         }
 
     def __key(self):
@@ -204,7 +207,9 @@ class MatchRule(object):
         """
         return (self.rule_matches(request['rule'])
                 and ('headers' not in request
-                     or self.headers_match(request['headers'])))
+                     or self.headers_match(request['headers']))
+                and ('body' not in request
+                     or self.body_match(request['body'])))
 
     def rule_matches(self, rule):
         """
@@ -235,4 +240,9 @@ class MatchRule(object):
                 else:
                     if header != v:
                         return False
+        return True
+
+    def body_match(self, body):
+        if self.body:
+            return re.match(self.body, ascii_to_binary(body)) is not None
         return True
