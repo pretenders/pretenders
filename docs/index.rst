@@ -49,6 +49,11 @@ Sample HTTP mocking test case::
     # For the next GET request to /long take 100 seconds to respond.
     mock.when('GET /long').reply('', after=100)
 
+    # If you need to reply different data depending on request body
+    # Regular expression to match certain body could be provided
+    mock.when('POST /body_requests', body='1.*').reply('First answer', times=FOREVER)
+    mock.when('POST /body_requests', body='2.*').reply('Second answer', times=FOREVER)
+
     # Your code is exercised here, after setting up the mock URL
     myapp.settings.FOO_ROOT_URL = mock.pretend_url
     ...
