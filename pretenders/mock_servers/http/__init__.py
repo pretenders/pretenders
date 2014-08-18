@@ -172,6 +172,7 @@ class MatchRule(object):
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
         :param headers: Dictionary of headers to match.
+        :param headers: Body to match (string using regex syntax).
         """
         self.rule = rule
         if headers:
@@ -243,6 +244,12 @@ class MatchRule(object):
         return True
 
     def body_match(self, body):
+        """
+        Check if a provided request matches the regex in the body attribute
+        :param body:  A string in regex syntax that will be matched against the
+            request body.
+        :return: True if the request body matches and False if not.
+        """
         if self.body:
             return re.match(self.body, ascii_to_binary(body)) is not None
         return True
