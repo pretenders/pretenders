@@ -1,6 +1,6 @@
 import sys
 
-from pretenders.log import get_logger
+from pretenders.server.log import get_logger
 from bottle import html_escape
 
 LOGGER = get_logger('pretenders.server.middleware')

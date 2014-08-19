@@ -4,9 +4,9 @@ import socket
 from pretenders.server.base import (
     in_parent_process,
     save_pid_file)
-from pretenders.log import get_logger
+from pretenders.server.log import get_logger
 from pretenders.client import BossClient
-from pretenders.constants import RETURN_CODE_PORT_IN_USE
+from pretenders.common.constants import RETURN_CODE_PORT_IN_USE
 
 LOGGER = get_logger('pretenders.server.pretender')
 

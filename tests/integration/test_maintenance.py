@@ -2,8 +2,8 @@ from nose.tools import assert_equal, assert_raises
 import time
 
 from pretenders.client.http import HTTPMock
-from pretenders.constants import FOREVER
-from pretenders.exceptions import ResourceNotFound
+from pretenders.common.constants import FOREVER
+from pretenders.common.exceptions import ResourceNotFound
 from pretenders.server.maintain import STALE_DELETE_FREQUENCY
 from . import get_fake_client
 

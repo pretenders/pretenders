@@ -1,11 +1,12 @@
 import smtpd
 import asyncore
 
-from pretenders.log import get_logger
+from pretenders.server.log import get_logger
+from pretenders.common.smtp import SMTPSerialiser
 from pretenders.server.pretender import Pretender
-from pretenders.mock_servers.smtp import SMTPSerialiser
 
-LOGGER = get_logger('pretenders.mock_servers.smtp.server')
+
+LOGGER = get_logger('pretenders.server.mock_servers.smtp.server')
 
 
 class MockSMTPServer(smtpd.SMTPServer, Pretender):

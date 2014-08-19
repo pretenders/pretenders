@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 import json
 
-from pretenders.constants import FOREVER
+from pretenders.common.constants import FOREVER
 
 def get_timedelta_from_string(string):
     data = string.split(":")

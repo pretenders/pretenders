@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from bottle import delete, get, HTTPResponse
 
-from pretenders.log import get_logger
+from pretenders.server.log import get_logger
 from pretenders.server import app
 
 LOGGER = get_logger('pretenders.server.apps.history')

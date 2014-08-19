@@ -1,4 +1,5 @@
 import json
+import logging
 try:
     from http import client as httplib
 except ImportError:
@@ -7,14 +8,13 @@ except ImportError:
 
 import urllib
 
-from pretenders.log import get_logger
-from pretenders.mock_servers import PretenderModel
-from pretenders.exceptions import (ConfigurationError, ResourceNotFound,
+from pretenders.common.exceptions import (ConfigurationError, ResourceNotFound,
                                    UnexpectedResponseStatus)
-from pretenders.mock_servers.http import binary_to_ascii, Preset
+from pretenders.common.pretender import PretenderModel
+from pretenders.common.http import binary_to_ascii, Preset
 
 
-LOGGER = get_logger('pretenders.client')
+LOGGER = logging.getLogger('pretenders.client')
 
 
 class APIHelper(object):
