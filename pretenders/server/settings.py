@@ -20,7 +20,7 @@ LOGGING_CONFIG = {
         },
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
+            'class': 'logging.handlers.WatchedFileHandler',
             'filename': 'pretenders.log',
             'formatter': 'verbose'
         },
