@@ -1,8 +1,10 @@
 import json
 import time
+import datetime
 
 import bottle
 from bottle import HTTPResponse
+from pretenders.server.apps.pretender import get_pretenders
 
 try:
     from collections import OrderedDict
@@ -89,6 +91,14 @@ def add_preset(uid):
         raise HTTPResponse(("Preset has {0} times. Must be greater than "
                              "zero.".format(preset.times).encode()),
                            status=400)
+    try:
+        pretender = get_pretenders('http')[uid]
+        if datetime.datetime.now() - pretender.start > pretender.timeout:
+            raise HTTPResponse("{0} mock {1} is TIMED OUT".format('http', uid),
+                               status=404)
+    except KeyError:
+        raise HTTPResponse("No matching {0} mock: {1}".format('http', uid),
+                           status=404)
 
     rule = match_rule_from_dict(preset.rule)
 
