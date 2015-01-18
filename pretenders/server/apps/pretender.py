@@ -119,8 +119,6 @@ def pretender_delete(protocol):
         for uid, server in get_pretenders(protocol).copy().items():
 
             LOGGER.debug("Pretender: {0}".format(server))
-            if server.timeout == FOREVER:
-                continue
-            if server.last_call + server.timeout < now:
+            if server.is_expired:
                 LOGGER.info("Deleting pretender with UID: {0}".format(uid))
                 delete_mock(protocol, uid)

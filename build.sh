@@ -11,7 +11,7 @@ sleep 2
 
 # run tests
 echo "[Pretenders] Running tests"
-nosetests
+nosetests -vv
 
 # sleep to allow for stale servers to be deleted
 echo "[Pretenders] Letting maintainer kill stale servers"

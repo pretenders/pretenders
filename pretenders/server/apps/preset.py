@@ -93,7 +93,7 @@ def add_preset(uid):
                            status=400)
     try:
         pretender = get_pretenders('http')[uid]
-        if datetime.datetime.now() - pretender.start > pretender.timeout:
+        if pretender.is_expired:
             raise HTTPResponse("{0} mock {1} is TIMED OUT".format('http', uid),
                                status=404)
     except KeyError:
