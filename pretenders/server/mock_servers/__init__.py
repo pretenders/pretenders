@@ -62,3 +62,8 @@ class PretenderModel(object):
     def keep_alive(self):
         "Refresh the last_call date to keep this server up"
         self.last_call = datetime.now()
+
+    @property
+    def is_expired(self):
+        return (self.timeout != FOREVER and
+                datetime.now() - self.last_call > self.timeout)
