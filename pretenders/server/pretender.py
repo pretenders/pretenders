@@ -24,8 +24,8 @@ class Pretender(object):
             save_pid_file('pretenders-mock-{0}.pid'.format(uid))
 
     def run(self):
-        raise NotImplementedError("run() not defined in "
-                                  "{0}".format(self.__class__))
+        raise NotImplementedError(
+            "run() not defined in {0}".format(self.__class__))
 
     @classmethod
     def start(cls):
@@ -44,16 +44,20 @@ class Pretender(object):
         Parse command line args and return the parsed object.
         """
         parser = argparse.ArgumentParser(description='Start the server')
-        parser.add_argument('-H', '--host', dest='host', default='localhost',
-                    help='host/IP to run the server on (default: localhost)')
-        parser.add_argument('-p', '--port', dest='port', type=int,
-                            default=8001, help=('port number to run the '
-                            'server on (default: 8001)'))
-        parser.add_argument('-b', '--boss', dest='boss_port', default='8000',
-                    help="port for accessing the Boss server.")
-        parser.add_argument('-d', '--debug', dest="debug", default=False,
-                    action="store_true",
-                    help='start a build right after creation')
+        parser.add_argument(
+            '-H', '--host', dest='host', default='localhost',
+            help='host/IP to run the server on (default: localhost)')
+        parser.add_argument(
+            '-p', '--port', dest='port', type=int,
+            default=8001, help=('port number to run the '
+                                'server on (default: 8001)'))
+        parser.add_argument(
+            '-b', '--boss', dest='boss_port', default='8000',
+            help="port for accessing the Boss server.")
+        parser.add_argument(
+            '-d', '--debug', dest="debug", default=False,
+            action="store_true",
+            help='start a build right after creation')
         parser.add_argument('-i', '--uid', dest='uid')
         args = parser.parse_args()
         return cls(uid=args.uid,
@@ -63,6 +67,7 @@ class Pretender(object):
 
     def store_history_retrieve_preset(self, body):
         return self.boss_api_handler.http(
-                            'POST',
-                            url="/replay/{0}".format(self.uid),
-                            body=body)
+            'POST',
+            url="/replay/{0}".format(self.uid),
+            body=body
+        )

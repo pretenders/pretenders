@@ -3,7 +3,7 @@ import bottle
 try:
     from collections import OrderedDict
 except ImportError:
-    #2.6 compatibility
+    # 2.6 compatibility
     from pretenders.common.compat.ordered_dict import OrderedDict
 
 from pretenders.server.log import get_logger

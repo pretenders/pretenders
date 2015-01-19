@@ -9,7 +9,7 @@ from pretenders.server.apps.pretender import get_pretenders
 try:
     from collections import OrderedDict
 except ImportError:
-    #2.6 compatibility
+    # 2.6 compatibility
     from pretenders.common.compat.ordered_dict import OrderedDict
 
 from collections import defaultdict
@@ -88,9 +88,9 @@ def add_preset(uid):
     """
     preset = Preset(json_data=bottle.request.body.read())
     if preset.times != FOREVER and preset.times <= 0:
-        raise HTTPResponse(("Preset has {0} times. Must be greater than "
-                             "zero.".format(preset.times).encode()),
-                           status=400)
+        msg = ("Preset has {0} times. Must be greater than "
+               "zero.".format(preset.times).encode())
+        raise HTTPResponse(msg, status=400)
     try:
         pretender = get_pretenders('http')[uid]
         if datetime.datetime.now() - pretender.start > pretender.timeout:

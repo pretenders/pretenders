@@ -3,6 +3,7 @@ import json
 
 from pretenders.common.constants import FOREVER
 
+
 def get_timedelta_from_string(string):
     data = string.split(":")
     time = timedelta(hours=int(data[0]),

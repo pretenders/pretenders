@@ -17,7 +17,6 @@ from pretenders.server import data
 from pretenders.server.mock_servers import PretenderModel
 
 
-
 LOGGER = get_logger('pretenders.server.mock_servers.smtp.handler')
 
 
