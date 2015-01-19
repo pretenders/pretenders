@@ -1,7 +1,7 @@
 import json
 from collections import defaultdict
 
-from bottle import delete, get, HTTPResponse
+from bottle import HTTPResponse
 
 from pretenders.server.log import get_logger
 from pretenders.server import app

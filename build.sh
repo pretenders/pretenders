@@ -23,5 +23,5 @@ kill -9 `cat maintain-boss.pid`
 kill -11 `cat pretenders-boss.pid`
 
 # PEP8 and documentation...
-pep8 pretenders > pep8.txt || echo "PEP8 errors"
+pep8 --exclude=common pretenders > pep8.txt || echo "PEP8 errors"
 (cd docs; make clean html)

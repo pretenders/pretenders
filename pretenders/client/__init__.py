@@ -8,8 +8,8 @@ except ImportError:
 
 import urllib
 
-from pretenders.common.exceptions import (ConfigurationError, ResourceNotFound,
-                                   UnexpectedResponseStatus)
+from pretenders.common.exceptions import (
+    ConfigurationError, ResourceNotFound, UnexpectedResponseStatus)
 from pretenders.common.pretender import PretenderModel
 from pretenders.common.http import binary_to_ascii, Preset
 

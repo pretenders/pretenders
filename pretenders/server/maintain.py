@@ -30,12 +30,12 @@ def launch_maintainer():
         The pid of the maintainer process.
     """
     process = subprocess.Popen([
-            sys.executable,
-            "-m",
-            "pretenders.server.maintain",
-            "-H", "localhost",
-            "-p", str(data.BOSS_PORT),
-            ],
+        sys.executable,
+        "-m",
+        "pretenders.server.maintain",
+        "-H", "localhost",
+        "-p", str(data.BOSS_PORT),
+        ],
     )
     return process.pid
 
@@ -43,10 +43,12 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Start the server')
-    parser.add_argument('-H', '--host', dest='host', default='localhost',
-                help='host/IP to run the server on (default: localhost)')
-    parser.add_argument('-p', '--port', dest='port', type=int, default=8000,
-                help='port number to run the server on (default: 8000)')
+    parser.add_argument(
+        '-H', '--host', dest='host', default='localhost',
+        help='host/IP to run the server on (default: localhost)')
+    parser.add_argument(
+        '-p', '--port', dest='port', type=int, default=8000,
+        help='port number to run the server on (default: 8000)')
 
     args = parser.parse_args()
     pid = os.getpid()

@@ -24,16 +24,20 @@ def run(host='localhost', port=8000):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Start the server')
-    parser.add_argument('-H', '--host', dest='host', default='localhost',
-                help='host/IP to run the server on (default: localhost)')
-    parser.add_argument('-p', '--port', dest='port', type=int, default=8000,
-                help='port number to run the server on (default: 8000)')
-    parser.add_argument('-d', '--debug', dest="debug", default=False,
-                action="store_true",
-                help='set debug mode')
-    parser.add_argument('-t', '--timeout', dest='timeout', type=int,
-                default=120,
-                help='timeout before deleting stale pretenders')
+    parser.add_argument(
+        '-H', '--host', dest='host', default='localhost',
+        help='host/IP to run the server on (default: localhost)')
+    parser.add_argument(
+        '-p', '--port', dest='port', type=int, default=8000,
+        help='port number to run the server on (default: 8000)')
+    parser.add_argument(
+        '-d', '--debug', dest="debug", default=False,
+        action="store_true",
+        help='set debug mode')
+    parser.add_argument(
+        '-t', '--timeout', dest='timeout', type=int,
+        default=120,
+        help='timeout before deleting stale pretenders')
 
     args = parser.parse_args()
     bottle.debug(args.debug)

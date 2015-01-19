@@ -177,8 +177,8 @@ class OrderedDict(dict):
         for key, value in kwds.items():
             self[key] = value
 
-    __update = update  # let subclasses override update without breaking
-                       # __init__
+    # let subclasses override update without breaking __init__
+    __update = update
 
     __marker = object()
 
