@@ -23,4 +23,3 @@ def test_pretender_expired_add_preset_404():
     assert_raises(
         ConfigurationError, preset.reply, b'You tested fred well', 200
     )
-

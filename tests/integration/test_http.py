@@ -394,5 +394,3 @@ def test_reply_depending_on_body():
 
     response, data = fake_client.post(url='/hello', body='345')
     assert_equals(response.status, 404)
-
-
