@@ -65,3 +65,23 @@ def replay_http(uid, url):
     # So the above works, but it looks ugly - ideally we'd handle both in
     # Preset constructor.
     return preset.as_http_response(bottle.response)
+
+
+@app.route('<url:path>', method='ANY')
+def replay_http(url):
+    """
+    New Replay route for global apps
+    """
+    print(url)
+    uid = 'global'
+    pretender.exists_or_404('http', uid)
+    request_info = RequestSerialiser(url, bottle.request)
+    body = request_info.serialize()
+    LOGGER.debug("KEEPING UID {0} ALIVE".format(uid))
+    pretender.keep_alive('http', uid)
+
+    boss_response = replay(uid, body)
+    preset = Preset(boss_response.as_json().encode('ascii'))
+    return preset.as_http_response(bottle.response)
+
+

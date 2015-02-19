@@ -24,7 +24,7 @@ class HttpHandler(object):
         if name in self.PRETENDERS:
             pretender = self.PRETENDERS[name]
         else:
-            path = "/mockhttp/{0}".format(name)
+            path = "/mockhttp/{0}".format(name) if name != 'global' else '/'
 
             if timeout != FOREVER:
                 timeout = datetime.timedelta(seconds=timeout)
