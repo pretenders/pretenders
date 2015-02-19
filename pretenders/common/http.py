@@ -220,7 +220,7 @@ class MatchRule(object):
                 except KeyError:
                     return False
                 else:
-                     if re.match(v, header) is None:
+                    if re.match(v, header) is None:
                         return False
         return True
 
