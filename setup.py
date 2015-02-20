@@ -15,6 +15,7 @@ setup(
     url='https://github.com/sheltonpaul89/pretender_extn',
     packages=['pretend_extended'],
     install_requires=['bottle', 'argparse'],
+    download_url='https://github.com/sheltonpaul89/pretender_extn/tarball/1.2.3',
     #include_package_data=True,
     #package_data={
     #    '': ['*.txt', '*.rst'],
