@@ -16,4 +16,5 @@ def setup_logging():
 
 def get_logger(name):
     setup_logging()
+    logging.getLogger(name).setLevel(logging.CRITICAL)
     return logging.getLogger(name)
