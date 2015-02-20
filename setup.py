@@ -3,18 +3,17 @@
 
 from setuptools import setup, find_packages
 
-from pretenders import __version__
-
+from pretend_extended import __version__
 
 setup(
-    name='pretenders',
-    version=__version__,
+    name='pretend_extended',
+    version='1.2.3',
     description='Fake servers for testing',
     long_description=open('README.rst').read(),
-    author='Carles Barrobés, Alex Couper',
-    author_email='carles@barrobes.com, amcouper@gmail.com',
-    url='https://github.com/pretenders/pretenders',
-    packages=find_packages(),
+    author='Shelton Paul Infant',
+    author_email='sheltonpaul89@gmail.com',
+    url='https://github.com/sheltonpaul89/pretender_extn',
+    packages=['pretend_extended'],
     install_requires=['bottle', 'argparse'],
     #include_package_data=True,
     #package_data={
