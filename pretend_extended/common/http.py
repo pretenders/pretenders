@@ -223,6 +223,8 @@ class MatchRule(object):
                     if v.startswith("PPP"):
                         if (re.match(v.replace("PPP",""), header) is None):
                             return True
+                        else:
+                            return False
                     elif re.match(v, header) is None:
                         return False
         return True
