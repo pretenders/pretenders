@@ -7,15 +7,15 @@ from pretend_extended import __version__
 
 setup(
     name='pretend_extended',
-    version='1.2.3',
+    version='1.2.4',
     description='Fake servers for testing',
     long_description=open('README.rst').read(),
     author='Shelton Paul Infant',
     author_email='sheltonpaul89@gmail.com',
     url='https://github.com/sheltonpaul89/pretender_extn',
-    packages=['pretend_extended'],
+    packages=find_packages(),
     install_requires=['bottle', 'argparse'],
-    download_url='https://github.com/sheltonpaul89/pretender_extn/tarball/1.2.3',
+    download_url='https://github.com/sheltonpaul89/pretender_extn/tarball/1.2.4',
     #include_package_data=True,
     #package_data={
     #    '': ['*.txt', '*.rst'],
