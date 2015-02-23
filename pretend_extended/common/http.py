@@ -237,11 +237,15 @@ class MatchRule(object):
         :return: True if the request body matches and False if not.
         """
         if self.body:
-             if self.body.startswith("PPP"):
-                if (re.match(self.body.replace("PPP",""), ascii_to_binary(body)) is None):
-                    return True
-                else:
-                    return False
-             else:
-                return re.match(self.body, ascii_to_binary(body)) is not None
+            if("PPP" in self.body):
+                 body_pattern = self.body.split("PPP")
+                 match = True
+                 no_match = True
+                 if(body_pattern[0]!=''):
+                    match = re.match(body_pattern[0], ascii_to_binary(body)) is not None
+                 if(body_pattern[1]!=''):
+                     no_match = re.match(body_pattern[1], ascii_to_binary(body)) is None
+                 return match and no_match
+            else:
+                return True if self.body == ascii_to_binary(body) else False
         return True
