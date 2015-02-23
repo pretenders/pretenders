@@ -3,19 +3,19 @@
 
 from setuptools import setup, find_packages
 
-from pretenders import __version__
-
+from pretend_extended import __version__
 
 setup(
-    name='pretenders',
-    version=__version__,
+    name='pretend_extended',
+    version='1.2.6',
     description='Fake servers for testing',
     long_description=open('README.rst').read(),
-    author='Carles Barrobés, Alex Couper',
-    author_email='carles@barrobes.com, amcouper@gmail.com',
-    url='https://github.com/pretenders/pretenders',
+    author='Shelton Paul Infant',
+    author_email='sheltonpaul89@gmail.com',
+    url='https://github.com/sheltonpaul89/pretender_extn',
     packages=find_packages(),
     install_requires=['bottle', 'argparse'],
+    download_url='https://github.com/sheltonpaul89/pretender_extn/tarball/1.2.4',
     #include_package_data=True,
     #package_data={
     #    '': ['*.txt', '*.rst'],
