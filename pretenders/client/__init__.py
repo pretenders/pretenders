@@ -1,5 +1,6 @@
 import json
 import logging
+import sys
 try:
     from http import client as httplib
 except ImportError:
@@ -7,6 +8,8 @@ except ImportError:
     import httplib
 
 import urllib
+
+_PY34 = sys.version_info >= (3, 4)
 
 from pretenders.common.exceptions import (
     ConfigurationError, ResourceNotFound, UnexpectedResponseStatus)
@@ -92,7 +95,11 @@ class BossClient(object):
         self.name = name
         self.full_host = "{0}:{1}".format(self.host, self.port)
 
-        self.connection = httplib.HTTPConnection(self.full_host, strict=0)
+        if _PY34:
+            self.connection = httplib.HTTPConnection(self.full_host)
+        else:
+            self.connection = httplib.HTTPConnection(self.full_host, strict=0)
+
         self.boss_access = APIHelper(self.connection, '')
 
         LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2} ({3})'
