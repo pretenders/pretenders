@@ -31,7 +31,7 @@ HTTP mock in a test case
 Sample HTTP mocking test case::
 
     from pretenders.client.http import HTTPMock
-    from pretenders.constants import FOREVER
+    from pretenders.common.constants import FOREVER
 
     # Assume a running server
     # Initialise the mock client and clear all responses
