@@ -92,7 +92,7 @@ class BossClient(object):
         self.name = name
         self.full_host = "{0}:{1}".format(self.host, self.port)
 
-        self.connection = httplib.HTTPConnection(self.full_host, strict=0)
+        self.connection = httplib.HTTPConnection(self.full_host)
         self.boss_access = APIHelper(self.connection, '')
 
         LOGGER.info('Requesting {0} pretender. Port:{1} Timeout:{2} ({3})'
