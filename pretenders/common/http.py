@@ -232,5 +232,6 @@ class MatchRule(object):
         :return: True if the request body matches and False if not.
         """
         if self.body:
-            return re.match(self.body, ascii_to_binary(body)) is not None
+            body = ascii_to_binary(body).decode()
+            return re.match(self.body, body) is not None
         return True

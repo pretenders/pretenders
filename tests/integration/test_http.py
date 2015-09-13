@@ -370,6 +370,21 @@ def test_list_history():
     assert_equals(historical_calls[2]['url'], '/call_three')
 
 
+def test_reply_depending_on_body():
+    http_mock.reset()
+    http_mock.when('POST /hello', body=u'1.*').reply(b'First', times=FOREVER)
+    http_mock.when('POST /hello', body=u'2.*').reply(b'Second', times=FOREVER)
+
+    response, data = fake_client.post(url='/hello', body=u'123')
+    assert_equals(data, b'First')
+
+    response, data = fake_client.post(url='/hello', body=u'234')
+    assert_equals(data, b'Second')
+
+    response, data = fake_client.post(url='/hello', body=u'345')
+    assert_equals(response.status, 404)
+
+
 def test_mock_timeout_behaviour():
     timeout_fake_client = get_fake_client(http_mock, timeout=10)
 
@@ -380,17 +395,3 @@ def test_mock_timeout_behaviour():
     assert_raises(socket.timeout,
                   timeout_fake_client.get,
                   url='/test-long-process')
-
-def test_reply_depending_on_body():
-    http_mock.reset()
-    http_mock.when('POST /hello', body=u'1.*').reply('First', times=FOREVER)
-    http_mock.when('POST /hello', body=u'2.*').reply('Second', times=FOREVER)
-
-    response, data = fake_client.post(url='/hello', body='123')
-    assert_equals(data, 'First')
-
-    response, data = fake_client.post(url='/hello', body='234')
-    assert_equals(data, 'Second')
-
-    response, data = fake_client.post(url='/hello', body='345')
-    assert_equals(response.status, 404)
