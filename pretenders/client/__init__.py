@@ -107,6 +107,7 @@ class BossClient(object):
             self.connection,
             '/history/{0}'.format(self.pretend_access_point_id)
         )
+        # TODO we are not initialising the right preset for SMTP!!!
         self.preset = PresetHelper(
             self.connection,
             '/preset/{0}'.format(self.pretend_access_point_id)
