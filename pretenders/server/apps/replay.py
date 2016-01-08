@@ -46,11 +46,13 @@ def replay_smtp(uid):
     return selected.as_json()
 
 
-@app.route('/mockhttp/<uid><url:path>', method='ANY')
-def replay_http(uid, url):
+@app.route('/mockhttp/<path:path>', method='ANY')
+def replay_http(path):
     """
     Replay a previously recorded preset, and save the request in history
     """
+    uid = path.split('/')[0]
+    url = path[len(uid):]
     pretender.exists_or_404('http', uid)
     request_info = RequestSerialiser(url, bottle.request)
     body = request_info.serialize()
