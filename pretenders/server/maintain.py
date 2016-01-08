@@ -6,7 +6,7 @@ import sys
 from pretenders.server import data
 from pretenders.client import BossClient
 
-STALE_DELETE_FREQUENCY = 5
+STALE_DELETE_FREQUENCY = 60
 
 
 def run(host, port):
