@@ -1,6 +1,5 @@
 import json
 from pretenders.client import BossClient
-from pretenders.common.constants import FOREVER
 from pretenders.common.smtp import SMTPSerialiser
 
 
@@ -10,7 +9,6 @@ class SMTPMock(BossClient):
 
     def __init__(self, host, port):
         super(SMTPMock, self).__init__(host, port)
-        self.preset.add('', times=FOREVER)
 
     @property
     def pretend_port(self):
@@ -34,4 +32,3 @@ class SMTPMock(BossClient):
 
     def reset(self):
         super(SMTPMock, self).reset()
-        self.preset.add('', times=FOREVER)

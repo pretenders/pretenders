@@ -1,6 +1,5 @@
 import bottle
 
-
 from pretenders.server.log import get_logger
 from pretenders.server.base import in_parent_process, save_pid_file
 from pretenders.server import data, pretender_app, settings
