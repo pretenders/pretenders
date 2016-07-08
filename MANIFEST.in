@@ -1,1 +1,3 @@
 include README.rst
+recursive-include pretenders/server/static *
+recursive-include pretenders/server/templates *
