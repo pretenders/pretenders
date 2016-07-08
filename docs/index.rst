@@ -25,6 +25,12 @@ Start the server to listen on all network interfaces::
 
     $ python -m pretenders.server.server --host 0.0.0.0 --port 8000
 
+
+If you prefer, you can run the pretenders server in docker::
+
+    docker run -d --name pretenders -p 8000 pretenders/pretenders:1.4
+
+
 HTTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
 

@@ -69,6 +69,14 @@ not need any specialised client. That said, we will be providing client
 libraries (at least one in Python) to simplify interacting with the server,
 and to provide a comfortable API to use in tests.
 
+Docker
+------
+
+You can run pretenders from its official docker image::
+
+    docker run -d --name pretenders -p <port> pretenders/pretenders:1.4
+
+
 Getting Help
 ------------
 
