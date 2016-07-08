@@ -15,7 +15,12 @@ setup(
     author_email='carles@barrobes.com, amcouper@gmail.com',
     url='https://github.com/pretenders/pretenders',
     packages=find_packages(),
-    install_requires=['bottle', 'argparse'],
+    install_requires=[
+        'bottle', 'argparse'
+    ],
+    extras_require = {
+        'ui':  ['jinja2']
+    },
     include_package_data=True,
     #package_data={
     #    '': ['*.txt', '*.rst'],

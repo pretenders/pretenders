@@ -18,6 +18,12 @@ Simply type::
 
     $ pip install pretenders
 
+If you want to run the UI, install like this, so that extra dependencies
+for the frontend are included::
+
+    $ pip install pretenders[ui]
+
+
 Example usage
 -------------
 
