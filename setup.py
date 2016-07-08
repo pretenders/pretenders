@@ -16,7 +16,7 @@ setup(
     url='https://github.com/pretenders/pretenders',
     packages=find_packages(),
     install_requires=['bottle', 'argparse'],
-    #include_package_data=True,
+    include_package_data=True,
     #package_data={
     #    '': ['*.txt', '*.rst'],
     #},
