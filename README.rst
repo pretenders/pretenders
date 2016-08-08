@@ -74,7 +74,7 @@ Docker
 
 You can run pretenders from its official docker image::
 
-    docker run -d --name pretenders -p <port> pretenders/pretenders:1.4
+    docker run -d --name pretenders -p <desired_port>:8000 pretenders/pretenders:1.4
 
 
 Getting Help
@@ -115,4 +115,3 @@ Running the tests
 
 ``build.sh`` runs the full suite of tests, as well as building the sphinx docs
 and checking for pep8 errors.
-
