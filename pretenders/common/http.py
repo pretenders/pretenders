@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+import sys
 from pretenders.common.exceptions import NoRequestFound
 
 
@@ -41,10 +42,16 @@ class RequestSerialiser(object):
         }
         return json.dumps(data)
 
-
 def binary_to_ascii(data):
-    return base64.b64encode(data).decode('ascii')
+    python3 = sys.version_info.major >= 3
 
+    if python3 and isinstance(data, str):
+        input_bytes = data.encode('utf8')
+    else:
+        input_bytes = data
+
+    output_bytes = base64.b64encode(input_bytes)
+    return output_bytes.decode('ascii') if python3 else output_bytes
 
 def ascii_to_binary(data):
     return base64.b64decode(data.encode('ascii'))
