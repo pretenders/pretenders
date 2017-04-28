@@ -213,10 +213,12 @@ class MatchRule(object):
             we're matching against.
         :return: True if the request is a match for headers and False if not.
         """
-        if self.headers:
-            for k, v in self.headers.items():
+        rq_headers = {k.lower(): v for k, v in headers.items()}
+        expected_headers = {k.lower(): v for k, v in self.headers.items()}
+        if expected_headers:
+            for k, v in expected_headers.items():
                 try:
-                    header = headers[k]
+                    header = rq_headers[k]
                 except KeyError:
                     return False
                 else:
