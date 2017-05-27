@@ -385,6 +385,22 @@ def test_reply_depending_on_body():
     assert_equals(response.status, 404)
 
 
+def test_body_filter_matches_anywhere_in_the_body():
+    http_mock.reset()
+    http_mock.when('POST /hello', body=u'some_post=variable').reply(b'First', times=FOREVER)
+    http_mock.when('POST /hello', body=u'other=post').reply(b'Second', times=FOREVER)
+
+    response, data = fake_client.post(url='/hello',
+            body=u'postvar1=postvalue1&some_post=variable&p3=v3')
+    assert_equals(data, b'First')
+
+    response, data = fake_client.post(url='/hello', body=u'p1=v1&other=post')
+    assert_equals(data, b'Second')
+
+    response, data = fake_client.post(url='/hello', body=u'shouldnt match')
+    assert_equals(response.status, 404)
+
+
 def test_mock_timeout_behaviour():
     timeout_fake_client = get_fake_client(http_mock, timeout=10)
 

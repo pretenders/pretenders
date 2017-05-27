@@ -233,5 +233,5 @@ class MatchRule(object):
         """
         if self.body:
             body = ascii_to_binary(body).decode()
-            return re.match(self.body, body) is not None
+            return re.search(self.body, body) is not None
         return True
