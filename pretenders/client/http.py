@@ -66,13 +66,16 @@ class HTTPMock(BossClient):
             full_host, self.pretend_access_path
         )
 
-    def when(self, rule='', headers=None, body=None):
+    def when(self, rule='', headers=None, body=None, data=None):
         """
         Set the match rule which is the first part of the Preset.
 
         :param rule: String incorporating the method and url to match
             eg "GET url/to/match"
         :param headers: An optional dictionary of headers to match.
+        :param body: Body to match (string using regex syntax).
+        :param data: Dictionary of form field names and values to match.
+            If present, overrides body parameter (if any).
 
         .. note::
 
@@ -86,7 +89,7 @@ class HTTPMock(BossClient):
             'GET /foo\?bar=1'
 
         """
-        match_rule = MatchRule(rule, headers, body)
+        match_rule = MatchRule(rule, headers, body, data)
         mock = copy(self)
         mock.rule = match_rule
         return mock
