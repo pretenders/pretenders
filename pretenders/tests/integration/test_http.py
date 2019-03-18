@@ -385,6 +385,21 @@ def test_reply_depending_on_body():
     assert_equals(response.status, 404)
 
 
+def test_reply_depending_on_data():
+    http_mock.reset()
+    http_mock.when('POST /hello', data={'one': 'first'}).reply(b'First', times=FOREVER)
+    http_mock.when('POST /hello', data={'two': 'second'}).reply(b'Second', times=FOREVER)
+
+    response, data = fake_client.post(url='/hello', body='one=first')
+    assert_equals(data, b'First')
+
+    response, data = fake_client.post(url='/hello', body='two=second')
+    assert_equals(data, b'Second')
+
+    response, data = fake_client.post(url='/hello', body=u'other=values')
+    assert_equals(response.status, 404)
+
+
 def test_mock_timeout_behaviour():
     timeout_fake_client = get_fake_client(http_mock, timeout=10)
 
