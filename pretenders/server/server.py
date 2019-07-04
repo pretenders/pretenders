@@ -6,8 +6,6 @@ from pretenders.server import data, pretender_app, settings
 from pretenders.server.maintain import launch_maintainer
 
 LOGGER = get_logger('pretenders.server.server')
-
-
 def run(host='localhost', port=8000):
     "Start the mock HTTP server"
     data.BOSS_PORT = port
@@ -19,6 +17,11 @@ def run(host='localhost', port=8000):
 
     bottle.run(app=pretender_app, host=host, port=port, reloader=True)
 
+def main(host, port, debug=False, timeout=120):
+    bottle.debug(debug)
+    settings.TIMEOUT_PRETENDER = timeout
+    LOGGER.debug('Setting pretender timeout: {0}'.format(timeout))
+    run(host, port)
 
 if __name__ == '__main__':
     import argparse
@@ -39,7 +42,4 @@ if __name__ == '__main__':
         help='timeout before deleting stale pretenders')
 
     args = parser.parse_args()
-    bottle.debug(args.debug)
-    settings.TIMEOUT_PRETENDER = args.timeout
-    LOGGER.debug('Setting pretender timeout: {0}'.format(args.timeout))
-    run(args.host, args.port)
+    main(args.host, args.port, args.debug, args.timeout)

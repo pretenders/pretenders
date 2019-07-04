@@ -36,6 +36,13 @@ If you prefer, you can run the pretenders server in docker::
 
     docker run -d --name pretenders -p 8000 pretenders/pretenders:1.4
 
+Alternatively, you can run the server programatically::
+  
+    from pretenders.server.server import main as init_pretenders
+
+    init_pretenders('localhost', 8000)
+    #Follow code below...
+
 
 HTTP mock in a test case
 ~~~~~~~~~~~~~~~~~~~~~~~~
