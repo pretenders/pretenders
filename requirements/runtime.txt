@@ -1,3 +1,3 @@
-bottle==0.12.9
+bottle==0.12.19
 argparse
 jinja2
