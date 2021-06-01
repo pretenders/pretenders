@@ -2,6 +2,7 @@ import base64
 import json
 import re
 import sys
+from urllib.parse import unquote
 from pretenders.common.exceptions import NoRequestFound
 
 
@@ -144,6 +145,7 @@ def match_rule_from_dict(data):
             data['rule'],
             data.get('headers', None),
             data.get('body', None),
+            data.get('data', None)
         )
 
     else:
@@ -155,12 +157,14 @@ class MatchRule(object):
     A matching rule against which incoming requests will be compared.
     """
 
-    def __init__(self, rule, headers=None, body=None):
+    def __init__(self, rule, headers=None, body=None, data=None):
         """
         :param rule: String incorporating the method and url to be matched
             eg "GET url/to/match"
         :param headers: Dictionary of headers to match.
-        :param headers: Body to match (string using regex syntax).
+        :param body: Body to match (string using regex syntax).
+        :param data: Dictionary of form field names and values to match.
+            If present, overrides body parameter (if any).
         """
         self.rule = rule
         if headers:
@@ -168,6 +172,7 @@ class MatchRule(object):
         else:
             self.headers = {}
         self.body = body
+        self.data = data
 
     def as_dict(self):
         """ Convert a match rule instance to a dictionary """
@@ -175,6 +180,7 @@ class MatchRule(object):
             'rule': self.rule,
             'headers': self.headers,
             'body': self.body,
+            'data': self.data
         }
 
     def __key(self):
@@ -194,11 +200,16 @@ class MatchRule(object):
             we'll attempt to match.
         :return: True if the request is a match for rule and False if not.
         """
-        return (self.rule_matches(request['rule'])
-                and ('headers' not in request
-                     or self.headers_match(request['headers']))
-                and ('body' not in request
-                     or self.body_match(request['body'])))
+        headers = {}
+
+        if 'headers' in request:
+            headers = request['headers']
+
+        return (self.rule_matches(request['rule']) and
+                (self.headers_match(headers)) and
+                ('body' not in request or
+                 (self.body_match(request['body']) and
+                  self.data_match(request['body'], headers))))
 
     def rule_matches(self, rule):
         """
@@ -242,3 +253,55 @@ class MatchRule(object):
             body = ascii_to_binary(body).decode()
             return re.match(self.body, body) is not None
         return True
+
+    def data_match(self, body, headers):
+        if self.data:
+            body = ascii_to_binary(body).decode()
+
+            if 'Content-Type' in headers:
+                match = re.search(r'\bmultipart/form-data.+boundary=(.+)',
+                                  headers['Content-Type'])
+
+                if match:
+                    return self.data_match_multipart(body, match.group(1))
+
+            return self.data_match_url_encoded(body)
+
+        return True
+
+    def data_match_multipart(self, body, boundary):
+        sections = body.split(boundary)
+        form = {}
+
+        for section in sections:
+            lines = list(filter(lambda x: len(x) > 0, section.split('\n')))
+
+            if len(lines) > 0:
+                m = re.search(r'name=["\']?(.+?)["\' ]$', lines[0])
+
+                if m:
+                    name = m.group(1)
+                    value = ''
+
+                    if len(lines) > 1:
+                        value = "\n".join(lines[1:])
+
+                    form[name] = value
+
+        return form == self.data
+
+    def data_match_url_encoded(self, body):
+        parts = body.split('&')
+        form = {}
+
+        for part in parts:
+            sides = part.split('=')
+            vari = unquote(sides[0])
+            if len(sides) > 1:
+                value = unquote(sides[1])
+            else:
+                value = ''
+
+            form[vari] = value
+
+        return form == self.data
