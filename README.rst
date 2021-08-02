@@ -115,3 +115,9 @@ Running the tests
 
 ``build.sh`` runs the full suite of tests, as well as building the sphinx docs
 and checking for pep8 errors.
+
+
+Related projects
+----------------
+
+- https://github.com/ktosiek/pytest-vcr records http request/responses & replays responses on subsequent test runs.
