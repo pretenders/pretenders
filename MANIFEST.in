@@ -1,3 +1,4 @@
 include README.rst
+include MIT-LICENCE.txt
 recursive-include pretenders/server/static *
 recursive-include pretenders/server/templates *
