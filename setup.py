@@ -16,7 +16,7 @@ setup(
     url='https://github.com/pretenders/pretenders',
     packages=find_packages(),
     install_requires=[
-        'bottle', 'argparse'
+        'bottle', 'argparse', 'aiosmtpd'
     ],
     extras_require = {
         'ui':  ['jinja2']

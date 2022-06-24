@@ -1,4 +1,5 @@
-import smtpd
+import time
+from aiosmtpd.controller import Controller
 import asyncore
 
 from pretenders.server.log import get_logger
@@ -8,29 +9,38 @@ from pretenders.server.pretender import Pretender
 
 LOGGER = get_logger('pretenders.server.mock_servers.smtp.server')
 
+class MockSMTPHandler:
 
-class MockSMTPServer(smtpd.SMTPServer, Pretender):
+    def __init__(self, pretender):
+        self.pretender = pretender
 
-    def __init__(self, host, port, **kwargs):
-        smtpd.SMTPServer.__init__(self, (host, port), None)
-        Pretender.__init__(self, host=host, port=port, **kwargs)
-        LOGGER.info("Initialised MockSMTPServer")
-
-    def process_message(self, peer, mailfrom, rcpttos, data):
+    async def handle_DATA(self, server, session, envelope):
+        print("IN handle_DATA")
+        data = envelope.content.decode('utf8', errors='replace')
         smtp_info = SMTPSerialiser(
-            peer=peer, mailfrom=mailfrom, rcpttos=rcpttos, data=data,
+            peer=session.peer, mailfrom=envelope.mail_from, rcpttos=envelope.rcpt_tos, data=data,
             rule='')
         body = smtp_info.serialize()
         LOGGER.info("Storing SMTP message: \n{0}".format(body))
-        self.store_history_retrieve_preset(body)
-        return
+        self.pretender.store_history_retrieve_preset(body)
+        return '250 Message accepted for delivery'
+
+class MockSMTPServer(Pretender):
 
     def run(self):
         "Runner for the MockSMTPServer"
-        LOGGER.info("Running SMTP mock server")
-        asyncore.loop()
-
+        LOGGER.info(f"Running SMTP mock server on {self.host} {self.port}")
+        controller = Controller(handler=MockSMTPHandler(self), hostname=self.host, port=self.port)
+        try:
+            controller.start()
+            LOGGER.info("SMTP mock server started.")
+            while 1:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            controller.stop()
+        
+    
 
 if __name__ == "__main__":
     MockSMTPServer.start()
-    LOGGER.info("SMTP mock server started")
+    

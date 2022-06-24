@@ -3,7 +3,7 @@ from nose.tools import (
 from mock import Mock
 
 from pretenders.common.constants import PRETEND_PORT_RANGE
-from pretenders.smtp.handler import SmtpHandler
+from pretenders.server.mock_servers.smtp.handler import SmtpHandler
 
 
 def test_available_ports():

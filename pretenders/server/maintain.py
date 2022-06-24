@@ -16,10 +16,13 @@ def run(host, port):
     Which regularly triggers the boss to delete stale Mock servers.
     """
     boss_client = BossClient(host, port)
-    while True:
-        time.sleep(STALE_DELETE_FREQUENCY)
-        boss_client.boss_access.http('DELETE', url='/smtp?stale=1')
-        boss_client.boss_access.http('DELETE', url='/http?stale=1')
+    try:
+        while True:
+            time.sleep(STALE_DELETE_FREQUENCY)
+            boss_client.boss_access.http('DELETE', url='/smtp?stale=1')
+            boss_client.boss_access.http('DELETE', url='/http?stale=1')
+    except KeyboardInterrupt:
+        pass
 
 
 def launch_maintainer():

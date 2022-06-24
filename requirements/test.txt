@@ -1,6 +1,6 @@
 -r runtime.txt
 
-nose
+pytest
 pep8
 Sphinx
 mock
