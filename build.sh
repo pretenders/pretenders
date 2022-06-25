@@ -13,6 +13,13 @@ sleep 2
 echo "[Pretenders] Running tests"
 nosetests -vv
 test_result=$?
+if test ! $test_result -eq 0
+then
+    echo "Tests failed. Boss output"
+    cat boss.out 
+    cat boss.err
+    echo "End of Boss Output"
+fi
 # sleep to allow for stale servers to be deleted
 echo "[Pretenders] Letting maintainer kill stale servers"
 sleep 6
