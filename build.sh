@@ -11,8 +11,9 @@ sleep 2
 
 # run tests
 echo "[Pretenders] Running tests"
-nosetests -vv
-
+# nosetests -vv -i "pretenders.common.tests.test_match_rule.test_false"
+nosetests /opt/pretenders/pretenders/common/tests/test_match_rule.py
+test_result=$?
 # sleep to allow for stale servers to be deleted
 echo "[Pretenders] Letting maintainer kill stale servers"
 sleep 6
@@ -25,3 +26,4 @@ kill -11 `cat pretenders-boss.pid`
 # PEP8 and documentation...
 pep8 --exclude=common pretenders > pep8.txt || echo "PEP8 errors"
 (cd docs; make clean html)
+exit $test_result
