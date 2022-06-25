@@ -44,9 +44,6 @@ def test_is_match_basic_is_false():
     assert_false(match_rule.matches(mock_request))
     assert_false(match_rule.rule_matches(mock_request['rule']))
 
-def test_false():
-    assert False
-    
 def test_is_match_regex():
     """ Test a matching regex """
     match_rule = MatchRule('GET /test-match/[0-9]{5}')

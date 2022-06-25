@@ -11,8 +11,7 @@ sleep 2
 
 # run tests
 echo "[Pretenders] Running tests"
-# nosetests -vv -i "pretenders.common.tests.test_match_rule.test_false"
-nosetests /opt/pretenders/pretenders/common/tests/test_match_rule.py
+nosetests -vv
 test_result=$?
 # sleep to allow for stale servers to be deleted
 echo "[Pretenders] Letting maintainer kill stale servers"
