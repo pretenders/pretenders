@@ -32,8 +32,9 @@ class Pretender(object):
         server = cls.from_command_line_args()
         try:
             server.run()
-        except socket.error:
-            LOGGER.info("QUITTING")
+        except socket.error as e:
+            LOGGER.exception("Socket error", exc_info=e)
+            LOGGER.info(f"QUITTING {server.uid} {server.__class__.__name__}")
             import sys
             sys.exit(RETURN_CODE_PORT_IN_USE)
 
