@@ -45,7 +45,9 @@ git push origin master
 git push --tags
 
 echo -e "\nUploading to PyPI..."
-python setup.py sdist bdist_wheel upload
+python setup.py sdist bdist_wheel
+twine check dist/*
+twine upload --repository pretenders dist/*
 
 echo -e "\nTriggering a build of the documentation at RTD..."
 sh ./rtdocs.sh
