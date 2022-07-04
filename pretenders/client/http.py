@@ -94,7 +94,7 @@ class HTTPMock(BossClient):
         mock.rule = match_rule
         return mock
 
-    def reply(self, body=b'', status=200, headers={}, times=1, after=0):
+    def reply(self, body=b'', status=200, headers={}, times=1, after=0, bodyfile=none):
         """
         Set the pre-canned reply for the preset.
 
@@ -102,7 +102,13 @@ class HTTPMock(BossClient):
             The http mock server will delay for ``after`` seconds before
             replying. Defaults to 0.
 
+        If there's a file to be sent as the body then load it and assign it to then
+        body.
         """
+        if bodyfile:
+            with open (bodyfile, "r") as bodysource:
+                body = bodysource.read()
+
         self.preset.add(self.rule, status, body, headers, times, after)
         return self
 
