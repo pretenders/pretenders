@@ -34,7 +34,8 @@ class MockSMTPServer(Pretender):
         try:
             controller.start()
             LOGGER.info("SMTP mock server started.")
-            while 1:
+            while True:
+                # We sleep here, because the controller runs in a separate thread
                 time.sleep(1)
         except KeyboardInterrupt:
             controller.stop()

@@ -11,4 +11,5 @@ tags
 dist/
 *.egg-info/
 docs/_build
+build/
 pep8.txt

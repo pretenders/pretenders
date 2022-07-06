@@ -22,6 +22,7 @@ setup(
         'ui':  ['jinja2']
     },
     include_package_data=True,
+    python_requires='>=3.7.0',
     #package_data={
     #    '': ['*.txt', '*.rst'],
     #},
