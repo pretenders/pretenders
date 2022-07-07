@@ -1,0 +1,37 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "develop" ]
+  pull_request:
+    branches: [ "develop" ]
+
+jobs:
+
+  test37:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run tests on python 3.7
+      run: docker build . --build-arg PYTHON=3.7 --file Dockerfile.testing --tag pretenders-test-py37:testing && docker run pretenders-test-py37:testing
+
+  test38:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run tests on python 3.8
+      run: docker build . --build-arg PYTHON=3.8 --file Dockerfile.testing --tag pretenders-test-py38:testing && docker run pretenders-test-py38:testing
+
+  test39:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run tests on python 3.9
+      run: docker build . --build-arg PYTHON=3.9 --file Dockerfile.testing --tag pretenders-test-py39:testing && docker run pretenders-test-py39:testing
+  
+  test310:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run tests on python 3.10
+      run: docker build . --build-arg PYTHON=3.10 --file Dockerfile.testing --tag pretenders-test-py310:testing && docker run pretenders-test-py310:testing

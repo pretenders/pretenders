@@ -58,7 +58,7 @@ class SmtpHandler(object):
                 sys.executable,
                 "-m",
                 "pretenders.server.mock_servers.smtp.server",
-                "-H", "localhost",
+                "-H", "127.0.0.1",
                 "-p", str(port_number),
                 "-b", str(data.BOSS_PORT),
                 "-i", str(name),
