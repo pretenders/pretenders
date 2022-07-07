@@ -3,7 +3,7 @@ from os.path import join, dirname
 import bottle
 from .middleware import ExceptionLoggingMiddleware
 
-bottle.TEMPLATE_PATH.insert(0, join(dirname(__file__), 'templates'))
+bottle.TEMPLATE_PATH.insert(0, join(dirname(__file__), "templates"))
 app = bottle.Bottle()
 app.catchall = False
 

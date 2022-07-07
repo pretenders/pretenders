@@ -19,7 +19,7 @@ from pretenders.common.constants import FOREVER
 from pretenders.common.http import Preset, match_rule_from_dict
 from pretenders.server import app
 
-LOGGER = get_logger('pretenders.server.apps.preset')
+LOGGER = get_logger("pretenders.server.apps.preset")
 PRESETS = defaultdict(OrderedDict)
 
 
@@ -81,24 +81,26 @@ def knock_off_preset(preset_dict, key):
             del preset_dict[key]
 
 
-@app.post('/preset/<uid>')
+@app.post("/preset/<uid>")
 def add_preset(uid):
     """
     Save the incoming request body as a preset response
     """
     preset = Preset(json_data=bottle.request.body.read())
     if preset.times != FOREVER and preset.times <= 0:
-        msg = ("Preset has {0} times. Must be greater than "
-               "zero.".format(preset.times).encode())
+        msg = (
+            "Preset has {0} times. Must be greater than "
+            "zero.".format(preset.times).encode()
+        )
         raise HTTPResponse(msg, status=400)
     try:
-        pretender = get_pretenders('http')[uid]
+        pretender = get_pretenders("http")[uid]
         if pretender.is_expired:
-            raise HTTPResponse("{0} mock {1} is TIMED OUT".format('http', uid),
-                               status=404)
+            raise HTTPResponse(
+                "{0} mock {1} is TIMED OUT".format("http", uid), status=404
+            )
     except KeyError:
-        raise HTTPResponse("No matching {0} mock: {1}".format('http', uid),
-                           status=404)
+        raise HTTPResponse("No matching {0} mock: {1}".format("http", uid), status=404)
 
     rule = match_rule_from_dict(preset.rule)
 
@@ -108,7 +110,7 @@ def add_preset(uid):
     url_presets.append(preset)
 
 
-@app.delete('/preset/<uid>')
+@app.delete("/preset/<uid>")
 def clear_presets(uid):
     """
     Delete all recorded presets
@@ -116,7 +118,7 @@ def clear_presets(uid):
     PRESETS[uid].clear()
 
 
-@app.get('/preset/<uid>')
+@app.get("/preset/<uid>")
 def list_presets(uid):
     presets = []
     for _, preset_list in PRESETS[uid].items():
