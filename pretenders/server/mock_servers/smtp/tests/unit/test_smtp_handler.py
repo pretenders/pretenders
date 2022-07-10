@@ -1,5 +1,4 @@
-from nose.tools import (
-    assert_equals, assert_not_equals, assert_true, assert_false)
+from nose.tools import assert_equals, assert_not_equals, assert_true, assert_false
 from mock import Mock
 
 from pretenders.common.constants import PRETEND_PORT_RANGE

@@ -17,9 +17,7 @@ def test_pretender_expired_add_preset_404():
     get a 404.
     """
 
-    http_mock = HTTPMock('localhost', 8000, timeout=0.1)
+    http_mock = HTTPMock("localhost", 8000, timeout=0.1)
     time.sleep(0.3)
-    preset = http_mock.when('POST /fred/test/one')
-    assert_raises(
-        ConfigurationError, preset.reply, b'You tested fred well', 200
-    )
+    preset = http_mock.when("POST /fred/test/one")
+    assert_raises(ConfigurationError, preset.reply, b"You tested fred well", 200)

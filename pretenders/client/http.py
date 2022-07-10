@@ -24,7 +24,7 @@ class HTTPMock(BossClient):
         assert_equal(r.url, '/hello?city=barcelona')
     """
 
-    boss_mock_type = 'http'
+    boss_mock_type = "http"
 
     def __init__(self, host, port, timeout=None, name=None):
         """
@@ -47,11 +47,11 @@ class HTTPMock(BossClient):
             will be created for the client.
         """
         super(HTTPMock, self).__init__(host, port, timeout, name)
-        self.rule = ''
+        self.rule = ""
 
     @property
     def pretend_access_path(self):
-        return self.pretender_details['path']
+        return self.pretender_details["path"]
 
     @property
     def pretend_url(self):
@@ -62,11 +62,9 @@ class HTTPMock(BossClient):
             full_host = self.host
         else:
             full_host = "{0}:{1}".format(self.host, self.port)
-        return "http://{0}{1}".format(
-            full_host, self.pretend_access_path
-        )
+        return "http://{0}{1}".format(full_host, self.pretend_access_path)
 
-    def when(self, rule='', headers=None, body=None, data=None):
+    def when(self, rule="", headers=None, body=None, data=None):
         """
         Set the match rule which is the first part of the Preset.
 
@@ -94,7 +92,7 @@ class HTTPMock(BossClient):
         mock.rule = match_rule
         return mock
 
-    def reply(self, body=b'', status=200, headers={}, times=1, after=0):
+    def reply(self, body=b"", status=200, headers={}, times=1, after=0):
         """
         Set the pre-canned reply for the preset.
 
@@ -119,7 +117,7 @@ class HTTPMock(BossClient):
                 return JsonHelper.from_http_request(historical)
             else:
                 response, json_data = self.history.list()
-                content = json_data.decode('ascii')
+                content = json_data.decode("ascii")
                 data = json.loads(content)
                 historical = []
                 for response in data:

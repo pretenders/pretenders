@@ -11,9 +11,10 @@ class SMTPSerialiser(object):
 
     It is used to serialise SMTP data as JSON data.
     """
+
     def __init__(self, **kwargs):
         self.data = kwargs
-        email = ensure_is_python_string(self.data['data'])
+        email = ensure_is_python_string(self.data["data"])
         self.message = Parser().parsestr(email)
 
     def serialize(self):
@@ -29,5 +30,5 @@ class SMTPSerialiser(object):
 
     @property
     def subject(self):
-        subj = email_lib.header.decode_header(self.message['Subject'])[0][0]
+        subj = email_lib.header.decode_header(self.message["Subject"])[0][0]
         return ensure_is_python_string(subj)

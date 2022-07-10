@@ -14,11 +14,11 @@ from pretenders.server import app, settings
 from pretenders.server.apps import history
 
 
-LOGGER = get_logger('pretenders.server.apps.pretender')
+LOGGER = get_logger("pretenders.server.apps.pretender")
 
 HANDLERS = {
-    'http': HttpHandler(),
-    'smtp': SmtpHandler(),
+    "http": HttpHandler(),
+    "smtp": SmtpHandler(),
 }
 
 
@@ -44,32 +44,31 @@ def exists_or_404(protocol, uid):
         get_pretenders(protocol)[uid]
     except KeyError:
         raise HTTPResponse(
-            "No matching {0} mock: {1}".format(protocol, uid),
-            status=404)
+            "No matching {0} mock: {1}".format(protocol, uid), status=404
+        )
 
 
-@app.get('/<protocol:re:(http|smtp)>')
+@app.get("/<protocol:re:(http|smtp)>")
 def list_pretenders(protocol):
-    response = json.dumps([
-        pretender.as_dict() for pretender in get_pretenders(protocol).values()
-    ])
+    response = json.dumps(
+        [pretender.as_dict() for pretender in get_pretenders(protocol).values()]
+    )
     return response
 
 
-@app.get('/<protocol:re:(http|smtp)>/<uid>')
+@app.get("/<protocol:re:(http|smtp)>/<uid>")
 def pretender_get(protocol, uid):
     """
     Get details for a given pretender, defined by protocol and UID
     """
-    bottle.response.content_type = 'application/json'
+    bottle.response.content_type = "application/json"
     try:
         return get_pretenders(protocol)[uid].as_json()
     except KeyError:
-        raise HTTPResponse("No matching {0} mock".format(protocol),
-                           status=404)
+        raise HTTPResponse("No matching {0} mock".format(protocol), status=404)
 
 
-@app.post('/<protocol:re:(http|smtp)>')
+@app.post("/<protocol:re:(http|smtp)>")
 def create_pretender(protocol):
     """
     Client is requesting a mock instance for the given protocol.
@@ -82,28 +81,28 @@ def create_pretender(protocol):
     protocols, new processes may be spawn and listen on different
     ports.
     """
-    post_body = bottle.request.body.read().decode('ascii')
+    post_body = bottle.request.body.read().decode("ascii")
     body_data = json.loads(post_body)
-    name = body_data.get('name') or str(uuid4())
+    name = body_data.get("name") or str(uuid4())
 
-    timeout = body_data.get('pretender_timeout', settings.TIMEOUT_PRETENDER)
+    timeout = body_data.get("pretender_timeout", settings.TIMEOUT_PRETENDER)
 
-    LOGGER.info("Creating {0} pretender access point at {1} {2}"
-                .format(protocol, name, timeout))
+    LOGGER.info(
+        "Creating {0} pretender access point at {1} {2}".format(protocol, name, timeout)
+    )
 
     return HANDLERS[protocol].get_or_create_pretender(name, timeout)
 
 
-@app.delete('/<protocol:re:(http|smtp)>/<uid>')
+@app.delete("/<protocol:re:(http|smtp)>/<uid>")
 def delete_mock(protocol, uid):
     "Delete http mock servers"
-    LOGGER.info("Performing delete on {0} pretender {1}"
-                .format(protocol, uid))
+    LOGGER.info("Performing delete on {0} pretender {1}".format(protocol, uid))
     HANDLERS[protocol].delete_pretender(uid)
     history.clear_history(uid)
 
 
-@app.delete('/<protocol:re:(http|smtp)>')
+@app.delete("/<protocol:re:(http|smtp)>")
 def pretender_delete(protocol):
     """
     Delete pretenders with filters
@@ -113,7 +112,7 @@ def pretender_delete(protocol):
     creation.
     """
     LOGGER.debug("Got DELETE request: {0}".format(bottle.request.GET))
-    if bottle.request.GET.get('stale'):
+    if bottle.request.GET.get("stale"):
         LOGGER.debug("Got request to delete stale pretenders")
         # Delete all stale requests
         now = datetime.datetime.now()

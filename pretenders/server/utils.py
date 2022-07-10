@@ -3,7 +3,7 @@ import bottle
 from pretenders.server.log import get_logger
 from pretenders.common.constants import REQUEST_ONLY_HEADERS
 
-LOGGER = get_logger('pretenders.server.utils')
+LOGGER = get_logger("pretenders.server.utils")
 
 
 def acceptable_response_header(header):

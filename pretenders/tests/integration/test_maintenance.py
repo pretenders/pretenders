@@ -9,10 +9,10 @@ from . import get_fake_client
 
 
 def test_clear_down_of_stale_mock_servers_taking_place():
-    #Test that stale mock servers are cleared out
+    # Test that stale mock servers are cleared out
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-    http_mock = HTTPMock('localhost', 8000, timeout=5)
+    http_mock = HTTPMock("localhost", 8000, timeout=5)
     pretender = http_mock.get_pretender()
 
     assert_equal(http_mock.pretend_access_point_id, pretender.name)
@@ -30,7 +30,7 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
     # recently made a request.
     # TODO: Once the timeout specification can be dictated by the client
     # the sleep in this test can be reduced.
-    http_mock = HTTPMock('localhost', 8000, timeout=5)
+    http_mock = HTTPMock("localhost", 8000, timeout=5)
     pretender = http_mock.get_pretender()
 
     timeout_server = pretender.timeout.seconds
@@ -52,13 +52,13 @@ def test_clear_down_only_happens_if_no_request_for_timeout_period():
 def test_clear_down_removes_history():
     # Test that when we clear down a pretender, the history is removed.
     # Otherwise we end up slowly creeping up the memory usage!
-    http_mock = HTTPMock('localhost', 8000, timeout=5)
+    http_mock = HTTPMock("localhost", 8000, timeout=5)
     pretender = http_mock.get_pretender()
     pretender_client = get_fake_client(http_mock)
 
     pretender_client.get(url="/some_url")
 
-    assert_equal(http_mock.get_request(0).url, '/some_url')
+    assert_equal(http_mock.get_request(0).url, "/some_url")
 
     time.sleep(STALE_DELETE_FREQUENCY + pretender.timeout.seconds + 1)
     assert_raises(ResourceNotFound, http_mock.get_pretender)
@@ -70,6 +70,5 @@ def test_clear_down_removes_history():
 def test_can_create_a_forever_mock():
     # Just test that we can actually create one of these chaps.
     # We won't actually check if it is still around in an eternity.
-    mock = HTTPMock('localhost', 8000, timeout=FOREVER)
+    mock = HTTPMock("localhost", 8000, timeout=FOREVER)
     assert_equal(FOREVER, mock.get_pretender().timeout)
-

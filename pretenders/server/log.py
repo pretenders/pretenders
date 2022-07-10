@@ -1,4 +1,5 @@
 import logging
+
 try:
     from logging.config import dictConfig
 except ImportError:

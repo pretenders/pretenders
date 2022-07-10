@@ -9,9 +9,11 @@ from zope.interface import implements
 
 log.startLogging(sys.stderr)
 
-publicKey = ('ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPr'
-             'J3/c9k2I/Az64fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTw'
-             'TTYLh5KmRpslkYHRivcJSkbh/C+BR3utDS555mV')
+publicKey = (
+    "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAGEArzJx8OYOnJmzf4tfBEvLi8DVPr"
+    "J3/c9k2I/Az64fxjHf9imyRJbixtQhlH9lfNjUIx+4LmrJH5QNRsFporcHDKOTw"
+    "TTYLh5KmRpslkYHRivcJSkbh/C+BR3utDS555mV"
+)
 
 privateKey = """-----BEGIN RSA PRIVATE KEY-----
 MIIByAIBAAJhAK8ycfDmDpyZs3+LXwRLy4vA1T6yd/3PZNiPwM+uH8Yx3/YpskSW
@@ -32,7 +34,7 @@ recorded = []
 
 class PatchedSSHSession(session.SSHSession):
     def loseConnection(self):
-        if getattr(self.client, 'transport', None) is not None:
+        if getattr(self.client, "transport", None) is not None:
             self.client.transport.loseConnection()
         channel.SSHChannel.loseConnection(self)
 
@@ -43,7 +45,7 @@ class PretendAvatar(avatar.ConchUser):
     def __init__(self, username):
         avatar.ConchUser.__init__(self)
         self.username = username
-        self.channelLookup.update({'session': PatchedSSHSession})
+        self.channelLookup.update({"session": PatchedSSHSession})
 
     def openShell(self, protocol):
         raise NotImplementedError("Interactive shell not supported")
@@ -54,8 +56,8 @@ class PretendAvatar(avatar.ConchUser):
     def execCommand(self, protocol, cmd):
         print("Command: [{0}]".format(cmd))
         recorded.append(cmd)
-        command = ('/bin/bash', '-c', 'echo "<dummy response>"')
-        reactor.spawnProcess(protocol, '/bin/bash', command)
+        command = ("/bin/bash", "-c", 'echo "<dummy response>"')
+        reactor.spawnProcess(protocol, "/bin/bash", command)
 
     def eofReceived(self):
         pass
@@ -78,8 +80,9 @@ class RecordPassAllCredentials:
     """
     Simply record credentials and pass.
     """
+
     implements(checkers.ICredentialsChecker)
-    credentialInterfaces = credentials.IUsernamePassword,
+    credentialInterfaces = (credentials.IUsernamePassword,)
     users = []
 
     def requestAvatarId(self, credentials):
@@ -89,7 +92,7 @@ class RecordPassAllCredentials:
         return defer.succeed(user)
 
 
-def run(host='127.0.0.1', port=2222):
+def run(host="127.0.0.1", port=2222):
     """
     Run a pretend SSH server.
     """
@@ -97,12 +100,8 @@ def run(host='127.0.0.1', port=2222):
     sshFactory.portal = portal.Portal(PretendRealm())
     sshFactory.portal.registerChecker(RecordPassAllCredentials())
 
-    sshFactory.publicKeys = {
-        'ssh-rsa': keys.Key.fromString(data=publicKey)
-    }
-    sshFactory.privateKeys = {
-        'ssh-rsa': keys.Key.fromString(data=privateKey)
-    }
+    sshFactory.publicKeys = {"ssh-rsa": keys.Key.fromString(data=publicKey)}
+    sshFactory.privateKeys = {"ssh-rsa": keys.Key.fromString(data=privateKey)}
 
     reactor.listenTCP(port, sshFactory, interface=host)
     reactor.run()
