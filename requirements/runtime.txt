@@ -1,4 +1,4 @@
 bottle==0.12.20
-aiosmtpd==1.4.2
+aiosmtpd==1.4.5
 argparse
 jinja2
