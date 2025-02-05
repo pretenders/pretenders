@@ -1,4 +1,4 @@
-FROM alpine:3.4
+FROM alpine:3.21.2
 
 WORKDIR /opt/pretenders
 ENV PYTHONPATH=/opt/pretenders
