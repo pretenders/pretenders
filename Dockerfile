@@ -1,16 +1,13 @@
-FROM alpine:3.21.2
+FROM python:3.8-alpine
 
 WORKDIR /opt/pretenders
 ENV PYTHONPATH=/opt/pretenders
 EXPOSE 8000
 
+RUN apk add bash
 COPY requirements/ requirements/
 
-RUN apk --no-cache add \
-        bash \
-        python3 \
-    && \
-    pip3 install -r /opt/pretenders/requirements/runtime.txt
+RUN pip3 install -r /opt/pretenders/requirements/runtime.txt
 
 COPY pretenders/ pretenders/
 
