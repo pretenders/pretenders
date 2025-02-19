@@ -20,7 +20,7 @@ if [ "$1" == "" ]
 then
     echo "Usage: $0 [-t] version"
     echo "    -t  run in test mode, i.e. not updating anything"
-    exit -1
+    exit 1
 fi
 
 echo "I assume you ran your tests all right..."
@@ -51,5 +51,9 @@ twine upload --repository pretenders dist/*
 
 echo -e "\nTriggering a build of the documentation at RTD..."
 sh ./rtdocs.sh
+
+echo -e "\nDockerimage"
+docker build -t pretenders/pretenders:$VERSION .
+docker push pretenders/pretenders:$VERSION
 
 echo -e "\nDone! Wasn't it nice and easy? :)"
