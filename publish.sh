@@ -40,7 +40,7 @@ git add $FILE
 git commit -m "Bumped version number to $VERSION" || echo "No changes to commit"
 
 echo -e "\nTagging and pushing to Github..."
-git tag $VERSION
+git tag $VERSION || echo "Tag already exists"
 git push origin master
 git push --tags
 
