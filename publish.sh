@@ -37,7 +37,7 @@ __version__ = '$VERSION'
 EOF
 
 git add $FILE
-git commit -m "Bumped version number to $VERSION"
+git commit -m "Bumped version number to $VERSION" || echo "No changes to commit"
 
 echo -e "\nTagging and pushing to Github..."
 git tag $VERSION
